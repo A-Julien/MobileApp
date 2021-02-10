@@ -5,7 +5,7 @@ import {LoginGuard} from './guards/login.guard';
 const routes: Routes = [
   {
     path: 'home',
-    canLoad: [LoginGuard],
+    canActivate: [LoginGuard],
     loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule)
   },
   {

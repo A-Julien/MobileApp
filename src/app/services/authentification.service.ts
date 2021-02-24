@@ -23,6 +23,7 @@ export class AuthenticationService {
         .createUserWithEmailAndPassword(email, password)
         .then(res => {
           console.log('Successfully signed up!', res);
+          res.user.sendEmailVerification();
           this.router.navigate(['/login']);
         })
         .catch(error => {
@@ -35,9 +36,13 @@ export class AuthenticationService {
     this.angularFireAuth
         .signInWithEmailAndPassword(email, password)
         .then(res => {
-          console.log('Successfully signed in!');
-          this.user = res;
-          this.router.navigate(['/home']);
+          if (res.user.emailVerified) {
+              console.log('Successfully signed in!');
+              this.user = res;
+              this.router.navigate(['/home']);
+          } else {
+              console.log('Email not verified');
+          }
         })
         .catch(err => {
           console.log('Something is wrong:', err.message);

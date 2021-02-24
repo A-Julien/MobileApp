@@ -3,6 +3,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import firebase from 'firebase';
 import {redirectLoggedInTo} from '@angular/fire/auth-guard';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class AuthenticationService {
   userData: Observable<firebase.User>;
   user = null;
 
-  constructor(private angularFireAuth: AngularFireAuth) {
+  constructor(private angularFireAuth: AngularFireAuth, private router: Router) {
     this.userData = angularFireAuth.authState;
   }
 
@@ -35,6 +36,7 @@ export class AuthenticationService {
         .then(res => {
           console.log('Successfully signed in!');
           this.user = res;
+          this.router.navigate(['/home']);
         })
         .catch(err => {
           console.log('Something is wrong:', err.message);

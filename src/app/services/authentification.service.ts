@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import firebase from 'firebase';
 import {redirectLoggedInTo} from '@angular/fire/auth-guard';
 import {Router} from '@angular/router';
+import {AlertController} from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,9 @@ export class AuthenticationService {
   userData: Observable<firebase.User>;
   user = null;
 
-  constructor(private angularFireAuth: AngularFireAuth, private router: Router) {
+  constructor(private angularFireAuth: AngularFireAuth,
+              private router: Router,
+              public alertController: AlertController) {
     this.userData = angularFireAuth.authState;
   }
 
@@ -23,11 +26,13 @@ export class AuthenticationService {
         .createUserWithEmailAndPassword(email, password)
         .then(res => {
           console.log('Successfully signed up!', res);
+          this.presentAlert( 'Successfully signed up!' );
           res.user.sendEmailVerification();
           this.router.navigate(['/login']);
         })
         .catch(error => {
-          console.log('Something is wrong:', error.message);
+            this.presentAlert( 'Something is wrong:' + error.message);
+            console.log('Something is wrong:', error.message);
         });
   }
 
@@ -38,14 +43,17 @@ export class AuthenticationService {
         .then(res => {
           if (res.user.emailVerified) {
               console.log('Successfully signed in!');
+              this.presentAlert( 'Successfully signed in!' );
               this.user = res;
               this.router.navigate(['/home']);
           } else {
-              console.log('Email not verified');
+                this.presentAlert( 'Failed to sign in, email is not verified');
+                console.log('Email not verified');
           }
         })
         .catch(err => {
-          console.log('Something is wrong:', err.message);
+            this.presentAlert( 'Failed to sign in, email or password does not exist');
+            console.log('Something is wrong:', err.message);
         });
   }
 
@@ -60,9 +68,11 @@ export class AuthenticationService {
           .sendPasswordResetEmail(email)
           .then(res => {
               console.log('Email sent');
+              this.presentAlert( 'Email sent to ' + email);
               this.router.navigate(['/login']);
           })
           .catch(err => {
+              this.presentAlert( 'Email not found' + err.message);
               console.log('Something is wrong:', err.message);
           });
   }
@@ -71,5 +81,17 @@ export class AuthenticationService {
     console.log(this.user);
     return this.user != null;
   }
+
+    private async presentAlert(msg: string) {
+        const alert = await this.alertController.create({
+            cssClass: 'my-custom-class',
+            header: 'Alert',
+            // subHeader: 'Subtitle',
+            message: msg,
+            // buttons: ['OK']
+        });
+
+        await alert.present();
+    }
 
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthenticationService} from '../../services/authentification.service';
 
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -22,5 +23,9 @@ export class LoginPage implements OnInit {
 
   signIn() {
     this.authService.SignIn(this.loginForm.get('login').value, this.loginForm.get('password').value);
+  }
+
+  signInGoogle() {
+    this.authService.signInWithGoogle();
   }
 }

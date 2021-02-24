@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import firebase from 'firebase';
-import {redirectLoggedInTo} from '@angular/fire/auth-guard';
 import {Router} from '@angular/router';
 import {AlertController} from '@ionic/angular';
+import {Plugins} from '@capacitor/core';
+import '@codetrix-studio/capacitor-google-auth';
 
 @Injectable({
   providedIn: 'root'
@@ -92,6 +93,23 @@ export class AuthenticationService {
         });
 
         await alert.present();
+    }
+
+    async signInWithGoogle() {
+        const googleUser = await Plugins.GoogleAuth.signIn() as any;
+        const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
+        this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
+            .then(res => {
+                this.user = res;
+                this.presentAlert( 'Successfully signed in!' );
+                this.router.navigate(['/home']);
+            })
+            .catch(err => {
+                this.presentAlert( 'Failed to sign in via Google');
+                console.log('Something is wrong:', err.message);
+            });
+
+
     }
 
 }

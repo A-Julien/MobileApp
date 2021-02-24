@@ -1,9 +1,23 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>register</ion-title>
+    <ion-title>Sign Up</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <form [formGroup]="loginForm" (ngSubmit)="signUp()" novalidate>
+    <ion-item lines="full">
+      <ion-label position="floating">Login</ion-label>
+      <ion-input type="text" name="login" formControlName="login" required></ion-input>
+    </ion-item>
+    <ion-item lines="full">
+      <ion-label position="floating">Password</ion-label>
+      <ion-input type="text" name="password" formControlName="password" required></ion-input>
+    </ion-item>
+    <ion-row>
+      <ion-col>
+        <ion-button [disabled]="loginForm.invalid" type="submit" color="primary" expand="block">Sign Up</ion-button>
+      </ion-col>
+    </ion-row>
+  </form>
 </ion-content>

@@ -23,6 +23,7 @@ export class AuthenticationService {
         .createUserWithEmailAndPassword(email, password)
         .then(res => {
           console.log('Successfully signed up!', res);
+          this.router.navigate(['/login']);
         })
         .catch(error => {
           console.log('Something is wrong:', error.message);

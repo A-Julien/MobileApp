@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
@@ -9,12 +9,13 @@ import { PasswordRecoveryPageRoutingModule } from './password-recovery-routing.m
 import { PasswordRecoveryPage } from './password-recovery.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    PasswordRecoveryPageRoutingModule
-  ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        PasswordRecoveryPageRoutingModule,
+        ReactiveFormsModule
+    ],
   declarations: [PasswordRecoveryPage]
 })
 export class PasswordRecoveryPageModule {}

@@ -55,6 +55,18 @@ export class AuthenticationService {
         .signOut();
   }
 
+  PasswordRecovery(email: string) {
+      this.angularFireAuth
+          .sendPasswordResetEmail(email)
+          .then(res => {
+              console.log('Email sent');
+              this.router.navigate(['/login']);
+          })
+          .catch(err => {
+              console.log('Something is wrong:', err.message);
+          });
+  }
+
   isLoggedIn(): boolean {
     console.log(this.user);
     return this.user != null;

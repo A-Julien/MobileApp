@@ -24,8 +24,4 @@ export class LoginPage implements OnInit {
   signIn() {
     this.authService.SignIn(this.loginForm.get('login').value, this.loginForm.get('password').value);
   }
-
-  signInGoogle() {
-    this.authService.signInWithGoogle();
-  }
 }

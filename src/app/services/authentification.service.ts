@@ -3,7 +3,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import firebase from 'firebase';
 import {Router} from '@angular/router';
-import {AlertController} from '@ionic/angular';
+import {AlertController, ToastController} from '@ionic/angular';
 import {Plugins} from '@capacitor/core';
 import '@codetrix-studio/capacitor-google-auth';
 
@@ -17,7 +17,8 @@ export class AuthenticationService {
 
   constructor(private angularFireAuth: AngularFireAuth,
               private router: Router,
-              public alertController: AlertController) {
+              public alertController: AlertController,
+              private toastController: ToastController) {
     this.userData = angularFireAuth.authState;
   }
 
@@ -27,7 +28,7 @@ export class AuthenticationService {
         .createUserWithEmailAndPassword(email, password)
         .then(res => {
           console.log('Successfully signed up!', res);
-          this.presentAlert( 'Successfully signed up!' );
+          this.presentAlert( 'Successfully signed up! Check your mail box' );
           res.user.sendEmailVerification();
           this.router.navigate(['/login']);
         })
@@ -44,7 +45,7 @@ export class AuthenticationService {
         .then(res => {
           if (res.user.emailVerified) {
               console.log('Successfully signed in!');
-              this.presentAlert( 'Successfully signed in!' );
+              this.presentToast( 'Successfully signed in!' );
               this.user = res;
               this.router.navigate(['/home']);
           } else {
@@ -89,10 +90,18 @@ export class AuthenticationService {
             header: 'Alert',
             // subHeader: 'Subtitle',
             message: msg,
-            // buttons: ['OK']
+            buttons: ['OK']
         });
 
         await alert.present();
+    }
+
+    async presentToast(msg: string) {
+        const toast = await this.toastController.create({
+            message: msg,
+            duration: 2000
+        });
+        toast.present();
     }
 
     async signInWithGoogle() {
@@ -101,15 +110,13 @@ export class AuthenticationService {
         this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res;
-                this.presentAlert( 'Successfully signed in!' );
+                this.presentToast( 'Successfully signed in!' );
                 this.router.navigate(['/home']);
             })
             .catch(err => {
                 this.presentAlert( 'Failed to sign in via Google');
                 console.log('Something is wrong:', err.message);
             });
-
-
     }
 
 }

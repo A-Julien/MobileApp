@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'loginRegister',
     pathMatch: 'full'
   },
   {
@@ -24,6 +24,10 @@ const routes: Routes = [
   {
     path: 'login',
     loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
+  },
+  {
+    path: 'loginRegister',
+    loadChildren: () => import('./pages/login-register/login-register.module').then( m => m.LoginRegisterPageModule)
   },
   {
     path: 'register',

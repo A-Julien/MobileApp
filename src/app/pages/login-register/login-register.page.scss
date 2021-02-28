@@ -38,3 +38,21 @@
   text-align: center;
   padding-bottom: 10px;
 }
+
+ion-grid{
+  height: 100%;
+}
+ion-row{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.vcenter{
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}

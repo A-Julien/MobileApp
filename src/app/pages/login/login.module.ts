@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { LoginPageRoutingModule } from './login-routing.module';
 
 import { LoginPage } from './login.page';
+import {ShowHidePasswordPageModule} from '../show-hide-password/show-hide-password.module';
 
 @NgModule({
     imports: [
@@ -14,8 +15,9 @@ import { LoginPage } from './login.page';
         FormsModule,
         IonicModule,
         LoginPageRoutingModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        ShowHidePasswordPageModule
     ],
-  declarations: [LoginPage]
+    declarations: [LoginPage]
 })
 export class LoginPageModule {}

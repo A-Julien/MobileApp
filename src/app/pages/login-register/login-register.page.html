@@ -1,0 +1,34 @@
+<!--suppress BuyFluidPluginNoteInspection -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Welcome
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="auth-form"  >
+  <ion-grid>
+    <ion-row>
+      <ion-col align-self-center>
+        <ion-button [routerLink]="['/register']" expand="block" color="dark">Register</ion-button>
+
+        <span class="divider line one-line">or</span>
+
+        <span class="already">Already a user?</span>
+
+        <ion-button [routerLink]="['/login']" expand="block" color="danger">Sign In</ion-button>
+
+        <span class="divider line one-line">or</span>
+
+        <span class="already">Sign in with Google</span>
+
+        <ion-button type="submit" color="primary" expand="block" (click)="signInGoogle()">
+          Sign In with Google
+          <ion-icon slot="end" name="logo-google"></ion-icon>
+        </ion-button>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

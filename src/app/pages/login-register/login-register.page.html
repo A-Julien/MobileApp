@@ -10,7 +10,7 @@
 <ion-content class="auth-form"  >
   <ion-grid>
     <ion-row>
-      <ion-col align-self-center>
+      <ion-col size="12">
         <ion-button [routerLink]="['/register']" expand="block" color="dark">Register</ion-button>
 
         <span class="divider line one-line">or</span>
@@ -21,12 +21,25 @@
 
         <span class="divider line one-line">or</span>
 
-        <span class="already">Sign in with Google</span>
+        <span class="already">Sign with social :</span>
 
-        <ion-button type="submit" color="primary" expand="block" (click)="signInGoogle()">
-          Sign In with Google
-          <ion-icon slot="end" name="logo-google"></ion-icon>
-        </ion-button>
+        <ion-row class="col positive-bg stable">
+          <ion-col size="5">
+          <ion-button type="submit" color="primary" expand="block" (click)="signInGoogle()">
+            <!--Sign In with Google-->
+            Google
+            <ion-icon slot="end" name="logo-google"></ion-icon>
+          </ion-button>
+          </ion-col>
+          <ion-col size="2"><span class="divider">or</span></ion-col>
+          <ion-col size="5">
+            <ion-button type="submit" color="primary" expand="block" (click)="signInFacebook()">
+              <!--Sign In with FaceBook-->
+              Facebook
+              <ion-icon slot="end" name="logo-facebook"></ion-icon>
+            </ion-button>
+          </ion-col>
+        </ion-row>
 
       </ion-col>
     </ion-row>

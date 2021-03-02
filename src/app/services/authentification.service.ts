@@ -2,24 +2,31 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import firebase from 'firebase';
-import {Router} from '@angular/router';
+import {NavigationExtras, Router} from '@angular/router';
 import {AlertController, ToastController} from '@ionic/angular';
-import {Plugins} from '@capacitor/core';
+import {Plugins, registerWebPlugin} from '@capacitor/core';
 import '@codetrix-studio/capacitor-google-auth';
+import {FacebookLogin, FacebookLoginPlugin} from '@capacitor-community/facebook-login';
+import {HttpClient} from '@angular/common/http';
+registerWebPlugin(FacebookLogin);
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class AuthenticationService {
-  userData: Observable<firebase.User>;
-  user = null;
+  private userData: Observable<firebase.User>;
+  private user = null;
+  private token = null;
+  private fbLogin: FacebookLoginPlugin;
 
   constructor(private angularFireAuth: AngularFireAuth,
               private router: Router,
               public alertController: AlertController,
+              private http: HttpClient,
               private toastController: ToastController) {
     this.userData = angularFireAuth.authState;
+    this.fbLogin = FacebookLogin;
   }
 
   /* Sign up */
@@ -103,6 +110,66 @@ export class AuthenticationService {
         });
         toast.present();
     }
+
+    async signInWithFacebook() {
+        const FACEBOOK_PERMISSIONS = ['email', 'user_birthday'];
+        const result = await this.fbLogin.login({ permissions: FACEBOOK_PERMISSIONS });
+
+        if (result.accessToken && result.accessToken.userId) {
+            this.token = result.accessToken;
+            this.loadUserData();
+        } else if (result.accessToken && !result.accessToken.userId) {
+            // Web only gets the token but not the user ID
+            // Directly call get token to retrieve it now
+            this.getCurrentToken();
+        } else {
+            this.presentAlert('Facebook Login Failed');
+        }
+    }
+
+    async getCurrentToken() {
+        const result = await this.fbLogin.getCurrentAccessToken();
+
+        if (result.accessToken) {
+            this.token = result.accessToken;
+            this.loadUserData();
+        } else {
+            // Not logged in.
+        }
+    }
+
+    async loadUserData() {
+        const url = `https://graph.facebook.com/${this.token.userId}?fields=id,name,picture.width(720),birthday,email&access_token=${this.token.token}`;
+        this.user = await this.http.get(url);
+        if (this.user === null){
+            await this.presentAlert('Facebook Login Failed');
+            return;
+        }
+        await this.presentToast('login success');
+        this.router.navigate(['/home']);
+  }
+
+    async FbLogout() {
+        await this.fbLogin.logout();
+        this.user = null;
+        this.token = null;
+    }
+
+    /*async signInWithFacebook() {
+        const FACEBOOK_PERMISSIONS = ['public_profile', 'email'];
+        const result = await Plugins.FacebookLogin.login({ permissions: FACEBOOK_PERMISSIONS });
+        if (result && result.accessToken) {
+            const user = { token: result.accessToken.token, userId: result.accessToken.userId };
+            const navigationExtras: NavigationExtras = {
+                queryParams: {
+                    userinfo: JSON.stringify(user)
+                }
+            };
+            this.router.navigate(['/home'], navigationExtras);
+        }else {
+            console.log('failed');
+        }
+    }*/
 
     async signInWithGoogle() {
         const googleUser = await Plugins.GoogleAuth.signIn() as any;

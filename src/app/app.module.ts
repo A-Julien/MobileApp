@@ -5,7 +5,7 @@ import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
-
+import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { CreateListComponent } from './modals/create-list/create-list.component';
@@ -15,7 +15,7 @@ import {AngularFireModule} from '@angular/fire';
 import { AngularFireAnalyticsModule} from '@angular/fire/analytics';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
-
+import { Facebook } from '@ionic-native/facebook';
 
 @NgModule({
   declarations: [AppComponent, CreateListComponent, CreateTodoComponent],
@@ -27,7 +27,8 @@ import { environment } from '../environments/environment';
       ReactiveFormsModule,
       AngularFireModule.initializeApp(environment.firebaseConfig),
       AngularFireAnalyticsModule,
-      AngularFirestoreModule
+      AngularFirestoreModule,
+      HttpClientModule
   ],
   providers: [
     StatusBar,

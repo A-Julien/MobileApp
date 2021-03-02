@@ -17,6 +17,6 @@ export class LoginRegisterPage implements OnInit {
   }
 
   signInGoogle() {
-    this.authService.signInWithGoogle();
+    this.authService.signInWithFacebook();
   }
 }

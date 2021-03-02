@@ -15,6 +15,8 @@ public class MainActivity extends BridgeActivity {
 
     // Initializes the Bridge
     this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
+    add(com.getcapacitor.community.facebooklogin.FacebookLogin.class);
+
       // Additional plugins you've installed go here
       // Ex: add(TotallyAwesomePlugin.class);
     add(GoogleAuth.class)

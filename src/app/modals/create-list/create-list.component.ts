@@ -24,8 +24,8 @@ export class CreateListComponent implements OnInit {
     });
   }
 
-  dismissModal() {
-    this.modalController.dismiss();
+  async dismissModal() {
+    await this.modalController.dismiss();
   }
 
   createNewList(){

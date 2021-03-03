@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import {List} from '../../models/list';
-import {ListService} from '../../services/list.service';
+import {ListDB, ListService} from '../../services/list.service';
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-home',
@@ -11,9 +12,10 @@ import {ListService} from '../../services/list.service';
 })
 export class HomePage {
 
-  lists: List[];
+  lists: Observable<ListDB[]>;
+
   constructor(private listService: ListService, public modalController: ModalController) {
-    this.lists = listService.getAll();
+    this.lists = this.listService.getAllDB();
   }
 
   async presentModal() {
@@ -24,7 +26,7 @@ export class HomePage {
     return await modal.present();
   }
 
-  delete(list: List): void {
-    this.listService.deleteList(list);
+  delete(listId: string, listName: string): void {
+    this.listService.deleteList(listId, listName);
   }
 }

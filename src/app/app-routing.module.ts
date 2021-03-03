@@ -15,10 +15,12 @@ const routes: Routes = [
   },
   {
     path: 'list-details/:listId',
+    canActivate: [LoginGuard],
     loadChildren: () => import('./pages/list-details/list-details.module').then( m => m.ListDetailsPageModule)
   },
   {
     path: 'list-details/:listId/todo-details/:todoId',
+    canActivate: [LoginGuard],
     loadChildren: () => import('./pages/todo-details/todo-details.module').then( m => m.TodoDetailsPageModule)
   },
   {

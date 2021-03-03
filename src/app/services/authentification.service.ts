@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import firebase from 'firebase';
-import {NavigationExtras, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {AlertController, ToastController} from '@ionic/angular';
 import {Plugins, registerWebPlugin} from '@capacitor/core';
 import '@codetrix-studio/capacitor-google-auth';
 import {FacebookLogin, FacebookLoginPlugin} from '@capacitor-community/facebook-login';
 import {HttpClient} from '@angular/common/http';
+
 registerWebPlugin(FacebookLogin);
 
 @Injectable({
@@ -51,9 +52,10 @@ export class AuthenticationService {
         .signInWithEmailAndPassword(email, password)
         .then(res => {
           if (res.user.emailVerified) {
+              this.user = res.user.uid;
+              console.log(this.user);
               console.log('Successfully signed in!');
               this.presentToast( 'Successfully signed in!' );
-              this.user = res;
               this.router.navigate(['/home']);
           } else {
                 this.presentAlert( 'Failed to sign in, email is not verified');
@@ -119,8 +121,6 @@ export class AuthenticationService {
             this.token = result.accessToken;
             this.loadUserData();
         } else if (result.accessToken && !result.accessToken.userId) {
-            // Web only gets the token but not the user ID
-            // Directly call get token to retrieve it now
             this.getCurrentToken();
         } else {
             this.presentAlert('Facebook Login Failed');
@@ -129,7 +129,6 @@ export class AuthenticationService {
 
     async getCurrentToken() {
         const result = await this.fbLogin.getCurrentAccessToken();
-
         if (result.accessToken) {
             this.token = result.accessToken;
             this.loadUserData();
@@ -155,21 +154,9 @@ export class AuthenticationService {
         this.token = null;
     }
 
-    /*async signInWithFacebook() {
-        const FACEBOOK_PERMISSIONS = ['public_profile', 'email'];
-        const result = await Plugins.FacebookLogin.login({ permissions: FACEBOOK_PERMISSIONS });
-        if (result && result.accessToken) {
-            const user = { token: result.accessToken.token, userId: result.accessToken.userId };
-            const navigationExtras: NavigationExtras = {
-                queryParams: {
-                    userinfo: JSON.stringify(user)
-                }
-            };
-            this.router.navigate(['/home'], navigationExtras);
-        }else {
-            console.log('failed');
-        }
-    }*/
+    public getUserId() {
+        return this.user;
+    }
 
     async signInWithGoogle() {
         const googleUser = await Plugins.GoogleAuth.signIn() as any;

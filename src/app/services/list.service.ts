@@ -15,18 +15,21 @@ export interface TodoDB {
   isDone: boolean;
 }
 
-export interface ListDB {
-  name: string;
-  userID: string;
+export interface ListDB extends ListDBtoPush {
+  id: string;
   todos: TodoDB[];
 }
 
+export interface ListDBtoPush  {
+  name: string;
+  userID: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ListService {
-  private listCollection: AngularFirestoreCollection<ListDB>;
+  private listCollection: AngularFirestoreCollection<ListDBtoPush>;
   private lists: List[];
 
   constructor(private fireStore: AngularFirestore,
@@ -38,7 +41,7 @@ export class ListService {
 
    getAllDB(): Observable<ListDB[]> {
     return this.listCollection.snapshotChanges().pipe(
-        map(data => this.convertSnapData<ListDB>(data))
+        map(data => this.convertSnapData<ListDBtoPush>(data))
     );
   }
 
@@ -80,7 +83,7 @@ export class ListService {
   }
 
   public create(list: List): void {
-    const l: ListDB = {name : list.name, userID : this.authService.getUserId()};
+    const l: ListDBtoPush = { name : list.name, userID : this.authService.getUserId()};
     this.lists.push(new List(name));
     this.listCollection.add(l);
     /*this.userDoc.set({

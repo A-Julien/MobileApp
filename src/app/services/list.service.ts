@@ -9,6 +9,10 @@ import {ToastController} from '@ionic/angular';
 import firebase from 'firebase';
 import database = firebase.database;
 
+export interface TodoDbId extends TodoDB{
+  id: string;
+}
+
 export interface TodoDB {
   name: string;
   content: string;
@@ -17,7 +21,7 @@ export interface TodoDB {
 
 export interface ListDB extends ListDBtoPush {
   id: string;
-  todos: TodoDB[];
+  todos: TodoDbId[];
 }
 
 export interface ListDBtoPush  {
@@ -62,20 +66,20 @@ export class ListService {
         .pipe(switchMap(list =>
           this.listCollection.doc(id).collection<TodoDB>('todos').snapshotChanges().pipe(
               map(data => {
-                list.todos = this.convertSnapData<TodoDB>(data);
-                console.log('GET TODO', list.todos);
+                list.todos = this.convertSnapData<TodoDbId>(data);
                 return list;
               })
           )
         ));
   }
 
-  public getOneTodo(listID: string, todoId: string): Observable<TodoDB> {
-    return this.listCollection.doc<ListDB>(listID).collection<TodoDB>('todos').doc(todoId).snapshotChanges().pipe(
+  public getOneTodo(listID: string, todoId: string): Observable<TodoDbId> {
+    /*return this.listCollection.doc<ListDB>(listID).collection<TodoDB>('todos').doc(todoId).snapshotChanges().pipe(
         map( data => {
-          return  this.convertSnapData(data);
+          return  this.convertSnapData<TodoDbId>(data);
         })
-    );
+    );*/
+    return this.listCollection.doc<ListDB>(listID).collection<TodoDbId>('todos').doc(todoId).valueChanges();
   }
 
   public getOne(id: string): List {
@@ -109,30 +113,7 @@ export class ListService {
     this.getOne(listId).todosList.splice(this.getOne(listId).todosList.indexOf(todo), 1);
   }
 
-  /*
-  return this.listCollection.doc<ListDB>(id).valueChanges()
-        .pipe(switchMap(list =>
-          this.listCollection.doc(id).collection<TodoDB>('todos').snapshotChanges().pipe(
-              map(data => {
-                list.todos = this.convertSnapData<TodoDB>(data);
-
-                return list;
-              })
-          )
-        ));
-   */
   addTodo(todo: TodoDB, listId): void {
-// Atomically add a new region to the "regions" array field.
-    /*this.listCollection.doc(listId).collection('todos').doc().update({
-      todos: firebase.firestore.FieldValue.arrayUnion(todo)
-    });
-    console.log("g=tg");
-    let ref = _this.db.collection('/users').doc(_this.userId).collection('/invoices').ref.doc().id;
-    console.log('ref: ' + ref);
-
-    this.db.collection('test2').ref.doc('myDoc1').collection(`/${this.myFolder}`).add(imagen);
-
-    */
     const ref = this.listCollection.doc(listId).ref.id;
 
     console.log('MY LIST ID', listId, ' ', ref);

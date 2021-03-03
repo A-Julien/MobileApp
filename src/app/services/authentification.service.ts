@@ -144,8 +144,18 @@ export class AuthenticationService {
             await this.presentAlert('Facebook Login Failed');
             return;
         }
-        await this.presentToast('login success');
-        this.router.navigate(['/home']);
+        const credential = firebase.auth.FacebookAuthProvider.credential(this.token.token);
+        this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
+            .then(res => {
+                this.user = res;
+                this.presentToast( 'Successfully signed in!' );
+                this.router.navigate(['/home']);
+            })
+            .catch(err => {
+                this.presentAlert( 'Failed to sign in via facebook');
+                console.log('Something is wrong:', err.message);
+            });
+
   }
 
     async FbLogout() {

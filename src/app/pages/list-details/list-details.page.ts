@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ListDB, ListService, TodoDB} from '../../services/list.service';
+import {ListDB, ListService, TodoDbId} from '../../services/list.service';
 import {ModalController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
 import {Observable} from 'rxjs';
@@ -15,7 +15,7 @@ export class ListDetailsPage implements OnInit {
   listID: string;
   listName: string;
   public list: Observable<ListDB>;
-  public todos: Observable<TodoDB[]>;
+  public todos: Observable<TodoDbId[]>;
 
   constructor(private route: ActivatedRoute, private listService: ListService, public modalController: ModalController) { }
 
@@ -27,9 +27,6 @@ export class ListDetailsPage implements OnInit {
           return list.todos;
         })
     );
-    this.list.subscribe((list) => this.listName = list.name);
-    this.list.subscribe((list) => console.log(list.todos));
-
   }
 
   async presentModal() {
@@ -44,7 +41,7 @@ export class ListDetailsPage implements OnInit {
     return await modal.present();
   }
 
-    delete(todo: TodoDB, listId) {
+    delete(todo: TodoDbId, listId) {
         //this.listService.deleteTodo(todo, listId);
     }
 }

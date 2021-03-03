@@ -3,10 +3,10 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ (todo | async).name }}</ion-title>
+    <ion-title>{{ (todo | async)?.name }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-label > {{ (todo | async).content }} </ion-label>
+  <ion-label > {{ (todo | async)?.content }} </ion-label>
 </ion-content>

@@ -8,6 +8,7 @@ import {map, switchMap} from 'rxjs/operators';
 import {ToastController} from '@ionic/angular';
 import firebase from 'firebase';
 import database = firebase.database;
+import {PopupService} from './popup.service';
 
 export interface TodoDbId extends TodoDB{
   id: string;
@@ -38,7 +39,7 @@ export class ListService {
 
   constructor(private fireStore: AngularFirestore,
               private authService: AuthenticationService,
-              private toastController: ToastController) {
+              private popupService: PopupService) {
     this.lists = new Array<List>();
     this.listCollection = this.fireStore.collection('/Lists', ref => ref.where('userID', '==', this.authService.getUserId()));
    }
@@ -86,35 +87,24 @@ export class ListService {
     this.lists.push(new List(name));
     this.listCollection.add(l);
   }
-  async presentToast(msg: string) {
-    const toast = await this.toastController.create({
-      message: msg,
-      duration: 5000
-    });
-    toast.present();
-  }
 
   deleteList(listID: string, listName: string): void {
     this.listCollection.doc<ListDB>(listID).delete()
-        .then(() => this.presentToast('list ' + listName + ' removed'))
-        .catch(() => this.presentToast('An error was occurred can not delete ' + listName));
+        .then(() => this.popupService.presentToast('list ' + listName + ' removed'))
+        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + listName));
   }
 
   deleteTodo(todo: TodoDbId, listId: string): void {
     this.listCollection.doc(listId).collection('todos').doc<TodoDB>(todo.id).delete()
-        .then(() => this.presentToast('list ' + todo.name + ' removed'))
-        .catch(() => this.presentToast('An error was occurred can not delete ' + todo.name));
+        .then(() => this.popupService.presentToast('list ' + todo.name + ' removed'))
+        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + todo.name));
   }
 
   creatTodo(todo: TodoDB, listId): void {
-    const ref = this.listCollection.doc(listId).ref.id;
-
-    console.log('MY LIST ID', listId, ' ', ref);
-
     this.listCollection.doc(listId).collection('todos').add(todo)
         .then(() => {
-          this.presentToast(todo.name + ' added');
+          this.popupService.presentToast(todo.name + ' added');
         })
-        .catch(() => this.presentToast('An error was occurred can not delete ' + todo.name));
+        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + todo.name));
   }
 }

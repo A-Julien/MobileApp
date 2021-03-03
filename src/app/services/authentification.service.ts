@@ -8,6 +8,7 @@ import {Plugins, registerWebPlugin} from '@capacitor/core';
 import '@codetrix-studio/capacitor-google-auth';
 import {FacebookLogin, FacebookLoginPlugin} from '@capacitor-community/facebook-login';
 import {HttpClient} from '@angular/common/http';
+import {PopupService} from './popup.service';
 
 registerWebPlugin(FacebookLogin);
 
@@ -23,9 +24,8 @@ export class AuthenticationService {
 
   constructor(private angularFireAuth: AngularFireAuth,
               private router: Router,
-              public alertController: AlertController,
               private http: HttpClient,
-              private toastController: ToastController) {
+              private popupService: PopupService) {
     this.userData = angularFireAuth.authState;
     this.fbLogin = FacebookLogin;
   }
@@ -36,12 +36,12 @@ export class AuthenticationService {
         .createUserWithEmailAndPassword(email, password)
         .then(res => {
           console.log('Successfully signed up!', res);
-          this.presentAlert( 'Successfully signed up! Check your mail box' );
+          this.popupService.presentAlert( 'Successfully signed up! Check your mail box' );
           res.user.sendEmailVerification();
           this.router.navigate(['/login']);
         })
         .catch(error => {
-            this.presentAlert( 'Something is wrong:' + error.message);
+            this.popupService.presentAlert( 'Something is wrong:' + error.message);
             console.log('Something is wrong:', error.message);
         });
   }
@@ -55,15 +55,15 @@ export class AuthenticationService {
               this.user = res.user;
               console.log(this.user);
               console.log('Successfully signed in!');
-              this.presentToast( 'Successfully signed in!' );
+              this.popupService.presentToast( 'Successfully signed in!' );
               this.router.navigate(['/home']);
           } else {
-                this.presentAlert( 'Failed to sign in, email is not verified');
+                this.popupService.presentAlert( 'Failed to sign in, email is not verified');
                 console.log('Email not verified');
           }
         })
         .catch(err => {
-            this.presentAlert( 'Failed to sign in, email or password does not exist');
+            this.popupService.presentAlert( 'Failed to sign in, email or password does not exist');
             console.log('Something is wrong:', err.message);
         });
   }
@@ -79,11 +79,11 @@ export class AuthenticationService {
           .sendPasswordResetEmail(email)
           .then(res => {
               console.log('Email sent');
-              this.presentAlert( 'Email sent to ' + email);
+              this.popupService.presentAlert( 'Email sent to ' + email);
               this.router.navigate(['/login']);
           })
           .catch(err => {
-              this.presentAlert( 'Email not found' + err.message);
+              this.popupService.presentAlert( 'Email not found' + err.message);
               console.log('Something is wrong:', err.message);
           });
   }
@@ -92,26 +92,6 @@ export class AuthenticationService {
     console.log(this.user);
     return this.user != null;
   }
-
-    private async presentAlert(msg: string) {
-        const alert = await this.alertController.create({
-            cssClass: 'my-custom-class',
-            header: 'Alert',
-            // subHeader: 'Subtitle',
-            message: msg,
-            buttons: ['OK']
-        });
-
-        await alert.present();
-    }
-
-    async presentToast(msg: string) {
-        const toast = await this.toastController.create({
-            message: msg,
-            duration: 2000
-        });
-        toast.present();
-    }
 
     async signInWithFacebook() {
         const FACEBOOK_PERMISSIONS = ['email', 'user_birthday'];
@@ -123,7 +103,7 @@ export class AuthenticationService {
         } else if (result.accessToken && !result.accessToken.userId) {
             this.getCurrentToken();
         } else {
-            this.presentAlert('Facebook Login Failed');
+            this.popupService.presentAlert('Facebook Login Failed');
         }
     }
 
@@ -141,18 +121,18 @@ export class AuthenticationService {
         const url = `https://graph.facebook.com/${this.token.userId}?fields=id,name,picture.width(720),birthday,email&access_token=${this.token.token}`;
         this.user = await this.http.get(url);
         if (this.user === null){
-            await this.presentAlert('Facebook Login Failed');
+            await this.popupService.presentAlert('Facebook Login Failed');
             return;
         }
         const credential = firebase.auth.FacebookAuthProvider.credential(this.token.token);
         this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res;
-                this.presentToast( 'Successfully signed in!' );
+                this.popupService.presentToast( 'Successfully signed in!' );
                 this.router.navigate(['/home']);
             })
             .catch(err => {
-                this.presentAlert( 'Failed to sign in via facebook');
+                this.popupService.presentAlert( 'Failed to sign in via facebook');
                 console.log('Something is wrong:', err.message);
             });
 
@@ -174,11 +154,11 @@ export class AuthenticationService {
         this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res.user;
-                this.presentToast( 'Successfully signed in!' );
+                this.popupService.presentToast( 'Successfully signed in!' );
                 this.router.navigate(['/home']);
             })
             .catch(err => {
-                this.presentAlert( 'Failed to sign in via Google');
+                this.popupService.presentAlert( 'Failed to sign in via Google');
                 console.log('Something is wrong:', err.message);
             });
     }

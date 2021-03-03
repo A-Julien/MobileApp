@@ -16,7 +16,7 @@ export class HomePage {
   lists: Observable<ListDBExtended[]>;
   showLoading = true;
   constructor(private listService: ListService, public modalController: ModalController) {
-    this.lists = this.listService.getAllDB();
+    this.lists = this.listService.getAllListDB();
     this.lists.subscribe(() => this.showLoading = false);
   }
 

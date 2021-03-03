@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import {List} from '../models/list';
 import {AuthenticationService} from './authentification.service';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
-import firebase from 'firebase';
 import {PopupService} from './popup.service';
+import firebase from 'firebase';
 
 export interface TodoDbId extends TodoDB{
   id: string;
@@ -17,8 +17,12 @@ export interface TodoDB {
   isDone: boolean;
 }
 
+export interface ListDB {
+  name: string;
+}
+
 export interface ListDBExtendedOwners extends ListDB {
-  owners: string[];
+  owners: firebase.firestore.FieldValue;
 }
 
 export interface ListDBExtended extends ListDB {
@@ -26,26 +30,23 @@ export interface ListDBExtended extends ListDB {
   todos: TodoDbId[];
 }
 
-export interface ListDB {
-  name: string;
-  userID: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class ListService {
-  private listCollection: AngularFirestoreCollection<ListDB>;
+  private listCollection: AngularFirestoreCollection<ListDBExtendedOwners>;
   private lists: List[];
 
   constructor(private fireStore: AngularFirestore,
               private authService: AuthenticationService,
               private popupService: PopupService) {
     this.lists = new Array<List>();
-    this.listCollection = this.fireStore.collection('/Lists', ref => ref.where('userID', '==', this.authService.getUserId()));
-   }
+    this.listCollection = this.fireStore.collection('/Lists',
+                ref => ref.where('userIDs', 'array-contains-any',
+                    [this.authService.getUserId(), this.authService.getUserEmail()]));
+  }
 
-   getAllDB(): Observable<ListDBExtended[]> {
+   getAllListDB(): Observable<ListDBExtended[]> {
     return this.listCollection.snapshotChanges().pipe(
         map(data => this.convertSnapData<ListDB>(data))
     );
@@ -69,7 +70,7 @@ export class ListService {
           this.listCollection.doc(id).collection<TodoDB>('todos').snapshotChanges().pipe(
               map(data => {
                 list.todos = this.convertSnapData<TodoDbId>(data);
-                return list;
+                return {name};
               })
           )
         ));
@@ -84,10 +85,16 @@ export class ListService {
   }
 
   public createList(list: List): void {
-    const l: ListDB = { name : list.name, userID : this.authService.getUserId()};
-    this.lists.push(new List(name));
+    const l: ListDBExtendedOwners = { name : list.name, owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId())};
     this.listCollection.add(l);
+    /*this.listCollection.doc().update({
+      name: list.name,
+      owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId())
+    });*/
   }
+
+
+
 
   deleteList(listID: string, listName: string): void {
     this.listCollection.doc<ListDBExtended>(listID).delete()

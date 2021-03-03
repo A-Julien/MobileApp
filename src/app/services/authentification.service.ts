@@ -144,8 +144,11 @@ export class AuthenticationService {
         this.token = null;
     }
 
-    public getUserId() {
+    public getUserId(): string {
         return this.user.uid;
+    }
+    public getUserEmail(): string {
+      return this.user.email;
     }
 
     async signInWithGoogle() {

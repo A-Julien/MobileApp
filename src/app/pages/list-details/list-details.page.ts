@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ListDB, ListService, TodoDbId} from '../../services/list.service';
+import {ListDBExtended, ListService, TodoDbId} from '../../services/list.service';
 import {ModalController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
 import {Observable} from 'rxjs';
@@ -14,7 +14,7 @@ import {map} from 'rxjs/operators';
 export class ListDetailsPage implements OnInit {
   listID: string;
   listName: string;
-  public list: Observable<ListDB>;
+  public list: Observable<ListDBExtended>;
   public todos: Observable<TodoDbId[]>;
 
   constructor(private route: ActivatedRoute, private listService: ListService, public modalController: ModalController) { }

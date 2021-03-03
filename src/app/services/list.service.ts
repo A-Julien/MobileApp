@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
 import {List} from '../models/list';
-import {Todo} from '../models/todo';
 import {AuthenticationService} from './authentification.service';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
 import {Observable} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
-import {ToastController} from '@ionic/angular';
 import firebase from 'firebase';
-import database = firebase.database;
 import {PopupService} from './popup.service';
 
 export interface TodoDbId extends TodoDB{
@@ -20,12 +17,12 @@ export interface TodoDB {
   isDone: boolean;
 }
 
-export interface ListDB extends ListDBtoPush {
+export interface ListDBExtended extends ListDB {
   id: string;
   todos: TodoDbId[];
 }
 
-export interface ListDBtoPush  {
+export interface ListDB {
   name: string;
   userID: string;
 }
@@ -34,7 +31,7 @@ export interface ListDBtoPush  {
   providedIn: 'root'
 })
 export class ListService {
-  private listCollection: AngularFirestoreCollection<ListDBtoPush>;
+  private listCollection: AngularFirestoreCollection<ListDB>;
   private lists: List[];
 
   constructor(private fireStore: AngularFirestore,
@@ -44,9 +41,9 @@ export class ListService {
     this.listCollection = this.fireStore.collection('/Lists', ref => ref.where('userID', '==', this.authService.getUserId()));
    }
 
-   getAllDB(): Observable<ListDB[]> {
+   getAllDB(): Observable<ListDBExtended[]> {
     return this.listCollection.snapshotChanges().pipe(
-        map(data => this.convertSnapData<ListDBtoPush>(data))
+        map(data => this.convertSnapData<ListDB>(data))
     );
   }
 
@@ -62,8 +59,8 @@ export class ListService {
     return this.lists;
   }
 
-  public getOneDB(id: string): Observable<ListDB>{
-    return this.listCollection.doc<ListDB>(id).valueChanges()
+  public getOneDB(id: string): Observable<ListDBExtended>{
+    return this.listCollection.doc<ListDBExtended>(id).valueChanges()
         .pipe(switchMap(list =>
           this.listCollection.doc(id).collection<TodoDB>('todos').snapshotChanges().pipe(
               map(data => {
@@ -75,7 +72,7 @@ export class ListService {
   }
 
   public getOneTodo(listID: string, todoId: string): Observable<TodoDbId> {
-    return this.listCollection.doc<ListDB>(listID).collection<TodoDbId>('todos').doc(todoId).valueChanges();
+    return this.listCollection.doc<ListDBExtended>(listID).collection<TodoDbId>('todos').doc(todoId).valueChanges();
   }
 
   public getOne(id: string): List {
@@ -83,13 +80,13 @@ export class ListService {
   }
 
   public createList(list: List): void {
-    const l: ListDBtoPush = { name : list.name, userID : this.authService.getUserId()};
+    const l: ListDB = { name : list.name, userID : this.authService.getUserId()};
     this.lists.push(new List(name));
     this.listCollection.add(l);
   }
 
   deleteList(listID: string, listName: string): void {
-    this.listCollection.doc<ListDB>(listID).delete()
+    this.listCollection.doc<ListDBExtended>(listID).delete()
         .then(() => this.popupService.presentToast('list ' + listName + ' removed'))
         .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + listName));
   }

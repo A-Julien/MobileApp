@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthenticationService} from '../../services/authentification.service';
-import {ToastController} from "@ionic/angular";
+import {PopupService} from '../../services/popup.service';
 
 @Component({
   selector: 'app-register',
@@ -14,7 +14,7 @@ export class RegisterPage implements OnInit {
 
   constructor(private formBuilder: FormBuilder,
               private authService: AuthenticationService,
-              private toastController: ToastController) { }
+              private popupService: PopupService) { }
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -26,7 +26,7 @@ export class RegisterPage implements OnInit {
 
   signUp() {
     if (this.loginForm.get('password').value !== this.loginForm.get('passwordConf').value){
-      this.authService.presentToast('password not identical');
+      this.popupService.presentAlert('password not identical');
       return;
     }
     this.authService.SignUp(this.loginForm.get('login').value, this.loginForm.get('password').value);

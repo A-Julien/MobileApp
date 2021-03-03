@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import {List} from '../../models/list';
-import {ListDB, ListService} from '../../services/list.service';
+import {ListDBExtended, ListService} from '../../services/list.service';
 import {Observable} from "rxjs";
 
 @Component({
@@ -12,7 +12,7 @@ import {Observable} from "rxjs";
 })
 export class HomePage {
 
-  lists: Observable<ListDB[]>;
+  lists: Observable<ListDBExtended[]>;
 
   constructor(private listService: ListService, public modalController: ModalController) {
     this.lists = this.listService.getAllDB();

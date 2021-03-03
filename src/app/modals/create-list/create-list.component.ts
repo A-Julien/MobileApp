@@ -30,7 +30,7 @@ export class CreateListComponent implements OnInit {
 
   createNewList(){
     if (this.newListForm.valid){
-      this.listService.create(new List(this.newListForm.get('name').value));
+      this.listService.createList(new List(this.newListForm.get('name').value));
       this.dismissModal();
     }
   }

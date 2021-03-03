@@ -31,7 +31,7 @@ export class CreateTodoComponent implements OnInit {
   createNewTodo(){
     if (this.newTodoForm.valid){
       // tslint:disable-next-line:max-line-length
-      this.listService.addTodo({name : this.newTodoForm.get('name').value, content: this.newTodoForm.get('description').value, isDone: false}, this.listId);
+      this.listService.creatTodo({name : this.newTodoForm.get('name').value, content: this.newTodoForm.get('description').value, isDone: false}, this.listId);
       this.dismissModal();
     }
   }

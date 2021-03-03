@@ -74,11 +74,6 @@ export class ListService {
   }
 
   public getOneTodo(listID: string, todoId: string): Observable<TodoDbId> {
-    /*return this.listCollection.doc<ListDB>(listID).collection<TodoDB>('todos').doc(todoId).snapshotChanges().pipe(
-        map( data => {
-          return  this.convertSnapData<TodoDbId>(data);
-        })
-    );*/
     return this.listCollection.doc<ListDB>(listID).collection<TodoDbId>('todos').doc(todoId).valueChanges();
   }
 
@@ -86,13 +81,10 @@ export class ListService {
     return this.lists.find(list => list.id === id);
   }
 
-  public create(list: List): void {
+  public createList(list: List): void {
     const l: ListDBtoPush = { name : list.name, userID : this.authService.getUserId()};
     this.lists.push(new List(name));
     this.listCollection.add(l);
-    /*this.userDoc.set({
-      name: list.name
-    });*/
   }
   async presentToast(msg: string) {
     const toast = await this.toastController.create({
@@ -106,14 +98,15 @@ export class ListService {
     this.listCollection.doc<ListDB>(listID).delete()
         .then(() => this.presentToast('list ' + listName + ' removed'))
         .catch(() => this.presentToast('An error was occurred can not delete ' + listName));
-    // this.lists.splice(this.lists.indexOf(list), 1);
   }
 
-  deleteTodo(todo: Todo, listId): void {
-    this.getOne(listId).todosList.splice(this.getOne(listId).todosList.indexOf(todo), 1);
+  deleteTodo(todo: TodoDbId, listId: string): void {
+    this.listCollection.doc(listId).collection('todos').doc<TodoDB>(todo.id).delete()
+        .then(() => this.presentToast('list ' + todo.name + ' removed'))
+        .catch(() => this.presentToast('An error was occurred can not delete ' + todo.name));
   }
 
-  addTodo(todo: TodoDB, listId): void {
+  creatTodo(todo: TodoDB, listId): void {
     const ref = this.listCollection.doc(listId).ref.id;
 
     console.log('MY LIST ID', listId, ' ', ref);

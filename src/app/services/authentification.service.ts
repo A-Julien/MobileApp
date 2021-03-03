@@ -52,7 +52,7 @@ export class AuthenticationService {
         .signInWithEmailAndPassword(email, password)
         .then(res => {
           if (res.user.emailVerified) {
-              this.user = res.user.uid;
+              this.user = res.user;
               console.log(this.user);
               console.log('Successfully signed in!');
               this.presentToast( 'Successfully signed in!' );
@@ -165,7 +165,7 @@ export class AuthenticationService {
     }
 
     public getUserId() {
-        return this.user;
+        return this.user.uid;
     }
 
     async signInWithGoogle() {
@@ -173,7 +173,7 @@ export class AuthenticationService {
         const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
         this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
-                this.user = res;
+                this.user = res.user;
                 this.presentToast( 'Successfully signed in!' );
                 this.router.navigate(['/home']);
             })

@@ -42,6 +42,7 @@ export class ListDetailsPage implements OnInit {
   }
 
     delete(todo: TodoDbId, listId) {
-        //this.listService.deleteTodo(todo, listId);
+        console.log(todo.id, listId);
+        this.listService.deleteTodo(todo, listId);
     }
 }

@@ -4,6 +4,7 @@ import { CreateListComponent } from '../../modals/create-list/create-list.compon
 import {List} from '../../models/list';
 import {ListDBExtended, ListService} from '../../services/list.service';
 import {Observable} from "rxjs";
+import {finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -13,9 +14,10 @@ import {Observable} from "rxjs";
 export class HomePage {
 
   lists: Observable<ListDBExtended[]>;
-
+  showLoading = true;
   constructor(private listService: ListService, public modalController: ModalController) {
     this.lists = this.listService.getAllDB();
+    this.lists.subscribe(() => this.showLoading = false);
   }
 
   async presentModal() {

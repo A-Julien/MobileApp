@@ -33,6 +33,7 @@
     "firebase": "^8.2.6",
     "ng-input-password": "^3.0.0",
     "rxjs": "~6.5.5",
+    "spinkit": "^2.0.1",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"
   },

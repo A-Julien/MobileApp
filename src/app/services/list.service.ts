@@ -17,6 +17,10 @@ export interface TodoDB {
   isDone: boolean;
 }
 
+export interface ListDBExtendedOwners extends ListDB {
+  owners: string[];
+}
+
 export interface ListDBExtended extends ListDB {
   id: string;
   todos: TodoDbId[];

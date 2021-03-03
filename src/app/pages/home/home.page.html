@@ -5,9 +5,11 @@
     </ion-title>
   </ion-toolbar>
 </ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-list>
+<ion-content [fullscreen]="true" *ngIf="showLoading">
+  <app-loading></app-loading>
+</ion-content>
+<ion-content [fullscreen]="true" *ngIf="!showLoading">
+  <ion-list >
     <ion-item-sliding *ngFor="let list of lists | async">
       <ion-item [routerLink]="['/list-details/' + list.id]">
         <ion-label>{{ list.name }}</ion-label>

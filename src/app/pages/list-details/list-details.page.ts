@@ -14,6 +14,8 @@ import {map} from 'rxjs/operators';
 export class ListDetailsPage implements OnInit {
   listID: string;
   listName: string;
+  showLoader = true;
+
   public list: Observable<ListDBExtended>;
   public todos: Observable<TodoDbId[]>;
 
@@ -27,6 +29,7 @@ export class ListDetailsPage implements OnInit {
           return list.todos;
         })
     );
+    this.todos.subscribe(() => this.showLoader = false);
   }
 
   async presentModal() {

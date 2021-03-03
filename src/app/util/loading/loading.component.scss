@@ -378,26 +378,26 @@ blockquote a {
 
 .cat-animation-mask {
   transform: rotate(45deg);
-  animation: mask-animation 2.5s 1s infinite;
+  animation: mask-animation 2.5s 0s infinite;
 }
 
 .cat-animation-mask:before {
-  animation: mask-animation-sub-right 2.5s 1s infinite;
+  animation: mask-animation-sub-right 2.5s 0s infinite;
 }
 
 .cat-animation-mask:after {
-  animation: mask-animation-sub-left 2.5s 1s infinite;
+  animation: mask-animation-sub-left 2.5s 0s infinite;
 }
 
 .cat-head {
   transform: rotate(70deg);
-  animation: head-animation 2.5s 1s infinite;
+  animation: head-animation 2.5s 0s infinite;
   animation-timing-function: cubic-bezier(0.2, 0, 0.09, 1);
 }
 
 .cat-foot {
   transform: rotate(25deg);
-  animation: foot-animation 2.5s 1s infinite;
+  animation: foot-animation 2.5s 0s infinite;
   animation-timing-function: cubic-bezier(0.2, 0, 0.45, 1);
 }
 

@@ -21,9 +21,9 @@ export class HomePage {
               private alertController: AlertController,
               private popupService: PopupService) {
     this.lists = this.listService.getAllListDB();
+    this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.ownerID)));
     this.listsShared = this.listService.getAllSharedListDB();
     this.lists.subscribe(() => this.showLoading = false);
-    this.listsShared.subscribe();
   }
 
   async presentModal() {
@@ -34,8 +34,8 @@ export class HomePage {
     return await modal.present();
   }
 
-  delete(listId: string, listName: string): void {
-    this.listService.deleteList(listId, listName);
+  delete(list: ListDBExtended): void {
+    this.listService.deleteList(list);
   }
 
 

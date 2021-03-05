@@ -19,24 +19,32 @@ export interface TodoDB {
 
 export interface ListDB {
   name: string;
+  owner: boolean;
   share: boolean;
-  owners: firebase.firestore.FieldValue;
+  owners: string[];
 }
 
 export interface ListDBExtended extends ListDB {
   id: string;
   todos: TodoDbId[];
+  ownerID: string[];
 }
 
 export interface SharingNotif {
-  email: string;
+  id: string;
+  newOwner: string;
+  owner: string;
   listID: string;
+  notify: boolean;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ListService {
+  private readonly LISTCOLLECTION = '/List';
+  private readonly SHARECOLLECTION = '/Share';
+
   private listCollection: AngularFirestoreCollection<ListDB>;
   private sharingCollection: AngularFirestoreCollection<SharingNotif>;
   private lists: List[];
@@ -45,11 +53,11 @@ export class ListService {
               private authService: AuthenticationService,
               private popupService: PopupService) {
     this.lists = new Array<List>();
-    this.listCollection = this.fireStore.collection('/Lists',
+    this.listCollection = this.fireStore.collection(this.LISTCOLLECTION,
                 ref => ref.where('owners', 'array-contains-any',
                     [this.authService.getUserId(), this.authService.getUserEmail()]));
 
-    this.sharingCollection = this.fireStore.collection('/Share',
+    this.sharingCollection = this.fireStore.collection(this.SHARECOLLECTION,
         ref => ref.where('newOwner', '==', this.authService.getUserEmail()));
   }
 
@@ -98,17 +106,25 @@ export class ListService {
   }
 
   public createList(list: List): void {
-    const l: ListDB = { name : list.name, owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId()), share: false};
-    this.listCollection.add(l)
+    const l: ListDB = { name : list.name, share: false, owner: true, owners: []};
+    const addList = this.fireStore.collection('/List');
+    addList.add(l).then((newList) => {
+      addList.doc(newList.id).update({
+        owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId())
+      })
+          .then(() => this.popupService.presentToast(list.name + 'create'))
+          .catch(() => this.popupService.presentAlert('error when created ' + list.name));
+    }).catch(() => this.popupService.presentAlert('error when created ' + list.name));
+
+   /* this.listCollection.add(l)
         .then(() => this.popupService.presentToast(list.name + 'create'))
-        .catch(() => this.popupService.presentAlert('error when created ' + list.name));
+        .catch(() => this.popupService.presentAlert('error when created ' + list.name));*/
 
   }
 
   public shareList(list: ListDBExtended, userEmail: string): Promise<any> {
     console.log(list.id, '  ', userEmail);
-    const listToShar = this.listCollection.doc(list.id);
-    listToShar.update({
+    this.fireStore.collection(this.LISTCOLLECTION).doc(list.id).update({
       share: true,
       owners: firebase.firestore.FieldValue.arrayUnion(userEmail)
     });
@@ -116,14 +132,48 @@ export class ListService {
   }
 
   private creatSharingNotif(emailUser: string, listNameUser: string): Promise<any>{
-    const s: SharingNotif = {email: emailUser, listID: listNameUser};
-    return this.sharingCollection.add(s);
+    return this.fireStore.collection(this.SHARECOLLECTION).add({
+      newOwner: emailUser,
+      owner: this.authService.getUserEmail(),
+      listID: listNameUser,
+      notify: false
+    });
   }
 
-  deleteList(listID: string, listName: string): void {
-    this.listCollection.doc<ListDBExtended>(listID).delete()
-        .then(() => this.popupService.presentToast('list ' + listName + ' removed'))
-        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + listName));
+  deleteList(list: ListDBExtended): void {
+    const delCol = this.fireStore.collection(this.LISTCOLLECTION);
+    if (list.share){
+      let sharing = true;
+      if (list.owners.length === 2) { sharing = false; }
+      delCol.doc(list.id).update({
+        share: sharing,
+        owners: firebase.firestore.FieldValue.arrayRemove(this.authService.getUserEmail())
+      }).then(() => {
+        this.getAllSharedListDB().subscribe((sl) => {
+          sl.forEach((l) => {
+            if ((l.owner === this.authService.getUserId() || l.newOwner === this.authService.getUserEmail() ) && l.listID === list.id) {
+              this.sharingCollection.doc(l.id).delete();
+            }
+          });
+        });
+      });
+      return;
+    }
+    this.listCollection.doc<ListDBExtended>(list.id).delete()
+        .then(() => this.popupService.presentToast('list ' + list.name + ' removed'))
+        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + list.name));
+    return;
+    /*if (list.share || !list.owner) {
+      this.listCollection.doc(list.id).update({
+        owners: firebase.firestore.FieldValue.arrayRemove(this.authService.getUserEmail())
+      });
+    }
+    if (!list.share || list.owner){
+      this.listCollection.doc<ListDBExtended>(list.id).delete()
+          .then(() => this.popupService.presentToast('list ' + list.name + ' removed'))
+          .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + list.name));
+      return;
+    }*/
   }
 
   deleteTodo(todo: TodoDbId, listId: string): void {

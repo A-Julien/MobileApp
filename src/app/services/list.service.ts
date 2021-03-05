@@ -19,9 +19,6 @@ export interface TodoDB {
 
 export interface ListDB {
   name: string;
-}
-
-export interface ListDBExtendedOwners extends ListDB {
   owners: firebase.firestore.FieldValue;
 }
 
@@ -34,7 +31,7 @@ export interface ListDBExtended extends ListDB {
   providedIn: 'root'
 })
 export class ListService {
-  private listCollection: AngularFirestoreCollection<ListDBExtendedOwners>;
+  private listCollection: AngularFirestoreCollection<ListDB>;
   private lists: List[];
 
   constructor(private fireStore: AngularFirestore,
@@ -42,7 +39,7 @@ export class ListService {
               private popupService: PopupService) {
     this.lists = new Array<List>();
     this.listCollection = this.fireStore.collection('/Lists',
-                ref => ref.where('userIDs', 'array-contains-any',
+                ref => ref.where('owners', 'array-contains-any',
                     [this.authService.getUserId(), this.authService.getUserEmail()]));
   }
 
@@ -67,12 +64,12 @@ export class ListService {
   public getOneDB(id: string): Observable<ListDBExtended>{
     return this.listCollection.doc<ListDBExtended>(id).valueChanges()
         .pipe(switchMap(list =>
-          this.listCollection.doc(id).collection<TodoDB>('todos').snapshotChanges().pipe(
-              map(data => {
-                list.todos = this.convertSnapData<TodoDbId>(data);
-                return {name};
-              })
-          )
+            this.listCollection.doc(id).collection<TodoDB>('todos').snapshotChanges().pipe(
+                map(data => {
+                  list.todos = this.convertSnapData<TodoDbId>(data);
+                  return list;
+                })
+            )
         ));
   }
 
@@ -85,15 +82,20 @@ export class ListService {
   }
 
   public createList(list: List): void {
-    const l: ListDBExtendedOwners = { name : list.name, owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId())};
-    this.listCollection.add(l);
-    /*this.listCollection.doc().update({
-      name: list.name,
-      owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId())
-    });*/
+    const l: ListDB = { name : list.name, owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId())};
+    this.listCollection.add(l)
+        .then(() => this.popupService.presentToast(list.name + 'create'))
+        .catch(() => this.popupService.presentAlert('error when created ' + list.name));
+
   }
 
-
+  public shareList(listID: string, userEmail: string): Promise<any> {
+    console.log(listID, '  ', userEmail);
+    const listToShar = this.listCollection.doc(listID);
+    return listToShar.update({
+      owners: firebase.firestore.FieldValue.arrayUnion(userEmail)
+    });
+  }
 
 
   deleteList(listID: string, listName: string): void {

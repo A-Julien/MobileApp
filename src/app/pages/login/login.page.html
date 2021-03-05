@@ -7,23 +7,58 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content  padding>
+    <div class="div_general">
+        <img src="assets/logo.png" width="55%">
+        <div class="div_mayor">
+          <form [formGroup]="loginForm" (ngSubmit)="signIn()" novalidate >
+            <ion-list no-lines style="background: transparent">
+              <ion-item color="transp" >
+                <ion-label><ion-icon name="person" ></ion-icon></ion-label>
+                <ion-input type="text" name="login" formControlName="login" required></ion-input>
+              </ion-item>
+              <ion-item color="transp">
+                <ion-label><ion-icon name="key"></ion-icon></ion-label>
+                <app-show-hide-password>
+                  <ion-input type="password" name="password" formControlName="password" required></ion-input>
+                </app-show-hide-password>
+              </ion-item>
+              <ion-row align="center">
+                <ion-col>
+                  <ion-button [disabled]="loginForm.invalid" type="submit" color="primary" expand="block">Sign In</ion-button>
+                  <span class="divider line one-line">or</span>
+                  <a style="color: red" [routerLink]="['/password-recovery']" class="small-text">Forgot Password ?</a>
+                </ion-col>
+              </ion-row>
+            </ion-list>
+          </form>
+        </div>
+    </div>
+</ion-content>
+<!--<ion-content>
   <form [formGroup]="loginForm" (ngSubmit)="signIn()" novalidate>
-    <ion-item lines="full">
-      <ion-label position="floating">Login</ion-label>
-      <ion-input type="text" name="login" formControlName="login" required></ion-input>
-    </ion-item>
+        <ion-card>
+          <ion-item lines="full">
+            <ion-label position="floating">Login</ion-label>
+            <ion-input type="text" name="login" formControlName="login" required></ion-input>
+          </ion-item>
 
 
-      <ion-item>
-        <ion-label position="floating">Password</ion-label>
-        <app-show-hide-password>
-          <ion-input type="password" name="password" formControlName="password" required></ion-input>
-        </app-show-hide-password>
-      </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <app-show-hide-password>
+              <ion-input type="password" name="password" formControlName="password" required></ion-input>
+            </app-show-hide-password>
+          </ion-item>
 
 
+        <ion-row>
+          <ion-col>
+            <ion-button [disabled]="loginForm.invalid" type="submit" color="primary" expand="block">Sign In</ion-button>
+            <a style="color: #ff0000; text-align: center" [routerLink]="['/password-recovery']" class="small-text, ion-text-center" >Forgot Password ?</a>
+          </ion-col>
+        </ion-row>
+        </ion-card>
     <ion-row align="center">
       <ion-col>
         <ion-button [disabled]="loginForm.invalid" type="submit" color="primary" expand="block">Sign In</ion-button>
@@ -33,4 +68,5 @@
     </ion-row>
   </form>
 
-</ion-content>
+
+</ion-content>-->

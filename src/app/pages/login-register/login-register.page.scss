@@ -20,6 +20,13 @@
   }
 }
 
+img{
+  display:block;
+  margin:auto;
+  height: auto;
+  padding: 1em;
+}
+
 .one-line {
   &:before,
   &:after {
@@ -44,7 +51,7 @@ ion-grid{
 }
 ion-row{
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
   height: 100%;
 }

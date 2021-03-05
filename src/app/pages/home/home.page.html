@@ -3,6 +3,9 @@
     <ion-title>
       Lists
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" *ngIf="showLoading">
@@ -11,8 +14,10 @@
 <ion-content [fullscreen]="true" *ngIf="!showLoading">
   <ion-list >
     <ion-item-sliding *ngFor="let list of lists | async" #slidingItem>
+
       <ion-item [routerLink]="['/list-details/' + list.id]">
         <ion-label>{{ list.name }}</ion-label>
+        <ion-badge color="primary" *ngIf="list.share">shared</ion-badge>
       </ion-item>
 
       <ion-item-options side="end">

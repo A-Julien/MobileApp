@@ -19,6 +19,7 @@ export interface TodoDB {
 
 export interface ListDB {
   name: string;
+  share: boolean;
   owners: firebase.firestore.FieldValue;
 }
 
@@ -27,11 +28,17 @@ export interface ListDBExtended extends ListDB {
   todos: TodoDbId[];
 }
 
+export interface SharingNotif {
+  email: string;
+  listID: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ListService {
   private listCollection: AngularFirestoreCollection<ListDB>;
+  private sharingCollection: AngularFirestoreCollection<SharingNotif>;
   private lists: List[];
 
   constructor(private fireStore: AngularFirestore,
@@ -41,6 +48,15 @@ export class ListService {
     this.listCollection = this.fireStore.collection('/Lists',
                 ref => ref.where('owners', 'array-contains-any',
                     [this.authService.getUserId(), this.authService.getUserEmail()]));
+
+    this.sharingCollection = this.fireStore.collection('/Share',
+        ref => ref.where('newOwner', '==', this.authService.getUserEmail()));
+  }
+
+  getAllSharedListDB(): Observable<SharingNotif[]> {
+    return this.sharingCollection.snapshotChanges().pipe(
+        map(data => this.convertSnapData<SharingNotif>(data))
+    );
   }
 
    getAllListDB(): Observable<ListDBExtended[]> {
@@ -82,21 +98,27 @@ export class ListService {
   }
 
   public createList(list: List): void {
-    const l: ListDB = { name : list.name, owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId())};
+    const l: ListDB = { name : list.name, owners: firebase.firestore.FieldValue.arrayUnion(this.authService.getUserId()), share: false};
     this.listCollection.add(l)
         .then(() => this.popupService.presentToast(list.name + 'create'))
         .catch(() => this.popupService.presentAlert('error when created ' + list.name));
 
   }
 
-  public shareList(listID: string, userEmail: string): Promise<any> {
-    console.log(listID, '  ', userEmail);
-    const listToShar = this.listCollection.doc(listID);
-    return listToShar.update({
+  public shareList(list: ListDBExtended, userEmail: string): Promise<any> {
+    console.log(list.id, '  ', userEmail);
+    const listToShar = this.listCollection.doc(list.id);
+    listToShar.update({
+      share: true,
       owners: firebase.firestore.FieldValue.arrayUnion(userEmail)
     });
+    return this.creatSharingNotif(userEmail, list.id);
   }
 
+  private creatSharingNotif(emailUser: string, listNameUser: string): Promise<any>{
+    const s: SharingNotif = {email: emailUser, listID: listNameUser};
+    return this.sharingCollection.add(s);
+  }
 
   deleteList(listID: string, listName: string): void {
     this.listCollection.doc<ListDBExtended>(listID).delete()

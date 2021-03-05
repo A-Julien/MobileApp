@@ -6,8 +6,9 @@
     </ion-title>
   </ion-toolbar>
 </ion-header>
-
+<img src="assets/logo.png" width="55%" alt="Super logo">
 <ion-content class="auth-form"  >
+  <ion-card>
   <ion-grid>
     <ion-row>
       <ion-col size="12">
@@ -23,14 +24,14 @@
 
         <span class="already">Sign with social :</span>
 
-        <ion-row class="col positive-bg stable">
+        <ion-row class="col positive-bg stable" style="align-items: center;">
           <ion-col size="5">
           <ion-button type="submit" color="primary" expand="block" (click)="signInGoogle()">
             Google
             <ion-icon slot="end" name="logo-google"></ion-icon>
           </ion-button>
           </ion-col>
-          <ion-col size="2"><span class="divider">or</span></ion-col>
+          <ion-col size="2"><span class="divider" >or</span></ion-col>
           <ion-col size="5">
             <ion-button type="submit" color="primary" expand="block" (click)="signInFacebook()">
               Facebook
@@ -38,8 +39,8 @@
             </ion-button>
           </ion-col>
         </ion-row>
-
       </ion-col>
     </ion-row>
   </ion-grid>
+  </ion-card>
 </ion-content>

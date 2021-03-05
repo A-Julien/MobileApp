@@ -4,6 +4,9 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>{{ (list | async)?.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -23,6 +26,4 @@
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>
-
-  <ion-button expand="block" (click)="presentModal()">Add Todo</ion-button>
 </ion-content>

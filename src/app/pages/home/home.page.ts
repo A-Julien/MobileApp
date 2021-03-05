@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import {AlertController, ModalController, IonItemSliding} from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
-import {ListDBExtended, ListService} from '../../services/list.service';
-import {Observable} from 'rxjs';
+import {ListDBExtended, SharingNotif, ListService} from '../../services/list.service';
+import {merge, Observable} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'app-home',
@@ -13,13 +14,16 @@ import {PopupService} from '../../services/popup.service';
 export class HomePage {
 
   lists: Observable<ListDBExtended[]>;
+  listsShared: Observable<SharingNotif[]>;
   showLoading = true;
   constructor(private listService: ListService,
               private modalController: ModalController,
               private alertController: AlertController,
-              private popupService :PopupService) {
+              private popupService: PopupService) {
     this.lists = this.listService.getAllListDB();
+    this.listsShared = this.listService.getAllSharedListDB();
     this.lists.subscribe(() => this.showLoading = false);
+    this.listsShared.subscribe();
   }
 
   async presentModal() {
@@ -57,7 +61,7 @@ export class HomePage {
         {
           text: 'Share',
           handler: data => {
-            this.listService.shareList(list.id, data.email)
+            this.listService.shareList(list, data.email)
                 .then(() => this.popupService.presentToast(list.name + ' shared with ' + data.email + '!'))
                 .catch(() => this.popupService.presentToast('Error, ' + list.name + ' not shared'))
                 .finally(() => slidingItem.close());

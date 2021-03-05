@@ -7,7 +7,45 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content  padding>
+  <div class="div_general">
+    <img src="assets/logo.png" width="55%">
+    <div class="div_mayor">
+      <ion-card-header style="color: #0d0d0d; text-align: center" >    Welcome to ToList App ! </ion-card-header>
+      <form [formGroup]="loginForm" (ngSubmit)="signUp()" novalidate>
+        <ion-list no-lines style="background: transparent">
+          <ion-item color="transp" >
+            <ion-label><ion-icon name="person" ></ion-icon></ion-label>
+            <ion-input placeholder="email" type="text" name="email" formControlName="login" required></ion-input>
+          </ion-item>
+          <ion-item color="transp">
+            <ion-label><ion-icon name="key"></ion-icon></ion-label>
+            <app-show-hide-password>
+              <ion-input placeholder="password" type="password" name="password" formControlName="password" required></ion-input>
+            </app-show-hide-password>
+          </ion-item>
+
+        <ion-item color="transp">
+            <ion-label><ion-icon name="key"></ion-icon></ion-label>
+            <app-show-hide-password>
+              <ion-input placeholder="Confirm password" type="password" name="passwordConf" formControlName="passwordConf" required></ion-input>
+            </app-show-hide-password>
+          </ion-item>
+
+
+
+          <ion-row align="center">
+            <ion-col>
+              <ion-button [disabled]="loginForm.invalid" type="submit" color="primary" expand="block">Sign Up</ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-list>
+      </form>
+    </div>
+  </div>
+</ion-content>
+
+<!--<ion-content>
   <form [formGroup]="loginForm" (ngSubmit)="signUp()" novalidate>
     <ion-item lines="full">
       <ion-label position="floating">Login</ion-label>
@@ -32,4 +70,4 @@
       </ion-col>
     </ion-row>
   </form>
-</ion-content>
+</ion-content>-->

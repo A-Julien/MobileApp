@@ -43,6 +43,7 @@ ion-icon{
 }
 ion-input{
   color: #0d0d0d;
+  --placeholder-color: rgb(0, 0, 0) !important;
 }
 
 .fullheight {
@@ -63,6 +64,7 @@ img{
   margin:auto;
   max-width: 35%;
   height: auto;
+  padding: 1em;
 }
 
 .div_mayor{
@@ -82,12 +84,7 @@ img{
     margin-top: 10px !important;
     border-radius: 10px;
     border-style: solid;
-    border-color: #3f51b5;
+    border-color: darkslategrey;
   }
 }
 
-.item.item-trns {
-  border-color: rgba(0, 0, 0, 0);
-  background-color: rgba(0, 0, 0, 0);
-  color: white;
-}

@@ -8,15 +8,16 @@ import {PopupService} from './popup.service';
 import firebase from 'firebase';
 import {userError} from '@angular/compiler-cli/src/transformers/util';
 import {Todo, todoToFirebase} from '../models/todo';
+import {MetaList, MetaListToFirebase} from '../models/metaList';
 
-
+/*
 export interface SharingNotif {
   id: string;
   newOwner: string;
   owner: string;
   listID: string;
   notify: boolean;
-}
+}*/
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,7 @@ export class ListService {
   private readonly SHARECOLLECTION = '/Share';
 
   private listCollection: AngularFirestoreCollection<List>;
-  private sharingCollection: AngularFirestoreCollection<SharingNotif>;
+  private sharingCollection: AngularFirestoreCollection<MetaList>;
   private lists: List[];
 
   constructor(private fireStore: AngularFirestore,
@@ -43,9 +44,9 @@ export class ListService {
   }
 
 
-  getAllSharedListDB(): Observable<SharingNotif[]> {
+  getAllSharedListDB(): Observable<MetaList[]> {
     return this.sharingCollection.snapshotChanges().pipe(
-        map(data => this.convertSnapData<SharingNotif>(data))
+        map(data => this.convertSnapData<MetaList>(data))
     );
   }
 
@@ -149,6 +150,11 @@ export class ListService {
         if (l.listID === listID) { this.sharingCollection.doc(l.id).delete(); }
       });
     });
+  }
+
+  public removedNotyficationShared(share: MetaList){
+    share.notify = true;
+    this.sharingCollection.doc(share.id).ref.withConverter(MetaListToFirebase).set(share);
   }
 
   public async removeSharedUser(userEmailToRm: string, list: List) {

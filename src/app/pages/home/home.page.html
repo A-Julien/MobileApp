@@ -17,6 +17,9 @@
 
       <ion-item [routerLink]="['/list-details/' + list.id]">
         <ion-label>{{ list.name }}</ion-label>
+        <div *ngFor="let s of listsShared | async">
+          <ion-badge color="danger" style="margin-right: 10px" *ngIf="s.listID === list.id && !s.notify && s.newOwner === this.auth.getUserEmail()">new</ion-badge>
+        </div>
         <ion-badge color="primary" *ngIf="list.share">shared</ion-badge>
       </ion-item>
 

@@ -5,8 +5,9 @@ import {ModalController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {List} from "../../models/list";
-import {Todo} from "../../models/todo";
+import {List} from '../../models/list';
+import {Todo} from '../../models/todo';
+import {AuthenticationService} from '../../services/authentification.service';
 
 @Component({
   selector: 'app-list-details',
@@ -21,7 +22,12 @@ export class ListDetailsPage implements OnInit {
   public list: Observable<List>;
   public todos: Observable<Todo[]>;
 
-  constructor(private route: ActivatedRoute, private listService: ListService, public modalController: ModalController) { }
+  constructor(
+      private route: ActivatedRoute,
+      private listService: ListService,
+      public modalController: ModalController,
+      private auth: AuthenticationService)
+  { }
 
   ngOnInit() {
     this.listID = this.route.snapshot.paramMap.get('listId');
@@ -32,6 +38,15 @@ export class ListDetailsPage implements OnInit {
         })
     );
     this.todos.subscribe(() => this.showLoader = false);
+
+    this.listService.getAllSharedListDB().subscribe( data => {
+      data.forEach(d => {
+        if (d.listID === this.listID && d.newOwner === this.auth.getUserEmail() && !d.notify){
+          this.listService.removedNotyficationShared(d);
+          return;
+        }
+      });
+    });
   }
 
   async presentModal() {

@@ -1,33 +1,42 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AlertController, ModalController, IonItemSliding} from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
-import {  SharingNotif, ListService} from '../../services/list.service';
+import { ListService} from '../../services/list.service';
 import {Observable} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
 import {List} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
-import {AuthenticationService} from "../../services/authentification.service";
+import {AuthenticationService} from '../../services/authentification.service';
+import {map, switchMap} from 'rxjs/operators';
+import {MetaList} from '../../models/metaList';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage {
+export class HomePage implements OnInit {
 
   lists: Observable<List[]>;
-  listsShared: Observable<SharingNotif[]>;
+  listsShared: Observable<MetaList[]>;
   showLoading = true;
+
   constructor(private listService: ListService,
               private modalController: ModalController,
               private alertController: AlertController,
               private popupService: PopupService,
-              private auth: AuthenticationService) {
+              public auth: AuthenticationService) {
+
     this.lists = this.listService.getAllListDB();
     this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
     this.listsShared = this.listService.getAllSharedListDB();
     this.lists.subscribe(() => this.showLoading = false);
   }
+
+  ngOnInit(): void {
+    this.listsShared = this.listService.getAllSharedListDB();
+  }
+
 
   async presentModal() {
     const modal = await this.modalController.create({
@@ -54,36 +63,12 @@ export class HomePage {
     });
     modal.present().then(() => slidingItem.close());
   }
-    /*
-    const alert = await this.alertController.create({
-      header: 'Sharing List ',
-      message: 'Share list \"' + list.name + '\" with another user : ',
-      inputs: [
-        {
-          name: 'email',
-          placeholder: 'email@todo.com'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: data => {
-            console.log('Cancel clicked');
-            slidingItem.close();
-          }
-        },
-        {
-          text: 'Share',
-          handler: data => {
-            this.listService.shareList(list, data.email)
-                .then(() => this.popupService.presentToast(list.name + ' shared with ' + data.email + '!'))
-                .catch(() => this.popupService.presentToast('Error, ' + list.name + ' not shared'))
-                .finally(() => slidingItem.close());
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }*/
+
+  public isNew(list: List): Observable<MetaList> {
+   return this.listsShared.pipe(
+        map(data => {
+          return data.find( d => d.listID === list.id && d.owner !== this.auth.getUserEmail());
+        })
+    );
+  }
 }

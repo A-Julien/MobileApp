@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ListDBExtended, ListService, TodoDbId} from '../../services/list.service';
+import { ListService} from '../../services/list.service';
 import {ModalController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {List} from "../../models/list";
+import {Todo} from "../../models/todo";
 
 @Component({
   selector: 'app-list-details',
@@ -16,8 +18,8 @@ export class ListDetailsPage implements OnInit {
   listName: string;
   showLoader = true;
 
-  public list: Observable<ListDBExtended>;
-  public todos: Observable<TodoDbId[]>;
+  public list: Observable<List>;
+  public todos: Observable<Todo[]>;
 
   constructor(private route: ActivatedRoute, private listService: ListService, public modalController: ModalController) { }
 
@@ -44,7 +46,7 @@ export class ListDetailsPage implements OnInit {
     return await modal.present();
   }
 
-    delete(todo: TodoDbId, listId) {
+    delete(todo: Todo, listId) {
         console.log(todo.id, listId);
         this.listService.deleteTodo(todo, listId);
     }

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import {AlertController, ModalController, IonItemSliding} from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
-import {ListDBExtended, SharingNotif, ListService} from '../../services/list.service';
+import {  SharingNotif, ListService} from '../../services/list.service';
 import {merge, Observable} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
-import {map} from "rxjs/operators";
+import {List} from "../../models/list";
 
 @Component({
   selector: 'app-home',
@@ -13,7 +13,7 @@ import {map} from "rxjs/operators";
 })
 export class HomePage {
 
-  lists: Observable<ListDBExtended[]>;
+  lists: Observable<List[]>;
   listsShared: Observable<SharingNotif[]>;
   showLoading = true;
   constructor(private listService: ListService,
@@ -21,7 +21,7 @@ export class HomePage {
               private alertController: AlertController,
               private popupService: PopupService) {
     this.lists = this.listService.getAllListDB();
-    this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.ownerID)));
+    this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
     this.listsShared = this.listService.getAllSharedListDB();
     this.lists.subscribe(() => this.showLoading = false);
   }
@@ -34,12 +34,12 @@ export class HomePage {
     return await modal.present();
   }
 
-  delete(list: ListDBExtended): void {
+  delete(list: List): void {
     this.listService.deleteList(list);
   }
 
 
-  public async share(list: ListDBExtended, slidingItem: IonItemSliding) {
+  public async share(list: List, slidingItem: IonItemSliding) {
     const alert = await this.alertController.create({
       header: 'Sharing List ',
       message: 'Share list \"' + list.name + '\" with another user : ',

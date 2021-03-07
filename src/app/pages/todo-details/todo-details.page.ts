@@ -1,9 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Todo} from '../../models/todo';
 import {ActivatedRoute} from '@angular/router';
-import {ListService, TodoDbId} from '../../services/list.service';
+import {ListService} from '../../services/list.service';
 import {map} from 'rxjs/operators';
-import {Observable} from "rxjs";
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-todo-details',
@@ -12,7 +12,7 @@ import {Observable} from "rxjs";
 })
 export class TodoDetailsPage implements OnInit {
 
-  public todo: Observable<TodoDbId>;
+  public todo: Observable<Todo>;
 
   constructor(private route: ActivatedRoute, private listService: ListService) { }
 

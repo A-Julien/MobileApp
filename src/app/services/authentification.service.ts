@@ -17,22 +17,22 @@ registerWebPlugin(FacebookLogin);
 })
 
 export class AuthenticationService {
-  private userData: Observable<firebase.User>;
   private user = null;
   private token = null;
   private fbLogin: FacebookLoginPlugin;
 
-  constructor(private angularFireAuth: AngularFireAuth,
+  constructor(private auth: AngularFireAuth,
               private router: Router,
               private http: HttpClient,
               private popupService: PopupService) {
-    this.userData = angularFireAuth.authState;
+
     this.fbLogin = FacebookLogin;
+    this.auth.authState.subscribe(user => {this.user = user; });
   }
 
   /* Sign up */
   SignUp(email: string, password: string) {
-    this.angularFireAuth
+    this.auth
         .createUserWithEmailAndPassword(email, password)
         .then(res => {
           console.log('Successfully signed up!', res);
@@ -48,7 +48,7 @@ export class AuthenticationService {
 
   /* Sign in */
   SignIn(email: string, password: string) {
-    this.angularFireAuth
+    this.auth
         .signInWithEmailAndPassword(email, password)
         .then(res => {
           if (res.user.emailVerified) {
@@ -70,12 +70,11 @@ export class AuthenticationService {
 
   /* Sign out */
   SignOut() {
-    this.angularFireAuth
-        .signOut();
+    this.auth.signOut();
   }
 
   PasswordRecovery(email: string) {
-      this.angularFireAuth
+      this.auth
           .sendPasswordResetEmail(email)
           .then(res => {
               console.log('Email sent');
@@ -125,7 +124,7 @@ export class AuthenticationService {
             return;
         }
         const credential = firebase.auth.FacebookAuthProvider.credential(this.token.token);
-        this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
+        this.auth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res;
                 this.popupService.presentToast( 'Successfully signed in!' );
@@ -151,10 +150,14 @@ export class AuthenticationService {
       return this.user.email;
     }
 
+    get authState(): Observable<firebase.User> {
+        return this.auth.authState;
+    }
+
     async signInWithGoogle() {
         const googleUser = await Plugins.GoogleAuth.signIn() as any;
         const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
-        this.angularFireAuth.signInAndRetrieveDataWithCredential(credential)
+        this.auth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res.user;
                 this.popupService.presentToast( 'Successfully signed in!' );

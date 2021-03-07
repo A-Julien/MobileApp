@@ -6,6 +6,9 @@
     <ion-buttons slot="end">
       <ion-button expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
     </ion-buttons>
+    <ion-buttons >
+      <ion-button expand="block" (click)="takePicture()"><ion-icon name="camera-outline"></ion-icon></ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" *ngIf="showLoading">

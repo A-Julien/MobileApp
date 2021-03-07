@@ -9,6 +9,7 @@ import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing
 import {AuthenticationService} from '../../services/authentification.service';
 import {map, switchMap} from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
+import {PhotoService} from "../../services/photo.service";
 
 @Component({
   selector: 'app-home',
@@ -20,12 +21,14 @@ export class HomePage implements OnInit {
   lists: Observable<List[]>;
   listsShared: Observable<MetaList[]>;
   showLoading = true;
+  private imageElement: any;
 
   constructor(private listService: ListService,
               private modalController: ModalController,
               private alertController: AlertController,
               private popupService: PopupService,
-              public auth: AuthenticationService) {
+              public auth: AuthenticationService,
+              private photoService: PhotoService){
 
     this.lists = this.listService.getAllListDB();
     this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
@@ -36,7 +39,6 @@ export class HomePage implements OnInit {
   ngOnInit(): void {
     this.listsShared = this.listService.getAllSharedListDB();
   }
-
 
   async presentModal() {
     const modal = await this.modalController.create({
@@ -70,5 +72,9 @@ export class HomePage implements OnInit {
           return data.find( d => d.listID === list.id && d.owner !== this.auth.getUserEmail());
         })
     );
+  }
+
+  takePicture() {
+    this.photoService.addNewToGallery();
   }
 }

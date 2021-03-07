@@ -79,6 +79,10 @@ export class ListService {
         ));
   }
 
+  public getOneList(id: string): Observable<List>{
+    return this.listCollection.doc<List>(id).valueChanges();
+  }
+
   public getOneTodo(listID: string, todoId: string): Observable<Todo> {
     return this.listCollection.doc(listID).collection<Todo>('todos').doc(todoId).valueChanges();
   }
@@ -88,7 +92,7 @@ export class ListService {
   }
 
   public async createList(list: List): Promise<void> {
-    list.owners.push(this.auth.getUserId());
+    list.owners.push(this.auth.getUserEmail());
     list.owner = this.auth.getUserId();
 
     this.listCollection.ref.withConverter(listToFirebase).add(list)
@@ -98,6 +102,10 @@ export class ListService {
 
   public shareList(list: List, userEmail: string): Promise<any> {
     console.log(list.id, '  ', userEmail);
+    if (list.owner !== this.auth.getUserId()) {
+      this.popupService.presentToast('can not share a list that don\'t belong to you');
+      return;
+    }
     this.fireStore.collection(this.LISTCOLLECTION).doc(list.id).update({
       share: true,
       owners: firebase.firestore.FieldValue.arrayUnion(userEmail)
@@ -144,10 +152,16 @@ export class ListService {
   }
 
   public async removeSharedUser(userEmailToRm: string, list: List) {
-    if (userEmailToRm === this.auth.getUserEmail()){ console.log('nope'); }
-    if (list.owner !== this.auth.getUserEmail()) { console.log('nope'); }
+    if (userEmailToRm === this.auth.getUserEmail()){
+      console.log('nope');
+      return;
+    }
+    if (list.owner !== this.auth.getUserId()) {
+      console.log('nope');
+      return;
+    }
 
-    list.owners = list.owners.filter(u => u !== this.auth.getUserEmail());
+    list.owners = list.owners.filter(u => u !== userEmailToRm);
     if (list.owners.length === 1) { list.share = false; }
 
     this.updateList(list);

@@ -243,3 +243,28 @@ body
 {
   font-size:1rem;
 }
+
+.share-modal {
+  @media (min-width: 500px) and (min-height: 700px) {
+    ion-backdrop {
+      visibility: visible;
+    }
+  }
+
+  .modal-wrapper {
+    position: absolute;
+    overflow: hidden;
+    max-width: 350px;
+    border-radius: 20px;
+    width: 80vw;
+    height: 50vh;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border: 0;
+    box-shadow: 0 16px 20px rgba(0,0,0,.4);
+    background-color: #fafafa;
+  }
+}

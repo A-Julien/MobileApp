@@ -5,7 +5,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
-import {LoadingComponent} from "../../util/loading/loading.component";
+import {LoadingComponent} from '../../util/loading/loading.component';
+import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 
 
 @NgModule({
@@ -19,6 +20,6 @@ import {LoadingComponent} from "../../util/loading/loading.component";
   exports: [
     LoadingComponent
   ],
-  declarations: [HomePage, LoadingComponent]
+  declarations: [HomePage, LoadingComponent, ManageSharingComponent]
 })
 export class HomePageModule {}

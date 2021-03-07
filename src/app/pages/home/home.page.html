@@ -11,7 +11,7 @@
 <ion-content [fullscreen]="true" *ngIf="showLoading">
   <app-loading></app-loading>
 </ion-content>
-<ion-content [fullscreen]="true" *ngIf="!showLoading">
+<ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
   <ion-list >
     <ion-item-sliding *ngFor="let list of lists | async" #slidingItem>
 

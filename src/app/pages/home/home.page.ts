@@ -2,9 +2,11 @@ import { Component } from '@angular/core';
 import {AlertController, ModalController, IonItemSliding} from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import {  SharingNotif, ListService} from '../../services/list.service';
-import {merge, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
-import {List} from "../../models/list";
+import {List} from '../../models/list';
+import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
+import {AuthenticationService} from "../../services/authentification.service";
 
 @Component({
   selector: 'app-home',
@@ -19,7 +21,8 @@ export class HomePage {
   constructor(private listService: ListService,
               private modalController: ModalController,
               private alertController: AlertController,
-              private popupService: PopupService) {
+              private popupService: PopupService,
+              private auth: AuthenticationService) {
     this.lists = this.listService.getAllListDB();
     this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
     this.listsShared = this.listService.getAllSharedListDB();
@@ -28,8 +31,7 @@ export class HomePage {
 
   async presentModal() {
     const modal = await this.modalController.create({
-      component: CreateListComponent,
-      cssClass: 'my-custom-class'
+      component: CreateListComponent
     });
     return await modal.present();
   }
@@ -38,8 +40,21 @@ export class HomePage {
     this.listService.deleteList(list);
   }
 
-
   public async share(list: List, slidingItem: IonItemSliding) {
+    if (list.owner !== this.auth.getUserId()) {
+      this.popupService.presentToast('can not share a list that don\'t belong to you');
+      return;
+    }
+    const modal = await this.modalController.create({
+      component: ManageSharingComponent,
+      cssClass: ['share-modal'],
+      componentProps: {
+        listParam: list,
+      }
+    });
+    modal.present().then(() => slidingItem.close());
+  }
+    /*
     const alert = await this.alertController.create({
       header: 'Sharing List ',
       message: 'Share list \"' + list.name + '\" with another user : ',
@@ -70,5 +85,5 @@ export class HomePage {
       ]
     });
     await alert.present();
-  }
+  }*/
 }

@@ -6,9 +6,6 @@
     <ion-buttons slot="end">
       <ion-button expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
     </ion-buttons>
-    <ion-buttons >
-      <ion-button expand="block" (click)="takePicture()"><ion-icon name="camera-outline"></ion-icon></ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" *ngIf="showLoading">
@@ -20,9 +17,9 @@
 
       <ion-item [routerLink]="['/list-details/' + list.id]">
         <ion-label>{{ list.name }}</ion-label>
-        <div *ngFor="let s of listsShared | async">
-          <ion-badge color="danger" style="margin-right: 10px" *ngIf="s.listID === list.id && !s.notify && s.newOwner === this.auth.getUserEmail()">new</ion-badge>
-        </div>
+        <ion-item *ngFor="let s of listsShared | async">
+          <ion-badge color="danger" *ngIf="s.listID === list.id && !s.notify && s.newOwner === this.auth.getUserEmail()">new</ion-badge>
+        </ion-item>
         <ion-badge color="primary" *ngIf="list.share">shared</ion-badge>
       </ion-item>
 
@@ -35,4 +32,17 @@
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button>
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button (click)="presentModal()">
+        <ion-icon name="add-outline"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="takePicture()">
+        <ion-icon name="camera-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
 </ion-content>

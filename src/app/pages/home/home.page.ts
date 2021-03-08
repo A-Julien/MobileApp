@@ -75,6 +75,6 @@ export class HomePage implements OnInit {
   }
 
   takePicture() {
-    this.photoService.addNewToGallery();
+    this.photoService.takePhoto();
   }
 }

@@ -160,7 +160,7 @@ export class AuthenticationService {
         this.auth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res.user;
-                this.popupService.presentToast( 'Successfully signed in!' );
+                this.popupService.presentToast( 'Welcome back !', 1000 );
                 this.router.navigate(['/home']);
             })
             .catch(err => {

@@ -10,6 +10,7 @@ import {AuthenticationService} from '../../services/authentification.service';
 import {map, switchMap} from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
 import {PhotoService} from "../../services/photo.service";
+import {OcrProviderService} from "../../services/ocr-provider.service";
 
 @Component({
   selector: 'app-home',
@@ -28,7 +29,8 @@ export class HomePage implements OnInit {
               private alertController: AlertController,
               private popupService: PopupService,
               public auth: AuthenticationService,
-              private photoService: PhotoService){
+              private photoService: PhotoService,
+              private ocrService: OcrProviderService){
 
     this.lists = this.listService.getAllListDB();
     this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
@@ -75,6 +77,9 @@ export class HomePage implements OnInit {
   }
 
   takePicture() {
-    this.photoService.takePhoto();
+    this.photoService.takePicture().then( picture => {
+      console.log(picture.base64String);
+      this.ocrService.getLabels(picture.base64String);
+    });
   }
 }

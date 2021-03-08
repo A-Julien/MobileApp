@@ -1,0 +1,13 @@
+<ion-header [translucent]="true">
+    <ion-toolbar>
+        <ion-title>
+            Crop image
+        </ion-title>
+        <ion-buttons slot="end">
+            <ion-button expand="block" (click)="finishCrop()"  ><ion-icon name="checkmark-circle-outline"></ion-icon></ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+ <ion-content [fullscreen]="true">
+    <angular-cropper [cropperOptions]="cropperOptions" [imageUrl]="imageToCrop" #angularCropper></angular-cropper>
+ </ion-content>

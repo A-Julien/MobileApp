@@ -7,19 +7,22 @@ import { HomePage } from './home.page';
 import { HomePageRoutingModule } from './home-routing.module';
 import {LoadingComponent} from '../../util/loading/loading.component';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
+import {AngularCropperjsModule} from 'angular-cropperjs';
+import {CropImgComponent} from "../../modals/crop-img/crop-img.component";
 
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ReactiveFormsModule,
-    HomePageRoutingModule
-  ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        ReactiveFormsModule,
+        HomePageRoutingModule,
+        AngularCropperjsModule
+    ],
   exports: [
     LoadingComponent
   ],
-  declarations: [HomePage, LoadingComponent, ManageSharingComponent]
+  declarations: [HomePage, LoadingComponent, ManageSharingComponent, CropImgComponent]
 })
 export class HomePageModule {}

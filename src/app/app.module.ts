@@ -15,6 +15,7 @@ import {AngularFireModule} from '@angular/fire';
 import { AngularFireAnalyticsModule} from '@angular/fire/analytics';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
+import { AngularCropperjsModule } from 'angular-cropperjs';
 
 @NgModule({
   declarations: [AppComponent, CreateListComponent, CreateTodoComponent],
@@ -27,7 +28,8 @@ import { environment } from '../environments/environment';
       AngularFireModule.initializeApp(environment.firebaseConfig),
       AngularFireAnalyticsModule,
       AngularFirestoreModule,
-      HttpClientModule
+      HttpClientModule,
+      AngularCropperjsModule
   ],
   providers: [
     StatusBar,

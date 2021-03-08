@@ -31,7 +31,7 @@ export class PhotoService {
 
   public async takePicture(): Promise<CameraPhoto>{
     return  Camera.getPhoto({
-      resultType: CameraResultType.Uri,
+      resultType: CameraResultType.DataUrl,
       source: CameraSource.Camera,
       quality: 100,
       height: 1920,

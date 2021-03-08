@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {AlertController, ModalController, IonItemSliding} from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
@@ -7,10 +7,14 @@ import {PopupService} from '../../services/popup.service';
 import {List} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
-import {map, switchMap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
-import {PhotoService} from "../../services/photo.service";
-import {OcrProviderService} from "../../services/ocr-provider.service";
+import {PhotoService} from '../../services/photo.service';
+import {OcrProviderService} from '../../services/ocr-provider.service';
+import { Plugins } from '@capacitor/core';
+import {CropImgComponent} from "../../modals/crop-img/crop-img.component";
+
+const { Network } = Plugins;
 
 @Component({
   selector: 'app-home',
@@ -22,7 +26,6 @@ export class HomePage implements OnInit {
   lists: Observable<List[]>;
   listsShared: Observable<MetaList[]>;
   showLoading = true;
-  private imageElement: any;
 
   constructor(private listService: ListService,
               private modalController: ModalController,
@@ -30,7 +33,8 @@ export class HomePage implements OnInit {
               private popupService: PopupService,
               public auth: AuthenticationService,
               private photoService: PhotoService,
-              private ocrService: OcrProviderService){
+              private ocrService: OcrProviderService
+  ){
 
     this.lists = this.listService.getAllListDB();
     this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
@@ -76,10 +80,21 @@ export class HomePage implements OnInit {
     );
   }
 
-  takePicture() {
-    this.photoService.takePicture().then( picture => {
-      console.log(picture.base64String);
-      this.ocrService.getLabels(picture.base64String);
+  async takePicture() {
+    const status = await Network.getStatus();
+    const picture = await  this.photoService.takePicture();
+
+    const modal = await this.modalController.create({
+      component: CropImgComponent,
+      cssClass: ['crop-modal'],
+      componentProps: {
+        imageToCrop: picture?.dataUrl
+      }
     });
+
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+
+    this.ocrService.getLabels(data.substring(23));
   }
 }

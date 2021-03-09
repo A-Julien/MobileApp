@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import {CameraPhoto} from '@capacitor/core';
 import {PopupService} from './popup.service';
 import {LoadingController} from '@ionic/angular';
 import {HttpClient} from '@angular/common/http';
@@ -16,6 +15,8 @@ export class OcrProviderService {
     langPath: '../../assets/lang-data',
     logger: m => console.log(m), // Add logger here
   });
+  public readonly DOCUMENT_TEXT_TYPE = 'DOCUMENT_TEXT_DETECTION';
+  public readonly DOCUMENT_HAND_TYPE = 'DOCUMENT_HAND_DETECTION';
 
   constructor(
       private popUpService: PopupService,
@@ -23,10 +24,10 @@ export class OcrProviderService {
       private http: HttpClient
   ) {}
 
-  getLabels(base64Image: string) {
+  OnLineOcrGoogleVisio(base64Image: string, detectionType: string) {
     console.log(base64Image);
     console.log('GOOGOLE');
-    const body = {
+    let body: any = {
       requests: [
         {
           image: {
@@ -42,23 +43,42 @@ export class OcrProviderService {
       ]
     };
     console.log('GOOGOLE2');
-
-    const s = this.http.post('https://eu-vision.googleapis.com/v1/images:annotate?key=' + environment.googleCloudVisionAPIKey, JSON.stringify(body))
+    if (detectionType === this.DOCUMENT_HAND_TYPE){
+      body = {
+        requests: [
+          {
+            image: {
+                content: base64Image
+            },
+            features: [
+              {
+                type: 'DOCUMENT_TEXT_DETECTION'
+              }
+            ],
+            imageContext: {
+              languageHints: ['fr-t-i0-handwrit']
+            }
+          }
+        ]
+      };
+    }
+    // tslint:disable-next-line:max-line-length
+    this.http.post('https://eu-vision.googleapis.com/v1/images:annotate?key=' + environment.googleCloudVisionAPIKey, JSON.stringify(body))
         .subscribe(data => {
           console.log(data);
         }
     );
   }
 
-  public async recognize(picture: CameraPhoto){
+  public async offLineOcrTesseract(picture){
     console.log('INPGOTO');
+    console.log(picture);
     const loader = await this.presentLoading();
-
     await this.worker.load();
     await this.worker.loadLanguage('fra');
     await this.worker.initialize('fra');
-    const { data: { text } } = await this.worker.recognize(picture.webPath);
-    console.log(text);
+    console.log('INPGOTO');
+    const { data: { text } } = await this.worker.recognize(picture);
     loader.dismiss();
     this.popUpService.presentAlert(text);
     await this.worker.terminate();

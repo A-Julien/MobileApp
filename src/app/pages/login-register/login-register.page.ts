@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthenticationService} from '../../services/authentification.service';
-import {ToastController} from '@ionic/angular';
+import {ModalController, ToastController} from '@ionic/angular';
 import {Router} from '@angular/router';
+import {CropImgComponent} from "../../modals/crop-img/crop-img.component";
+import {Network} from "@capacitor/core";
+import {PhotoService} from "../../services/photo.service";
+import {OcrProviderService} from "../../services/ocr-provider.service";
 
 @Component({
   selector: 'app-login-register',
@@ -10,8 +14,7 @@ import {Router} from '@angular/router';
 })
 export class LoginRegisterPage implements OnInit {
 
-  constructor(private authService: AuthenticationService,
-              private router: Router) { }
+  constructor(private authService: AuthenticationService) { }
 
   ngOnInit() {
   }

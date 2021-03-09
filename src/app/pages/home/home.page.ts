@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {AlertController, ModalController, IonItemSliding} from '@ionic/angular';
+import {AlertController, ModalController, IonItemSliding, ActionSheetController} from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
 import {Observable} from 'rxjs';
@@ -12,7 +12,7 @@ import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
 import { Plugins } from '@capacitor/core';
-import {CropImgComponent} from "../../modals/crop-img/crop-img.component";
+import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
 
 const { Network } = Plugins;
 
@@ -33,7 +33,8 @@ export class HomePage implements OnInit {
               private popupService: PopupService,
               public auth: AuthenticationService,
               private photoService: PhotoService,
-              private ocrService: OcrProviderService
+              private ocrService: OcrProviderService,
+              public actionSheetController: ActionSheetController
   ){
 
     this.lists = this.listService.getAllListDB();
@@ -95,6 +96,7 @@ export class HomePage implements OnInit {
     await modal.present();
     const { data } = await modal.onWillDismiss();
 
-    this.ocrService.getLabels(data.substring(23));
+    await this.ocrService.offLineOcrTesseract(data);
+    //this.ocrService.OnLineOcrGoogleVisio(data.substring(23));
   }
 }

@@ -19,9 +19,9 @@ export class PhotoService {
   public photos: Photo[] = [];
   constructor() { }
 
-  public async takePictureBase64(): Promise<CameraPhoto> {
+  public async takePictureDataUrl(): Promise<CameraPhoto> {
     return Camera.getPhoto({
-      resultType: CameraResultType.Base64,
+      resultType: CameraResultType.DataUrl,
       source: CameraSource.Camera,
       quality: 100
       /*height: 1920,
@@ -31,12 +31,11 @@ export class PhotoService {
 
   public async takePicture(): Promise<CameraPhoto>{
     return  Camera.getPhoto({
-      resultType: CameraResultType.DataUrl,
+      resultType: CameraResultType.Uri,
       source: CameraSource.Camera,
       quality: 100,
       height: 1920,
       width: 1080
     });
   }
-
 }

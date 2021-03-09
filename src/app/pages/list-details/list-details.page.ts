@@ -8,6 +8,10 @@ import {map} from 'rxjs/operators';
 import {List} from '../../models/list';
 import {Todo} from '../../models/todo';
 import {AuthenticationService} from '../../services/authentification.service';
+import {Network} from '@capacitor/core';
+import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
+import {PhotoService} from "../../services/photo.service";
+import {OcrProviderService} from "../../services/ocr-provider.service";
 
 @Component({
   selector: 'app-list-details',
@@ -26,7 +30,9 @@ export class ListDetailsPage implements OnInit {
       private route: ActivatedRoute,
       private listService: ListService,
       public modalController: ModalController,
-      private auth: AuthenticationService)
+      private auth: AuthenticationService,
+      private photoService: PhotoService,
+      private ocrService: OcrProviderService)
   { }
 
   ngOnInit() {
@@ -65,4 +71,35 @@ export class ListDetailsPage implements OnInit {
         console.log(todo.id, listId);
         this.listService.deleteTodo(todo, listId);
     }
+
+  async OcrDigital(type: string) {
+
+    // const picture = await  this.photoService.takePicture();
+    const picture = await  this.photoService.takePictureDataUrl();
+
+    const modal = await this.modalController.create({
+      component: CropImgComponent,
+      cssClass: ['crop-modal'],
+      componentProps: {
+        imageToCrop: picture?.dataUrl
+      }
+    });
+
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+
+    const status = await Network.getStatus();
+    if (status.connected){
+      if (type === 'document'){
+        this.ocrService.OnLineOcrGoogleVisio(data.substring(23), this.ocrService.DOCUMENT_TEXT_TYPE);
+      }
+      if (type === 'handWriter'){
+        this.ocrService.OnLineOcrGoogleVisio(data.substring(23), this.ocrService.DOCUMENT_HAND_TYPE);
+      }
+      return;
+    }
+
+    await this.ocrService.offLineOcrTesseract(data);
+
+  }
 }

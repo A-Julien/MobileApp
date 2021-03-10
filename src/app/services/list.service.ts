@@ -186,6 +186,10 @@ export class ListService {
     return this.listCollection.doc(list.id).ref.withConverter(listToFirebase).set(list);
   }
 
+  public updateTodo(todo: Todo, listID: string){
+    this.listCollection.doc(listID).collection('todos').doc(todo.id).ref.withConverter(todoToFirebase).set(todo);
+  }
+
   deleteTodo(todo: Todo, listId: string): void {
     this.listCollection.doc(listId).collection('todos').doc(todo.id).delete()
         .then(() => this.popupService.presentToast('list ' + todo.name + ' removed'))

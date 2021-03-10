@@ -8,11 +8,7 @@ import {map} from 'rxjs/operators';
 import {List} from '../../models/list';
 import {Todo} from '../../models/todo';
 import {AuthenticationService} from '../../services/authentification.service';
-import {Network} from '@capacitor/core';
-import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
-import {PhotoService} from '../../services/photo.service';
-import {OcrProviderService} from '../../services/ocr-provider.service';
-import {PopupService} from "../../services/popup.service";
+
 
 @Component({
   selector: 'app-list-details',
@@ -31,10 +27,7 @@ export class ListDetailsPage implements OnInit {
       private route: ActivatedRoute,
       private listService: ListService,
       public modalController: ModalController,
-      private auth: AuthenticationService,
-      private photoService: PhotoService,
-      private ocrService: OcrProviderService,
-      private popUpService: PopupService)
+      private auth: AuthenticationService)
   { }
 
   ngOnInit() {
@@ -69,39 +62,8 @@ export class ListDetailsPage implements OnInit {
     return await modal.present();
   }
 
-    delete(todo: Todo, listId) {
-        console.log(todo.id, listId);
-        this.listService.deleteTodo(todo, listId);
-    }
-
-  async OcrDigital(type: string) {
-
-    // const picture = await  this.photoService.takePicture();
-    const picture = await  this.photoService.takePictureDataUrl();
-    const loader = await this.popUpService.presentLoading('Processing...');
-    const modal = await this.modalController.create({
-      component: CropImgComponent,
-      cssClass: ['crop-modal'],
-      componentProps: {
-        imageToCrop: picture?.dataUrl
-      }
-    });
-
-    await modal.present().then(() => loader.dismiss());
-    const { data } = await modal.onWillDismiss();
-
-    const status = await Network.getStatus();
-    if (status.connected){
-      if (type === 'document'){
-        this.ocrService.OnLineOcrGoogleVisio(data.substring(23), this.ocrService.DOCUMENT_TEXT_TYPE);
-      }
-      if (type === 'handWriter'){
-        this.ocrService.OnLineOcrGoogleVisio(data.substring(23), this.ocrService.DOCUMENT_HAND_TYPE);
-      }
-      return;
-    }
-
-    await this.ocrService.offLineOcrTesseract(data);
-
+  delete(todo: Todo, listId) {
+      console.log(todo.id, listId);
+      this.listService.deleteTodo(todo, listId);
   }
 }

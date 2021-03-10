@@ -63,14 +63,14 @@ export class OcrProviderService {
       };
     }
     // tslint:disable-next-line:max-line-length
-    this.http.post('https://eu-vision.googleapis.com/v1/images:annotate?key=' + environment.googleCloudVisionAPIKey, JSON.stringify(body))
-        .subscribe(data => {
+    return this.http.post('https://eu-vision.googleapis.com/v1/images:annotate?key=' + environment.googleCloudVisionAPIKey, JSON.stringify(body));
+        /*.subscribe(data => {
           console.log(data);
         }
-    );
+    );*/
   }
 
-  public async offLineOcrTesseract(picture){
+  public async offLineOcrTesseract(picture): Promise<string>{
     console.log('INPGOTO');
     console.log(picture);
     const loader = await this.popUpService.presentLoading('Please wait...');
@@ -80,8 +80,8 @@ export class OcrProviderService {
     console.log('INPGOTO');
     const { data: { text } } = await this.worker.recognize(picture);
     loader.dismiss();
-    this.popUpService.presentAlert(text);
     await this.worker.terminate();
+    return text;
   }
 
 

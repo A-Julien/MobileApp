@@ -1,12 +1,29 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button (click)="save()"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ (todo | async)?.name }}</ion-title>
+    <ion-buttons slot="end" (click)="save()">
+      <ion-icon name="save-outline"></ion-icon>
+    </ion-buttons>
+    <ion-title>{{ todo.name }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-label > {{ (todo | async)?.content }} </ion-label>
+<ion-content class="fullheight">
+  <ion-textarea debounce="5" auto-grow="true" (ionChange)="save()" [(ngModel)]="todo.content" ></ion-textarea>
+  <!--<ion-label > {{ (todo | async)?.content }} </ion-label>-->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button>
+      <ion-icon name="camera"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button (click)="OcrDigital('document')">
+        <ion-icon name="text-outline"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="OcrDigital('handWriter')">
+        <ion-icon name="pencil"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
 </ion-content>

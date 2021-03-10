@@ -13,6 +13,7 @@ import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
 import { Plugins } from '@capacitor/core';
 import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
+import {Router} from '@angular/router';
 
 const { Network } = Plugins;
 
@@ -26,6 +27,7 @@ export class HomePage implements OnInit {
   lists: Observable<List[]>;
   listsShared: Observable<MetaList[]>;
   showLoading = true;
+  editing = false;
 
   constructor(private listService: ListService,
               private modalController: ModalController,
@@ -34,7 +36,7 @@ export class HomePage implements OnInit {
               public auth: AuthenticationService,
               private photoService: PhotoService,
               private ocrService: OcrProviderService,
-              public actionSheetController: ActionSheetController
+              private router: Router
   ){
 
     this.lists = this.listService.getAllListDB();
@@ -97,6 +99,31 @@ export class HomePage implements OnInit {
     const { data } = await modal.onWillDismiss();
 
     await this.ocrService.offLineOcrTesseract(data);
-    //this.ocrService.OnLineOcrGoogleVisio(data.substring(23));
+    // this.ocrService.OnLineOcrGoogleVisio(data.substring(23));
+  }
+
+  routeToTodos(id: string){
+    if (!this.editing) { this.router.navigate(['/list-details/' + id]); }
+  }
+
+  startedit() {
+      this.editing = true;
+  }
+
+  stopedit() {
+    this.editing = false;
+  }
+
+  delSelect() {
+    console.log('wsh');
+
+    this.listService.getAllListDB().toPromise().then( (listArray) => {
+      console.log(listArray);
+      listArray.forEach((list) => {
+        if (list.isChecked) { this.delete(list); }
+      });
+    });
+
+
   }
 }

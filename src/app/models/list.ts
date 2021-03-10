@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import {DocumentData, QueryDocumentSnapshot, SnapshotOptions} from '@angular/fire/firestore';
-import {Todo} from "./todo";
+import {Todo} from './todo';
 
 export class List {
     id: string;
@@ -11,7 +11,10 @@ export class List {
     share: boolean;
     owners: string[];
 
+    isChecked: boolean;
+
     constructor(name: string) {
+        this.isChecked = false;
         this.name = name;
         this.todos = [];
         this.owners = [];

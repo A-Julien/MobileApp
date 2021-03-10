@@ -73,7 +73,7 @@ export class OcrProviderService {
   public async offLineOcrTesseract(picture){
     console.log('INPGOTO');
     console.log(picture);
-    const loader = await this.presentLoading();
+    const loader = await this.popUpService.presentLoading('Please wait...');
     await this.worker.load();
     await this.worker.loadLanguage('fra');
     await this.worker.initialize('fra');
@@ -84,13 +84,5 @@ export class OcrProviderService {
     await this.worker.terminate();
   }
 
-  private async presentLoading(): Promise<HTMLIonLoadingElement> {
-    const loading = await this.loadingController.create({
-      cssClass: 'my-custom-class',
-      message: 'Please wait...'
-    });
-    await loading.present();
-    return loading;
 
-  }
 }

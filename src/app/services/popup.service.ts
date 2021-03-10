@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AlertController, ToastController} from '@ionic/angular';
+import {AlertController, LoadingController, ToastController} from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +7,8 @@ import {AlertController, ToastController} from '@ionic/angular';
 export class PopupService {
 
   constructor(private toastController: ToastController,
-              private alertController: AlertController) { }
+              private alertController: AlertController,
+              private loadingController: LoadingController) { }
 
  public async presentToast(msg: string, timeToShow = 5000) {
     const toast = await this.toastController.create({
@@ -28,4 +29,13 @@ export class PopupService {
 
     await alert.present();
   }
+
+    public async presentLoading(text: string): Promise<HTMLIonLoadingElement> {
+        const loading = await this.loadingController.create({
+            cssClass: 'my-custom-class',
+            message: text
+        });
+        await loading.present();
+        return loading;
+    }
 }

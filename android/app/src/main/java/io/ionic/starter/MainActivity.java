@@ -39,7 +39,11 @@ public class MainActivity extends BridgeActivity {
           webSettings.setForceDark(WebSettings.FORCE_DARK_ON);
         }
       } else {
-        webSettings.setForceDark(WebSettings.FORCE_DARK_OFF);
+        try {
+          webSettings.setForceDark(WebSettings.FORCE_DARK_OFF);
+        } catch (NoSuchMethodError e) {
+          System.out.println("WARN dark theme not available");
+        }
       }
     }
 }

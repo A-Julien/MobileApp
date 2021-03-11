@@ -111,14 +111,15 @@ export class ListService {
       share: true,
       owners: firebase.firestore.FieldValue.arrayUnion(userEmail)
     });
-    return this.creatSharingNotif(userEmail, list.id);
+    return this.creatSharingNotif(userEmail, list);
   }
 
-  private creatSharingNotif(emailUser: string, listNameUser: string): Promise<any>{
+  private creatSharingNotif(emailUser: string, lisToShare: List): Promise<any>{
     return this.fireStore.collection(this.SHARECOLLECTION).add({
       newOwner: emailUser,
       owner: this.auth.getUserEmail(),
-      listID: listNameUser,
+      listID: lisToShare.id,
+      listName: lisToShare.name,
       notify: false
     });
   }

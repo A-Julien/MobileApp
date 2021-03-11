@@ -1,8 +1,12 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Lists
-    </ion-title>
+    <ion-item slot="start">
+      <ion-title style="padding: 0">Lists</ion-title>
+      <ion-buttons>
+        <ion-button *ngIf="!editing" (click)='popShareHistory($event)'><ion-icon name="notifications-outline"></ion-icon></ion-button>
+      </ion-buttons>
+    </ion-item>
+
     <ion-buttons slot="end">
       <ion-button *ngIf="editing" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
       <ion-button *ngIf="!editing" (click)="startedit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
@@ -20,7 +24,7 @@
 
       <!--<ion-item  [routerLink]="['/list-details/' + list.id]">-->
       <ion-item  (click)="routeToTodos(list.id)">
-        <ion-checkbox *ngIf="editing" slot="start" [(ngModel)]="list.isChecked"></ion-checkbox>
+        <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)" [(ngModel)]="list.isChecked"></ion-checkbox>
         <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
         <ion-input *ngIf="editing" value="{{ list.name }}"></ion-input>
 
@@ -35,7 +39,7 @@
       </ion-item-options>
 
       <ion-item-options  side="start">
-        <ion-item-option *ngIf="!editing" (click)="share(list,slidingItem)" color="primary"><ion-icon name="share-social-outline"></ion-icon></ion-item-option>
+        <ion-item-option *ngIf="!editing" [disabled]="list.owner !== auth.getUserId()" (click)="share(list,slidingItem)" color="primary"><ion-icon name="share-social-outline"></ion-icon></ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>

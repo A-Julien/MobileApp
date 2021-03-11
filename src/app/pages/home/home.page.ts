@@ -1,5 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {AlertController, ModalController, IonItemSliding, ActionSheetController} from '@ionic/angular';
+import {
+  AlertController,
+  ModalController,
+  IonItemSliding,
+  ActionSheetController,
+  PopoverController
+} from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
 import {Observable} from 'rxjs';
@@ -7,13 +13,14 @@ import {PopupService} from '../../services/popup.service';
 import {List} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
-import {map} from 'rxjs/operators';
+import {last, map, takeLast} from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
 import { Plugins } from '@capacitor/core';
 import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
 import {Router} from '@angular/router';
+import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
 
 const { Network } = Plugins;
 
@@ -28,21 +35,34 @@ export class HomePage implements OnInit {
   listsShared: Observable<MetaList[]>;
   showLoading = true;
   editing = false;
+  lastList: List[];
+  listToRm: List[];
 
   constructor(private listService: ListService,
               private modalController: ModalController,
               private alertController: AlertController,
-              private popupService: PopupService,
+              private popUpService: PopupService,
               public auth: AuthenticationService,
               private photoService: PhotoService,
               private ocrService: OcrProviderService,
+              private popOverController: PopoverController,
               private router: Router
   ){
+    this.listToRm = [];
 
-    this.lists = this.listService.getAllListDB();
+    this.lists = this.listService.getAllListDB().pipe(
+        map(list => {
+          console.log('ischecked 0');
+          list.forEach(l => l.isChecked = false);
+          return list;
+        })
+    );
     this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
     this.listsShared = this.listService.getAllSharedListDB();
-    this.lists.subscribe(() => this.showLoading = false);
+    this.lists.subscribe((listArray) => {
+      this.showLoading = false;
+      this.lastList = listArray;
+    });
   }
 
   ngOnInit(): void {
@@ -51,18 +71,19 @@ export class HomePage implements OnInit {
 
   async presentModal() {
     const modal = await this.modalController.create({
-      component: CreateListComponent
+      component: CreateListComponent,
+      cssClass: ['share-modal']
     });
     return await modal.present();
   }
 
-  delete(list: List): void {
-    this.listService.deleteList(list);
+  async delete(list: List) {
+    await this.listService.deleteList(list);
   }
 
   public async share(list: List, slidingItem: IonItemSliding) {
     if (list.owner !== this.auth.getUserId()) {
-      this.popupService.presentToast('can not share a list that don\'t belong to you');
+      this.popUpService.presentToast('can not share a list that don\'t belong to you');
       return;
     }
     const modal = await this.modalController.create({
@@ -114,16 +135,34 @@ export class HomePage implements OnInit {
     this.editing = false;
   }
 
-  delSelect() {
-    console.log('wsh');
-
-    this.listService.getAllListDB().toPromise().then( (listArray) => {
-      console.log(listArray);
-      listArray.forEach((list) => {
-        if (list.isChecked) { this.delete(list); }
-      });
-    });
-
-
+  addToDel(list: List){
+    if (this.listToRm.indexOf(list) !== -1){
+      this.listToRm = this.listToRm.filter(l => l !== list);
+      return;
+    }
+    this.listToRm.push(list);
   }
+
+  async delSelect() {
+    let msg = 'deleting ' + this.listToRm.length + ' list';
+    if ( this.listToRm.length > 1) { msg = 'deleting ' + this.listToRm.length + ' lists'; }
+    const loader = await this.popUpService.presentLoading(msg);
+    this.listToRm.forEach( list => {
+        console.log('delete list ', list.name);
+        this.delete(list);
+    });
+    await loader.dismiss();
+  }
+
+  async popShareHistory(ev) {
+      const popover = await this.popOverController.create({
+        component: ShareHistoryComponent,
+        cssClass: 'my-custom-class',
+        event: ev,
+        mode: 'ios',
+        translucent: true
+      });
+      return await popover.present();
+  }
+
 }

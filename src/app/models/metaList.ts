@@ -5,9 +5,11 @@ export class MetaList {
     newOwner: string;
     owner: string;
     listID: string;
+    listName: string;
     notify: boolean;
 
-    constructor(newOwner: string, owner: string, listID: string) {
+    constructor(newOwner: string, owner: string, listID: string, listName: string) {
+        this.listName = listName;
         this.newOwner = newOwner;
         this.owner = owner;
         this.listID = listID;
@@ -20,6 +22,7 @@ export const MetaListToFirebase = {
             newOwner: metaList.newOwner,
             owner: metaList.owner,
             listID: metaList.listID,
+            listName: metaList.listName,
             notify: metaList.notify
         };
     },

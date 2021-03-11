@@ -8,7 +8,9 @@ import { HomePageRoutingModule } from './home-routing.module';
 import {LoadingComponent} from '../../util/loading/loading.component';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AngularCropperjsModule} from 'angular-cropperjs';
-import {CropImgComponent} from "../../modals/crop-img/crop-img.component";
+import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
+import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
+
 
 
 @NgModule({
@@ -23,6 +25,6 @@ import {CropImgComponent} from "../../modals/crop-img/crop-img.component";
   exports: [
     LoadingComponent
   ],
-  declarations: [HomePage, LoadingComponent, ManageSharingComponent, CropImgComponent]
+  declarations: [HomePage, LoadingComponent, ManageSharingComponent, CropImgComponent, ShareHistoryComponent]
 })
 export class HomePageModule {}

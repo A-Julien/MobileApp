@@ -3,7 +3,11 @@
     <ion-item slot="start">
       <ion-title style="padding: 0">Lists</ion-title>
       <ion-buttons>
-        <ion-button *ngIf="!editing" (click)='popShareHistory($event)'><ion-icon name="notifications-outline"></ion-icon></ion-button>
+        <ion-button *ngIf="!editing" (click)='popShareHistory($event)'>
+          <ion-icon  name="notifications-outline"></ion-icon>
+          <ion-badge class="badge-one" color="danger">3</ion-badge>
+          <!--[class.badge-one]="unread < 10" [class.badge-two]="unread >= 10"-->
+        </ion-button>
       </ion-buttons>
     </ion-item>
 

@@ -1,8 +1,10 @@
 <ion-list >
   <ion-item  *ngFor="let lists of listsShared | async">
     <ion-icon style="margin-right: 1px" size="small" name="share-social"></ion-icon>
-    <ion-label> {{ lists.owner.split('@')[0] }} -> {{ lists.listName }}</ion-label>
-    <ion-icon name="caret-forward"></ion-icon>
-    <ion-label>{{ lists.listName }}</ion-label>
+    <ion-label>
+      {{ lists.owner.split('@')[0] }}
+      <ion-icon name="caret-forward"></ion-icon>
+      {{ lists.listName }}
+    </ion-label>
   </ion-item>
 </ion-list>

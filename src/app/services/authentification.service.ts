@@ -28,6 +28,8 @@ export class AuthenticationService {
 
     this.fbLogin = FacebookLogin;
     this.auth.authState.subscribe(user => {this.user = user; });
+    this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
   }
 
   /* Sign up */
@@ -155,8 +157,13 @@ export class AuthenticationService {
     }
 
     async signInWithGoogle() {
+
         const googleUser = await Plugins.GoogleAuth.signIn() as any;
         const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+            .then(() => {
+                this.signInWithGoogle();
+
         this.auth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res.user;
@@ -166,6 +173,7 @@ export class AuthenticationService {
             .catch(err => {
                 this.popupService.presentAlert( 'Failed to sign in via Google');
                 console.log('Something is wrong:', err.message);
+            });
             });
     }
 

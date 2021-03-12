@@ -5,14 +5,14 @@
       <ion-buttons>
         <ion-button *ngIf="!editing" (click)='popShareHistory($event)'>
           <ion-icon  name="notifications-outline"></ion-icon>
-          <ion-badge class="badge-one" color="danger">3</ion-badge>
+          <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
           <!--[class.badge-one]="unread < 10" [class.badge-two]="unread >= 10"-->
         </ion-button>
       </ion-buttons>
     </ion-item>
 
     <ion-buttons slot="end">
-      <ion-button *ngIf="editing" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
+      <ion-button *ngIf="editing" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
       <ion-button *ngIf="!editing" (click)="startedit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
       <ion-button *ngIf="editing" (click)="stopedit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
       <ion-button expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
@@ -32,9 +32,7 @@
         <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
         <ion-input *ngIf="editing" value="{{ list.name }}"></ion-input>
 
-        <ion-item *ngFor="let s of listsShared | async">
-          <ion-badge slot="end" color="danger" *ngIf="s.listID === list.id && !s.notify && s.newOwner === this.auth.getUserEmail() && !editing">new</ion-badge>
-        </ion-item>
+        <ion-badge slot="end" color="danger" *ngIf="isNewList(list.id) && !editing">new</ion-badge>
         <ion-badge slot="end" color="primary" *ngIf="list.share && !editing">shared</ion-badge>
       </ion-item>
 

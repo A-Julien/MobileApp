@@ -35,8 +35,10 @@ export class HomePage implements OnInit {
   listsShared: Observable<MetaList[]>;
   showLoading = true;
   editing = false;
-  lastList: List[];
+  private lastList: List[];
   listToRm: List[];
+  nbNotif: number;
+  private metalist: MetaList[];
 
   constructor(private listService: ListService,
               private modalController: ModalController,
@@ -48,6 +50,7 @@ export class HomePage implements OnInit {
               private popOverController: PopoverController,
               private router: Router
   ){
+    this.nbNotif = 0;
     this.listToRm = [];
 
     this.lists = this.listService.getAllListDB().pipe(
@@ -59,6 +62,16 @@ export class HomePage implements OnInit {
     );
     this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
     this.listsShared = this.listService.getAllSharedListDB();
+    this.listsShared.subscribe(ml => {
+      this.metalist = ml;
+      this.nbNotif = 0;
+      ml.forEach(meta => {
+        if (!meta.notify && meta.newOwner === this.auth.getUserEmail()){
+          this.nbNotif += 1;
+        }
+      });
+    });
+
     this.lists.subscribe((listArray) => {
       this.showLoading = false;
       this.lastList = listArray;
@@ -75,6 +88,14 @@ export class HomePage implements OnInit {
       cssClass: ['share-modal']
     });
     return await modal.present();
+  }
+
+  isNewList(listId: string) {
+    let res = false;
+    this.metalist.forEach( ml => {
+      if (ml.listID === listId && !ml.notify && ml.newOwner === this.auth.getUserEmail()) { res =  true; }
+    });
+    return res;
   }
 
   async delete(list: List) {

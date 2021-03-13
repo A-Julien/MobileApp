@@ -148,11 +148,11 @@ export class HomePage implements OnInit {
     if (!this.editing) { this.router.navigate(['/list-details/' + id]); }
   }
 
-  startedit() {
+  startEdit() {
       this.editing = true;
   }
 
-  stopedit() {
+  stopEdit() {
     this.editing = false;
   }
 
@@ -178,7 +178,7 @@ export class HomePage implements OnInit {
   async popShareHistory(ev) {
       const popover = await this.popOverController.create({
         component: ShareHistoryComponent,
-        cssClass: 'my-custom-class',
+        cssClass: 'notif',
         event: ev,
         mode: 'ios',
         translucent: true

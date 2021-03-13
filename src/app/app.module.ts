@@ -16,9 +16,10 @@ import { AngularFireAnalyticsModule} from '@angular/fire/analytics';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { AngularCropperjsModule } from 'angular-cropperjs';
+import {SideMenuComponent} from './modals/side-menu/side-menu.component';
 
 @NgModule({
-  declarations: [AppComponent, CreateListComponent, CreateTodoComponent],
+  declarations: [AppComponent, CreateListComponent, CreateTodoComponent, SideMenuComponent],
   entryComponents: [],
   imports: [
       BrowserModule,

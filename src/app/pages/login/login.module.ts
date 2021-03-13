@@ -16,7 +16,7 @@ import {ShowHidePasswordPageModule} from '../show-hide-password/show-hide-passwo
         IonicModule,
         LoginPageRoutingModule,
         ReactiveFormsModule,
-        ShowHidePasswordPageModule
+        ShowHidePasswordPageModule,
     ],
     declarations: [LoginPage]
 })

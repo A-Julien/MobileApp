@@ -294,3 +294,15 @@ body
   }
 }
 
+/*.popoverNotif {
+  .popover-content {
+    --width: auto;
+  }
+}*/
+
+ion-popover.notif {
+  --width: auto;
+  --max-width: 100%;
+}
+
+

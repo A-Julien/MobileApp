@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-item class="force-background">
+    <ion-avatar slot="start">
+      <img src="assets/img/avatar.svg">
+    </ion-avatar>
+    <ion-label>
+      <h3></h3>
+      <p>{{ userEmail }}</p>
+    </ion-label>
+  </ion-item>
+</ion-header>
+
+<!--<div class="nav">
+<ion-menu-toggle auto-hide="false">
+    <span class="divider"></span>
+      <div class="nav-item">
+        <ion-icon class="icon" name="cog"></ion-icon>
+        <ion-label>Settings</ion-label>
+        <span class="divider"></span>
+      </div>
+
+</ion-menu-toggle>
+<ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
+  <div class="nav-item" [routerLink]="[p.url]">
+    <span class="icon">{{p.icon}}</span>
+    {{p.title}}
+    <span class="divider"></span>
+  </div>
+</ion-menu-toggle>
+</div>-->
+<div class="nav">
+  <ion-menu-toggle auto-hide="false">
+    <div class="nav-item">
+      <ion-icon  class="icon" name="hammer-sharp"></ion-icon>
+      <ion-label>User Settings</ion-label>
+      <span class="divider"></span>
+    </div>
+  </ion-menu-toggle>
+</div>
+
+<ion-footer>
+  <div class="foot-nav">
+    <div class="nav-item">
+      <ion-icon class="icon" name="cog"></ion-icon>
+      <ion-label>Settings</ion-label>
+    </div>
+    <div class="nav-item">
+      <ion-item class="force-background">
+        <ion-toggle value="false"></ion-toggle>
+        <ion-label>Force offline ocr</ion-label>
+      </ion-item>
+      <span class="divider"></span>
+    </div>
+  </div>
+
+  <div class="footer-nav">
+    <ion-button class="force-background" expand="block">
+        <ion-icon (click)="logout()" color="danger" size="large"  name="log-out"></ion-icon>
+        <ion-label>Log out</ion-label>
+    </ion-button>
+  </div>
+
+  <div class="footer-social">
+    <ion-icon  name="logo-instagram"></ion-icon>
+    <ion-icon  name="logo-facebook"></ion-icon>
+    <ion-icon  name="logo-twitter"></ion-icon>
+    <ion-icon  name="globe"></ion-icon>
+  </div>
+
+  <div class="footer-app-version">
+    Version v{{version}}
+  </div>
+
+</ion-footer>

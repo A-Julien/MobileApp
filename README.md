@@ -28,7 +28,7 @@ A simple todo list App with O.C.R support
 ·
 <a href="https://github.com/A-Julien/MobileApp/issues">Request Feature</a>
 </p>
-
+</p>
 
 
 <!-- TABLE OF CONTENTS -->
@@ -60,7 +60,9 @@ A simple todo list App with O.C.R support
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
+<a href="https://github.com/A-Julien/MobileApp">
+    <img src="readmeImg/ss1.png" alt="ss1" style="max-width: 50%;">
+</a>
 ![Logo](https://github.com/A-Julien/MobileApp/blob/main/readmeImg/ss1.png)
 
 Tolist i s simply PWA. Tolist are deployed natively with Capacitor.

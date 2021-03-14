@@ -17,6 +17,7 @@ import {AngularFirestoreModule} from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { AngularCropperjsModule } from 'angular-cropperjs';
 import {SideMenuComponent} from './modals/side-menu/side-menu.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [AppComponent, CreateListComponent, CreateTodoComponent, SideMenuComponent],
@@ -27,10 +28,12 @@ import {SideMenuComponent} from './modals/side-menu/side-menu.component';
       AppRoutingModule,
       ReactiveFormsModule,
       AngularFireModule.initializeApp(environment.firebaseConfig),
+      AngularFirestoreModule.enablePersistence(),
       AngularFireAnalyticsModule,
       AngularFirestoreModule,
       HttpClientModule,
-      AngularCropperjsModule
+      AngularCropperjsModule,
+      ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     StatusBar,

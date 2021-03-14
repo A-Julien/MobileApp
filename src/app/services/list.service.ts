@@ -34,14 +34,14 @@ export class ListService {
               private auth: AuthenticationService,
               private popupService: PopupService) {
     this.lists = new Array<List>();
-    this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION,
+    /*this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION,
         ref => ref.where('owners', 'array-contains-any',
-            [this.auth.userEmail, this.auth.userId]));
-   // this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION);
+            [this.auth.userEmail, this.auth.userId]));*/
+    this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION);
 
-
-    this.sharingCollection = this.afs.collection(this.SHARECOLLECTION,
-        ref => ref.where('newOwner', '==', this.auth.userEmail));
+    this.sharingCollection = this.afs.collection(this.SHARECOLLECTION);
+    /*this.sharingCollection = this.afs.collection(this.SHARECOLLECTION,
+        ref => ref.where('newOwner', '==', this.auth.userEmail));*/
 
   }
 

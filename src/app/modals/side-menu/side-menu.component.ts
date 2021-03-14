@@ -4,6 +4,7 @@ import {AuthenticationService} from '../../services/authentification.service';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs';
 import firebase from 'firebase';
+import {EmailComposer} from '@ionic-native/email-composer/ngx';
 
 @Component({
   selector: 'app-side-menu',
@@ -18,7 +19,8 @@ export class SideMenuComponent implements OnInit {
   constructor(
       private auth: AngularFireAuth,
       private authService: AuthenticationService,
-      private router: Router
+      private router: Router,
+      private emailComposer: EmailComposer
   ) {
     this.user = this.authService.authState;
   }
@@ -28,5 +30,20 @@ export class SideMenuComponent implements OnInit {
 
   async logout() {
    await this.authService.logout();
+  }
+
+  openGithub() {
+    window.open('https://github.com/A-Julien/MobileApp', '_system');
+  }
+
+  sendMail(){
+    const email = {
+      to: 'julien.alaimo@gmail.com',
+      subject: '[Tolist] Suggestion',
+      body: 'Some improvement ? Tel Us !',
+      isHtml: true
+    };
+
+    this.emailComposer.open(email);
   }
 }

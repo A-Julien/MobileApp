@@ -67,8 +67,8 @@ export class ListService {
       const id = res.payload.doc.id;
       return {id, ...data } as T;
     });
-
   }
+
   public getAll(): List[] {
     return this.lists;
   }

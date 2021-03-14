@@ -18,6 +18,7 @@ import { environment } from '../environments/environment';
 import { AngularCropperjsModule } from 'angular-cropperjs';
 import {SideMenuComponent} from './modals/side-menu/side-menu.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import {EmailComposer} from '@ionic-native/email-composer/ngx';
 
 @NgModule({
   declarations: [AppComponent, CreateListComponent, CreateTodoComponent, SideMenuComponent],
@@ -37,6 +38,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
   ],
   providers: [
     StatusBar,
+    EmailComposer,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

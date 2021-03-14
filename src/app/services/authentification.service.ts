@@ -9,6 +9,7 @@ import '@codetrix-studio/capacitor-google-auth';
 import {FacebookLogin, FacebookLoginPlugin} from '@capacitor-community/facebook-login';
 import {HttpClient} from '@angular/common/http';
 import {PopupService} from './popup.service';
+import {UserSettingsService} from "./user-settings.service";
 
 registerWebPlugin(FacebookLogin);
 
@@ -24,7 +25,8 @@ export class AuthenticationService {
   constructor(private auth: AngularFireAuth,
               private router: Router,
               private http: HttpClient,
-              private popupService: PopupService) {
+              private popupService: PopupService,
+              private uServivce: UserSettingsService) {
 
     this.fbLogin = FacebookLogin;
     this.auth.authState.subscribe(user => { console.log('userhchange', user); this.user = user; });
@@ -77,6 +79,7 @@ export class AuthenticationService {
                     .then(user => {
                         if (user.user.emailVerified) {
                             this.router.navigateByUrl('/home', {replaceUrl: true});
+                            this.uServivce.uSexist(user.user.uid);
                             resolve(user.user);
                         } else {
                             this.auth.signOut();
@@ -174,8 +177,9 @@ async isLoggedIn(): Promise<boolean> {
         const credential = firebase.auth.FacebookAuthProvider.credential(this.fbToken.fbToken);
         return new Promise((resolve, reject) => {
             this.auth.signInAndRetrieveDataWithCredential(credential)
-                .then(() => {
+                .then((u) => {
                     this.popupService.presentToast('Successfully signed in!');
+                    this.uServivce.uSexist(u.user.uid);
                     this.router.navigate(['/home']);
                     resolve();
                 })
@@ -242,8 +246,9 @@ async isLoggedIn(): Promise<boolean> {
         return new Promise((resolve, reject) => {
             firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(async () =>
                 this.auth.signInAndRetrieveDataWithCredential(credential)
-                    .then(() => {
+                    .then((u) => {
                         this.popupService.presentToast('Welcome back !', 1000);
+                        this.uServivce.uSexist(u.user.uid);
                         this.router.navigate(['/home']);
                         resolve();
                     })

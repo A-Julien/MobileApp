@@ -7,9 +7,13 @@
       <h3></h3>
       <p>{{ userEmail }}</p>
     </ion-label>
+    <ion-menu-toggle auto-hide="false">
+        <ion-icon  class="icon" name="hammer-sharp"></ion-icon>
+    </ion-menu-toggle>
   </ion-item>
 </ion-header>
-
+<div class="nav">
+</div>
 <!--<div class="nav">
 <ion-menu-toggle auto-hide="false">
     <span class="divider"></span>
@@ -27,7 +31,7 @@
     <span class="divider"></span>
   </div>
 </ion-menu-toggle>
-</div>-->
+</div>
 <div class="nav">
   <ion-menu-toggle auto-hide="false">
     <div class="nav-item">
@@ -36,7 +40,7 @@
       <span class="divider"></span>
     </div>
   </ion-menu-toggle>
-</div>
+</div>-->
 
 <ion-footer>
   <div class="foot-nav">
@@ -54,10 +58,12 @@
   </div>
 
   <div class="footer-nav">
-    <ion-button class="force-background" expand="block">
-        <ion-icon (click)="logout()" color="danger" size="large"  name="log-out"></ion-icon>
-        <ion-label>Log out</ion-label>
-    </ion-button>
+    <ion-menu-toggle auto-hide="false">
+      <ion-button (click)="logout()" class="force-background" expand="block">
+          <ion-icon  color="danger" size="large"  name="log-out"></ion-icon>
+          <ion-label>Log out</ion-label>
+      </ion-button>
+    </ion-menu-toggle>
   </div>
 
   <div class="footer-social">
@@ -68,7 +74,7 @@
   </div>
 
   <div class="footer-app-version">
-    Version v{{version}}
+    Version v{{ version }}
   </div>
 
 </ion-footer>

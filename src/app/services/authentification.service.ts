@@ -18,7 +18,7 @@ registerWebPlugin(FacebookLogin);
 
 export class AuthenticationService {
   private user = null;
-  private token = null;
+  private fbToken = null;
   private fbLogin: FacebookLoginPlugin;
 
   constructor(private auth: AngularFireAuth,
@@ -99,7 +99,7 @@ export class AuthenticationService {
         const result = await this.fbLogin.login({ permissions: FACEBOOK_PERMISSIONS });
 
         if (result.accessToken && result.accessToken.userId) {
-            this.token = result.accessToken;
+            this.fbToken = result.accessToken;
             this.loadUserData();
         } else if (result.accessToken && !result.accessToken.userId) {
             this.getCurrentToken();
@@ -111,7 +111,7 @@ export class AuthenticationService {
     async getCurrentToken() {
         const result = await this.fbLogin.getCurrentAccessToken();
         if (result.accessToken) {
-            this.token = result.accessToken;
+            this.fbToken = result.accessToken;
             this.loadUserData();
         } else {
             // Not logged in.
@@ -119,13 +119,13 @@ export class AuthenticationService {
     }
 
     async loadUserData() {
-        const url = `https://graph.facebook.com/${this.token.userId}?fields=id,name,picture.width(720),birthday,email&access_token=${this.token.token}`;
+        const url = `https://graph.facebook.com/${this.fbToken.userId}?fields=id,name,picture.width(720),birthday,email&access_token=${this.fbToken.fbToken}`;
         this.user = await this.http.get(url);
         if (this.user === null){
             await this.popupService.presentAlert('Facebook Login Failed');
             return;
         }
-        const credential = firebase.auth.FacebookAuthProvider.credential(this.token.token);
+        const credential = firebase.auth.FacebookAuthProvider.credential(this.fbToken.fbToken);
         this.auth.signInAndRetrieveDataWithCredential(credential)
             .then(res => {
                 this.user = res;
@@ -139,10 +139,27 @@ export class AuthenticationService {
 
   }
 
+
+  async logout() {
+      return new Promise((resolve, reject) => {
+          if (this.auth.currentUser) {
+              this.auth.signOut()
+                  .then(() => {
+                      this.router.navigate(['/loginRegister']);
+                      if (this.fbToken) { this.FbLogout(); }
+                      console.log('LOG Out');
+                      this.user = null;
+                      resolve();
+                  }).catch((error) => {
+                  reject();
+              });
+          }
+      });
+  }
+
     async FbLogout() {
         await this.fbLogin.logout();
-        this.user = null;
-        this.token = null;
+        this.fbToken = null;
     }
 
     public getUserId(): string {

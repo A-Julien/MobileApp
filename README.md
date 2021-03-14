@@ -11,7 +11,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/A-Julien/MobileApp">
-    <img src="src/assets/logo.png" alt="Logo" width="80" height="80">
+    <img src="src/assets/logo.png" alt="Logo" width="100" height="100">
   </a>
 
 <h3 align="center">ToList</h3>
@@ -61,7 +61,7 @@ A simple todo list App with O.C.R support
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](readmeImg/ss1.png)
+![Logo](https://github.com/A-Julien/MobileApp/blob/main/readmeImg/ss1.png)
 
 Tolist i s simply PWA. Tolist are deployed natively with Capacitor.
 **To avoid retyping too much info. Do a search and replace with your text editor for the following:**

@@ -5,7 +5,7 @@
     </ion-avatar>
     <ion-label>
       <h3></h3>
-      <p>{{ userEmail }}</p>
+      <p>{{ ( user | async)?.email }}</p>
     </ion-label>
     <ion-menu-toggle auto-hide="false">
         <ion-icon  class="icon" name="hammer-sharp"></ion-icon>

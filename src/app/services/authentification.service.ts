@@ -237,7 +237,6 @@ async isLoggedIn(): Promise<boolean> {
     }
 
     async signInWithGoogle(): Promise<firebase.User> {
-
         const googleUser = await Plugins.GoogleAuth.signIn() as any;
         const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
         return new Promise((resolve, reject) => {

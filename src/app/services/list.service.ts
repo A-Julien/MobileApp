@@ -30,30 +30,35 @@ export class ListService {
   private sharingCollection: AngularFirestoreCollection<MetaList>;
   private lists: List[];
 
-  constructor(private fireStore: AngularFirestore,
+  constructor(private afs: AngularFirestore,
               private auth: AuthenticationService,
               private popupService: PopupService) {
     this.lists = new Array<List>();
-    this.listCollection = this.fireStore.collection<List>(this.LISTCOLLECTION,
+    this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION,
         ref => ref.where('owners', 'array-contains-any',
             [this.auth.userEmail, this.auth.userId]));
+   // this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION);
 
-    this.sharingCollection = this.fireStore.collection(this.SHARECOLLECTION,
+
+    this.sharingCollection = this.afs.collection(this.SHARECOLLECTION,
         ref => ref.where('newOwner', '==', this.auth.userEmail));
 
   }
 
 
   getAllSharedListDB(): Observable<MetaList[]> {
-    return this.sharingCollection.snapshotChanges().pipe(
-        map(data => this.convertSnapData<MetaList>(data))
+    return this.auth.authState.pipe(
+        switchMap(user => this.afs.collection(this.SHARECOLLECTION, ref => ref.where('newOwner', '==', user.email)).snapshotChanges()),
+        map(actions => this.convertSnapData<List>(actions))
     );
   }
 
    getAllListDB(): Observable<List[]> {
-    return this.listCollection.snapshotChanges().pipe(
-        map(data => this.convertSnapData<List>(data))
-    );
+     return this.auth.authState.pipe(
+         switchMap(user => this.afs.collection(this.LISTCOLLECTION, ref => ref.where('owners', 'array-contains-any',
+             [user.email, user.uid])).snapshotChanges()),
+         map(actions => this.convertSnapData<List>(actions))
+     );
   }
 
   private convertSnapData<T>(datas){
@@ -107,7 +112,7 @@ export class ListService {
       this.popupService.presentToast('can not share a list that don\'t belong to you');
       return;
     }
-    this.fireStore.collection(this.LISTCOLLECTION).doc(list.id).update({
+    this.afs.collection(this.LISTCOLLECTION).doc(list.id).update({
       share: true,
       owners: firebase.firestore.FieldValue.arrayUnion(userEmail)
     });
@@ -115,7 +120,7 @@ export class ListService {
   }
 
   private creatSharingNotif(emailUser: string, lisToShare: List): Promise<any>{
-    return this.fireStore.collection(this.SHARECOLLECTION).add({
+    return this.afs.collection(this.SHARECOLLECTION).add({
       newOwner: emailUser,
       owner: this.auth.userEmail,
       listID: lisToShare.id,

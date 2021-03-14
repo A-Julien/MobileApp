@@ -27,71 +27,117 @@ export class AuthenticationService {
               private popupService: PopupService) {
 
     this.fbLogin = FacebookLogin;
-    this.auth.authState.subscribe(user => {this.user = user; });
-    this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-
+    this.auth.authState.subscribe(user => { console.log('userhchange', user); this.user = user; });
   }
 
   /* Sign up */
-  SignUp(email: string, password: string) {
-    this.auth
-        .createUserWithEmailAndPassword(email, password)
-        .then(res => {
-          console.log('Successfully signed up!', res);
-          this.popupService.presentAlert( 'Successfully signed up! Check your mail box' );
-          res.user.sendEmailVerification();
-          this.router.navigate(['/login']);
-        })
-        .catch(error => {
-            this.popupService.presentAlert( 'Something is wrong:' + error.message);
-            console.log('Something is wrong:', error.message);
-        });
+  SignUp(email: string, password: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+          this.auth.createUserWithEmailAndPassword(email, password)
+              .then(
+                  user => { // Creation succeeded
+                      user.user.sendEmailVerification(null)
+                          .then(() => {
+                              this.auth.signOut()
+                                  .then(resolve)
+                                  .catch(reject);
+                              this.popupService.presentAlert( 'Successfully signed up! Check your mail box' );
+                              this.router.navigate(['/login']);
+                          })
+                          .catch(error => {
+                              // Error occurred. Inspect error code.
+                              reject(error);
+                          });
+                  })
+              .catch(err => { // Creation failed
+                  let errMsg = 'Unknown error';
+
+                  switch (err.code) {
+                      case 'auth/invalid-email':
+                          errMsg = 'Invalid Email';
+                          break;
+                      case 'auth/email-already-in-use':
+                          errMsg = 'Email already use';
+                          break;
+                      case 'auth/weak-password':
+                          errMsg = 'Password is too weak';
+                          break;
+                  }
+
+                  reject(errMsg);
+              });
+      });
   }
 
-  /* Sign in */
-  SignIn(email: string, password: string) {
-    this.auth
-        .signInWithEmailAndPassword(email, password)
-        .then(res => {
-          if (res.user.emailVerified) {
-              this.user = res.user;
-              console.log(this.user);
-              console.log('Successfully signed in!');
-              this.popupService.presentToast( 'Successfully signed in!' );
-              this.router.navigate(['/home']);
-          } else {
-                this.popupService.presentAlert( 'Failed to sign in, email is not verified');
-                console.log('Email not verified');
-          }
-        })
-        .catch(err => {
-            this.popupService.presentAlert( 'Failed to sign in, email or password does not exist');
-            console.log('Something is wrong:', err.message);
+    /* Sign in */
+    SignIn(email: string, password: string): Promise<firebase.User> {
+        return new Promise((resolve, reject) => {
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(async () =>
+                this.auth.signInWithEmailAndPassword(email, password)
+                    .then(user => {
+                        if (user.user.emailVerified) {
+                            this.router.navigateByUrl('/home', {replaceUrl: true});
+                            resolve(user.user);
+                        } else {
+                            this.auth.signOut();
+                            reject('Sorry, email is not verified');
+                        }
+                    })
+                    .catch(err => {
+                        let errMsg = 'Unknown error';
+
+                        switch (err.code) {
+                            case 'auth/invalid-email':
+                                errMsg = 'Email is invalid';
+                                break;
+                            case 'auth/user-disabled':
+                                errMsg = 'User is disabled';
+                                break;
+                            case 'auth/user-not-found':
+                                errMsg = 'User not found';
+                                break;
+                        }
+
+                        return reject(errMsg);
+                    })
+            );
         });
-  }
+    }
 
   /* Sign out */
   SignOut() {
     this.auth.signOut();
   }
 
-  PasswordRecovery(email: string) {
-      this.auth
-          .sendPasswordResetEmail(email)
-          .then(res => {
-              console.log('Email sent');
-              this.popupService.presentAlert( 'Email sent to ' + email);
-              this.router.navigate(['/login']);
-          })
-          .catch(err => {
-              this.popupService.presentAlert( 'Email not found' + err.message);
-              console.log('Something is wrong:', err.message);
-          });
+  PasswordRecovery(email: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+          this.auth.sendPasswordResetEmail(email)
+              .then(() => {
+                  this.popupService.presentAlert( 'Email sent to ' + email);
+                  this.router.navigate(['/login']);
+                  resolve();
+              })
+              .catch(err => {
+                  let errMsg = 'Unknown error';
+
+                  switch (err.code) {
+                      case 'auth/invalid-email':
+                          errMsg = 'Email is invalid';
+                          break;
+                      case 'auth/user-not-found':
+                          errMsg = 'User not found';
+                          break;
+                  }
+
+                  reject(errMsg);
+              });
+      });
   }
 
-  isLoggedIn(): boolean {
-    console.log(this.user);
-    return this.user != null;
+async isLoggedIn(): Promise<boolean> {
+    const u = await this.auth.authState.toPromise();
+    console.log(firebase.auth().currentUser);
+    return u !== null;
   }
 
     async signInWithFacebook() {
@@ -118,7 +164,7 @@ export class AuthenticationService {
         }
     }
 
-    async loadUserData() {
+    async loadUserData(): Promise<firebase.User> {
         const url = `https://graph.facebook.com/${this.fbToken.userId}?fields=id,name,picture.width(720),birthday,email&access_token=${this.fbToken.fbToken}`;
         this.user = await this.http.get(url);
         if (this.user === null){
@@ -126,21 +172,38 @@ export class AuthenticationService {
             return;
         }
         const credential = firebase.auth.FacebookAuthProvider.credential(this.fbToken.fbToken);
-        this.auth.signInAndRetrieveDataWithCredential(credential)
-            .then(res => {
-                this.user = res;
-                this.popupService.presentToast( 'Successfully signed in!' );
-                this.router.navigate(['/home']);
-            })
-            .catch(err => {
-                this.popupService.presentAlert( 'Failed to sign in via facebook');
-                console.log('Something is wrong:', err.message);
-            });
+        return new Promise((resolve, reject) => {
+            this.auth.signInAndRetrieveDataWithCredential(credential)
+                .then(() => {
+                    this.popupService.presentToast('Successfully signed in!');
+                    this.router.navigate(['/home']);
+                    resolve();
+                })
+                .catch(err => {
+                    let errMsg = 'Unknown error';
+                    switch (err.code) {
+                        case 'auth/invalid-email':
+                            errMsg = 'Email is invalid';
+                            break;
+                        case 'auth/user-disabled':
+                            errMsg = 'User is disabled';
+                            break;
+                        case 'auth/user-not-found':
+                            errMsg = 'User not found';
+                            break;
+                        case 'auth/wrong-password':
+                            errMsg = 'Wrong password';
+                            break;
+                    }
+                    this.popupService.presentAlert(errMsg);
+                    reject(errMsg);
+                });
+        });
 
   }
 
 
-  async logout() {
+  async logout(): Promise<void> {
       return new Promise((resolve, reject) => {
           if (this.auth.currentUser) {
               this.auth.signOut()
@@ -157,15 +220,15 @@ export class AuthenticationService {
       });
   }
 
-    async FbLogout() {
+    private async FbLogout() {
         await this.fbLogin.logout();
         this.fbToken = null;
     }
 
-    public getUserId(): string {
+    get userId(): string {
         return this.user.uid;
     }
-    public getUserEmail(): string {
+    get userEmail(): string {
       return this.user.email;
     }
 
@@ -173,25 +236,41 @@ export class AuthenticationService {
         return this.auth.authState;
     }
 
-    async signInWithGoogle() {
+    async signInWithGoogle(): Promise<firebase.User> {
 
         const googleUser = await Plugins.GoogleAuth.signIn() as any;
         const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
-            .then(() => {
-                this.signInWithGoogle();
+        return new Promise((resolve, reject) => {
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(async () =>
+                this.auth.signInAndRetrieveDataWithCredential(credential)
+                    .then(() => {
+                        this.popupService.presentToast('Welcome back !', 1000);
+                        this.router.navigate(['/home']);
+                        resolve();
+                    })
+                    .catch(err => {
+                        let errMsg = 'Unknown error';
+                        switch (err.code) {
+                            case 'auth/invalid-email':
+                                errMsg = 'Email is invalid';
+                                break;
+                            case 'auth/user-disabled':
+                                errMsg = 'User is disabled';
+                                break;
+                            case 'auth/user-not-found':
+                                errMsg = 'User not found';
+                                break;
+                            case 'auth/wrong-password':
+                                errMsg = 'Wrong password';
+                                break;
+                        }
+                        this.popupService.presentAlert(errMsg);
+                        reject(errMsg);
 
-        this.auth.signInAndRetrieveDataWithCredential(credential)
-            .then(res => {
-                this.user = res.user;
-                this.popupService.presentToast( 'Welcome back !', 1000 );
-                this.router.navigate(['/home']);
-            })
-            .catch(err => {
-                this.popupService.presentAlert( 'Failed to sign in via Google');
-                console.log('Something is wrong:', err.message);
-            });
-            });
-    }
+                    })
+            );
+        });
+
+  }
 
 }

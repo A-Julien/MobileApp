@@ -36,10 +36,10 @@ export class ListService {
     this.lists = new Array<List>();
     this.listCollection = this.fireStore.collection<List>(this.LISTCOLLECTION,
         ref => ref.where('owners', 'array-contains-any',
-            [this.auth.getUserEmail(), this.auth.getUserId()]));
+            [this.auth.userEmail, this.auth.userId]));
 
     this.sharingCollection = this.fireStore.collection(this.SHARECOLLECTION,
-        ref => ref.where('newOwner', '==', this.auth.getUserEmail()));
+        ref => ref.where('newOwner', '==', this.auth.userEmail));
 
   }
 
@@ -93,8 +93,8 @@ export class ListService {
   }
 
   public async createList(list: List): Promise<void> {
-    list.owners.push(this.auth.getUserEmail());
-    list.owner = this.auth.getUserId();
+    list.owners.push(this.auth.userEmail);
+    list.owner = this.auth.userId;
 
     this.listCollection.ref.withConverter(listToFirebase).add(list)
         .then(() => this.popupService.presentToast(list.name + 'create'))
@@ -103,7 +103,7 @@ export class ListService {
 
   public shareList(list: List, userEmail: string): Promise<any> {
     console.log(list.id, '  ', userEmail);
-    if (list.owner !== this.auth.getUserId()) {
+    if (list.owner !== this.auth.userId) {
       this.popupService.presentToast('can not share a list that don\'t belong to you');
       return;
     }
@@ -117,7 +117,7 @@ export class ListService {
   private creatSharingNotif(emailUser: string, lisToShare: List): Promise<any>{
     return this.fireStore.collection(this.SHARECOLLECTION).add({
       newOwner: emailUser,
-      owner: this.auth.getUserEmail(),
+      owner: this.auth.userEmail,
       listID: lisToShare.id,
       listName: lisToShare.name,
       notify: false
@@ -126,7 +126,7 @@ export class ListService {
 
   public async deleteList(list: List): Promise<void> {
 
-    if (list.owner === this.auth.getUserId()){
+    if (list.owner === this.auth.userId){
       this.listCollection.doc(list.id).delete()
           .then(() => this.popupService.presentToast('list ' + list.name + ' removed'))
           .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + list.name));
@@ -135,7 +135,7 @@ export class ListService {
     }
 
     if (list.share){
-      list.owners = list.owners.filter(u => u !== this.auth.getUserEmail());
+      list.owners = list.owners.filter(u => u !== this.auth.userEmail);
       if (list.owners.length === 1) { list.share = false; }
     }
 
@@ -159,11 +159,11 @@ export class ListService {
   }
 
   public async removeSharedUser(userEmailToRm: string, list: List) {
-    if (userEmailToRm === this.auth.getUserEmail()){
+    if (userEmailToRm === this.auth.userEmail){
       console.log('nope');
       return;
     }
-    if (list.owner !== this.auth.getUserId()) {
+    if (list.owner !== this.auth.userId) {
       console.log('nope');
       return;
     }

@@ -66,7 +66,7 @@ export class HomePage implements OnInit {
       this.metalist = ml;
       this.nbNotif = 0;
       ml.forEach(meta => {
-        if (!meta.notify && meta.newOwner === this.auth.getUserEmail()){
+        if (!meta.notify && meta.newOwner === this.auth.userEmail){
           this.nbNotif += 1;
         }
       });
@@ -93,7 +93,7 @@ export class HomePage implements OnInit {
   isNewList(listId: string) {
     let res = false;
     this.metalist.forEach( ml => {
-      if (ml.listID === listId && !ml.notify && ml.newOwner === this.auth.getUserEmail()) { res =  true; }
+      if (ml.listID === listId && !ml.notify && ml.newOwner === this.auth.userEmail) { res =  true; }
     });
     return res;
   }
@@ -103,7 +103,7 @@ export class HomePage implements OnInit {
   }
 
   public async share(list: List, slidingItem: IonItemSliding) {
-    if (list.owner !== this.auth.getUserId()) {
+    if (list.owner !== this.auth.userId) {
       this.popUpService.presentToast('can not share a list that don\'t belong to you');
       return;
     }
@@ -120,7 +120,7 @@ export class HomePage implements OnInit {
   public isNew(list: List): Observable<MetaList> {
    return this.listsShared.pipe(
         map(data => {
-          return data.find( d => d.listID === list.id && d.owner !== this.auth.getUserEmail());
+          return data.find( d => d.listID === list.id && d.owner !== this.auth.userEmail);
         })
     );
   }

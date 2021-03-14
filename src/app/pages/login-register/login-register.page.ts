@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthenticationService} from '../../services/authentification.service';
-import {ModalController, ToastController} from '@ionic/angular';
 import {Router} from '@angular/router';
-import {CropImgComponent} from "../../modals/crop-img/crop-img.component";
-import {Network} from "@capacitor/core";
-import {PhotoService} from "../../services/photo.service";
-import {OcrProviderService} from "../../services/ocr-provider.service";
+import firebase from 'firebase';
 
 @Component({
   selector: 'app-login-register',
@@ -14,9 +10,14 @@ import {OcrProviderService} from "../../services/ocr-provider.service";
 })
 export class LoginRegisterPage implements OnInit {
 
-  constructor(private authService: AuthenticationService) { }
+  constructor(private authService: AuthenticationService,
+              private router: Router) { }
 
   ngOnInit() {
+    if (firebase.auth().currentUser != null) {
+      console.log('connected');
+      this.router.navigateByUrl('/home');
+    }
   }
 
   signInGoogle() {

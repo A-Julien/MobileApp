@@ -20,7 +20,7 @@ export class SideMenuComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.auth.authState.subscribe( user => this.userEmail = user.email);
+    this.authService.authState.subscribe( user => this.userEmail = user.email);
   }
 
   async logout() {

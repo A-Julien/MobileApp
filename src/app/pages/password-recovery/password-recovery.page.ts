@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthenticationService} from '../../services/authentification.service';
+import {Router} from '@angular/router';
+import {PopupService} from '../../services/popup.service';
 
 @Component({
   selector: 'app-password-recovery',
@@ -11,7 +13,11 @@ export class PasswordRecoveryPage implements OnInit {
 
   loginForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder, private authService: AuthenticationService) { }
+  constructor(
+      private formBuilder: FormBuilder,
+      private authService: AuthenticationService,
+      private router: Router,
+      private popupService: PopupService) { }
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -20,6 +26,7 @@ export class PasswordRecoveryPage implements OnInit {
   }
 
   passwordRecovery() {
-    this.authService.PasswordRecovery(this.loginForm.get('login').value);
+    this.authService.PasswordRecovery(this.loginForm.get('login').value)
+        .catch(this.popupService.presentAlert);
   }
 }

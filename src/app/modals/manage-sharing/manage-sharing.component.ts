@@ -40,7 +40,7 @@ export class ManageSharingComponent implements OnInit {
     );
     this.sharedUsers = this.listService.getOneList(this.list.id).pipe(
         map( (list) => list.owners.filter(
-            user => user !== this.auth.getUserEmail()
+            user => user !== this.auth.userEmail
         ))
     );
 

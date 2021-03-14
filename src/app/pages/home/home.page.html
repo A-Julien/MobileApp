@@ -45,7 +45,7 @@
       </ion-item-options>
 
       <ion-item-options  side="start">
-        <ion-item-option *ngIf="!editing" [disabled]="list.owner !== auth.getUserId()" (click)="share(list,slidingItem)" color="primary"><ion-icon name="share-social-outline"></ion-icon></ion-item-option>
+        <ion-item-option *ngIf="!editing" [disabled]="list.owner !== auth.userId" (click)="share(list,slidingItem)" color="primary"><ion-icon name="share-social-outline"></ion-icon></ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>

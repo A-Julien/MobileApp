@@ -6,12 +6,10 @@
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
-
-<!-- PROJECT LOGO -->
 <br />
 <p align="center">
   <a href="https://github.com/A-Julien/MobileApp">
-    <img src="src/assets/logo.png" alt="Logo" width="100" height="100">
+    <img src="src/assets/logo.png" alt="Logo" width="300" height="300">
   </a>
 
 <h3 align="center">ToList</h3>
@@ -19,11 +17,9 @@
 <p align="center">
 A simple todo list App with O.C.R support 
 <br />
-<a href="https://github.com/A-Julien/MobileApp"><strong>Explore the docs »</strong></a>
+<a href="https://mobileapp-e7f03.web.app/loginRegister"><strong>Explore the App »</strong></a>
 <br />
 <br />
-<a href="https://github.com/github_username/repo_name">View Demo</a>
-·
 <a href="https://github.com/A-Julien/MobileApp/issues">Report Bug</a>
 ·
 <a href="https://github.com/A-Julien/MobileApp/issues">Request Feature</a>
@@ -60,10 +56,7 @@ A simple todo list App with O.C.R support
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-<a href="https://github.com/A-Julien/MobileApp">
-    <img src="readmeImg/ss1.png" alt="ss1" style="max-width: 50%;">
-</a>
-![Logo](https://github.com/A-Julien/MobileApp/blob/main/readmeImg/ss1.png)
+<kbd><img src="readmeImg/ss1.png" alt="ss1" width=50%></kbd>
 
 Tolist i s simply PWA. Tolist are deployed natively with Capacitor.
 **To avoid retyping too much info. Do a search and replace with your text editor for the following:**
@@ -111,8 +104,6 @@ This is an example of how to list things you need to use the software and how to
    ionic serve
    ```
 
-
-
 ## Usage
 
 
@@ -135,14 +126,13 @@ Contributions are what make the open source community such an amazing place to b
 
 
 
-
-
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [](julie.alaimo@gmail.com) - email
+Alaimo Julien - [julien.alaimo@gmail.com](julien.alaimo@gmail.com) - email
+Hugo Feydel - []() - email
 
-Project Link: [https://github.com/github_username/repo_name](https://github.com/A-Julien/MobileApp)
+Project Link: [https://github.com/A-Julien/MobileApp](https://github.com/A-Julien/MobileApp)
 
 
 

@@ -5,7 +5,7 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
+[![Deploy to Firebase Hosting on merge](https://github.com/A-Julien/MobileApp/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/A-Julien/MobileApp/actions/workflows/firebase-hosting-merge.yml)
 <br />
 <p align="center">
   <a href="https://github.com/A-Julien/MobileApp">

@@ -56,15 +56,32 @@ A simple todo list App with O.C.R support
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
+
 <kbd><img src="readmeImg/ss1.png" alt="ss1" width=50%></kbd>
 
 Tolist i s simply PWA. Tolist are deployed natively with Capacitor.
 
-### Built With
+<kbd><img src="readmeImg/ss2.png" alt="ss2"></kbd>
 
-* []()
-* []()
-* []()
+You can add List; share List with other user. You have a minimal side menu. App style in dev !
+
+## OCR 
+
+<kbd><img src="readmeImg/ss3.png" alt="ss3"></kbd>
+
+You can use OCR in todo. The app allow you to crop your picture. Tolist use the GoogleVisionApi to make ocr
+detection. If you car about your personal info, you can force the offline ocr mode (Use Tesseract JS).
+But it will be less accurate and longer !
+
+
+### Firebase 
+### Collections
+* List -> contain all info for a list and a subCollection of todo.
+* Share -> we create 1 element when a user share a list with another user. That allow us to make notifications.
+* UserSetting -> Store user settings
+
+### Security configuration
+
 
 
 
@@ -75,7 +92,6 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
 * npm
   ```sh
   npm install npm@latest -g

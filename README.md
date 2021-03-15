@@ -48,7 +48,6 @@ A simple todo list App with O.C.R support
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
 </details>
 
@@ -67,14 +66,14 @@ You can add List; share List with other user. You have a minimal side menu. App 
 
 ## OCR 
 
-<kbd><img src="readmeImg/ss3.png" alt="ss3"></kbd>
+<kbd><img src="readmeImg/ss3.png" alt="ss3 width=50%"></kbd>
 
 You can use OCR in todo. The app allow you to crop your picture. Tolist use the GoogleVisionApi to make ocr
 detection. If you car about your personal info, you can force the offline ocr mode (Use Tesseract JS).
 But it will be less accurate and longer !
 
 
-### Firebase 
+## Firebase 
 ### Collections
 * List -> contain all info for a list and a subCollection of todo.
 * Share -> we create 1 element when a user share a list with another user. That allow us to make notifications.
@@ -142,22 +141,11 @@ Contributions are what make the open source community such an amazing place to b
 <!-- CONTACT -->
 ## Contact
 
-Alaimo Julien - [julien.alaimo@gmail.com](julien.alaimo@gmail.com) - email
-Hugo Feydel - []() - email
+* Alaimo Julien - [julien.alaimo@gmail.com](julien.alaimo@gmail.com)
+
+* Hugo Feydel - []()
 
 Project Link: [https://github.com/A-Julien/MobileApp](https://github.com/A-Julien/MobileApp)
-
-
-
-<!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
-
-* []()
-* []()
-* []()
-
-
-
 
 
 <!-- MARKDOWN LINKS & IMAGES -->

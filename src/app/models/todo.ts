@@ -1,5 +1,4 @@
-import {DocumentData, QueryDocumentSnapshot, SnapshotOptions} from "@angular/fire/firestore";
-import {List} from "./list";
+import {DocumentData, QueryDocumentSnapshot, SnapshotOptions} from '@angular/fire/firestore';
 
 export class Todo {
 
@@ -14,6 +13,7 @@ export class Todo {
         this.isDone = false;
     }
 }
+
 export const todoToFirebase = {
     toFirestore(todo: Todo): DocumentData {
         return {

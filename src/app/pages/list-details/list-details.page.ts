@@ -9,6 +9,7 @@ import {List} from '../../models/list';
 import {Todo} from '../../models/todo';
 import {AuthenticationService} from '../../services/authentification.service';
 import {PopupService} from '../../services/popup.service';
+import {Updater} from '../../models/updater';
 
 
 @Component({
@@ -22,8 +23,8 @@ export class ListDetailsPage implements OnInit {
   showLoader = true;
 
   editing = false;
-  TodosToRm: Todo[];
-  TodosToUpdate: Todo[];
+  todosToRm: Updater[];
+  todosToUpdate: Updater[];
 
 
 
@@ -40,8 +41,8 @@ export class ListDetailsPage implements OnInit {
   { }
 
   ngOnInit() {
-    this.TodosToRm = [];
-    this.TodosToUpdate = [];
+    this.todosToRm = [];
+    this.todosToUpdate = [];
     this.listID = this.route.snapshot.paramMap.get('listId');
     this.list = this.listService.getOneDB(this.listID);
     this.todos = this.list.pipe(
@@ -77,51 +78,50 @@ export class ListDetailsPage implements OnInit {
 
   async stopEdit() {
     this.editing = false;
-    const nbTodos =  this.TodosToUpdate.length;
+    const nbTodos =  this.todosToUpdate.length;
 
     let msg = 'Update Name of ' + nbTodos + ' todo';
     if ( nbTodos > 1) { msg = 'Update Name of ' + nbTodos + ' Todos'; }
     const loader = await this.popUpService.presentLoading(msg);
 
-    this.TodosToUpdate.forEach(todo => {
-      console.log('update todo ', todo.name);
-      this.updateTodos(todo, this.listID);
+    this.todosToUpdate.forEach(u => {
+      console.log('update todo ', u.field);
+      this.updateTodo(u);
     });
-    this.TodosToUpdate = [];
+    this.todosToUpdate = [];
 
     await loader.dismiss();
 
   }
 
+  async updateTodo(u: Updater){
+    await this.listService.updateTodoName(u, this.listID);
+  }
+
   addToDel(todo: Todo){
-    if (this.TodosToRm.indexOf(todo) !== -1){
-      this.TodosToRm = this.TodosToRm.filter(t => t !== todo);
+    const index = this.todosToUpdate.findIndex(t => t.id === todo.id);
+    if (index !== -1){
+      this.todosToRm = this.todosToRm.filter(t => t.id !== todo.id);
       return;
     }
-    this.TodosToRm.push(todo);
+    this.todosToRm.push(new Updater(todo.id, todo.name));
   }
 
-  delete(todo: Todo, listId) {
-      console.log(todo.id, listId);
-      this.listService.deleteTodo(todo, listId);
+  delete(u: Updater, listId) {
+      this.listService.deleteTodo(u, listId);
   }
 
-  async updateTodos(todo: Todo, listId) {
-    console.log(todo.id, listId);
-    await this.listService.updateTodo(todo, listId);
-  }
 
   async delSelect() {
-    const nbTodos = this.TodosToRm.length;
+    const nbTodos = this.todosToRm.length;
     let msg = 'deleting ' + nbTodos + ' todo';
     if ( nbTodos > 1) { msg = 'Deleting ' + nbTodos + ' Todos'; }
     const loader = await this.popUpService.presentLoading(msg);
 
-    this.TodosToRm.forEach(todo => {
-      console.log('delete todo ', todo.name);
+    this.todosToRm.forEach(todo => {
       this.delete(todo, this.listID);
     });
-    this.TodosToRm = [];
+    this.todosToRm = [];
     await loader.dismiss();
   }
 
@@ -130,11 +130,12 @@ export class ListDetailsPage implements OnInit {
   }
 
   addToUpdateTodos(todo: Todo): void {
-    const index = this.TodosToUpdate.indexOf(todo);
+    console.log(this.todosToUpdate.length);
+    const index = this.todosToUpdate.findIndex(t => t.id === todo.id);
     if (index !== -1){
-      this.TodosToUpdate[index] = todo;
+      this.todosToUpdate[index].field = todo.name;
       return;
     }
-    this.TodosToUpdate.push(todo);
+    this.todosToUpdate.push(new Updater(todo.id, todo.name));
   }
 }

@@ -34,9 +34,11 @@ export class HomePage implements OnInit {
   lists: Observable<List[]>;
   listsShared: Observable<MetaList[]>;
   showLoading = true;
+
   editing = false;
-  private lastList: List[];
   listToRm: List[];
+  listToUpdate: List[];
+
   nbNotif: number;
   private metalist: MetaList[];
 
@@ -52,6 +54,7 @@ export class HomePage implements OnInit {
   ){
     this.nbNotif = 0;
     this.listToRm = [];
+    this.listToUpdate = [];
 
     this.lists = this.listService.getAllListDB().pipe(
         map(list => {
@@ -74,7 +77,6 @@ export class HomePage implements OnInit {
 
     this.lists.subscribe((listArray) => {
       this.showLoading = false;
-      this.lastList = listArray;
     });
   }
 
@@ -182,4 +184,7 @@ export class HomePage implements OnInit {
       return await popover.present();
   }
 
+  addToUpdateList(list: List) {
+
+  }
 }

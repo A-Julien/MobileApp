@@ -9,6 +9,7 @@ import firebase from 'firebase';
 import {userError} from '@angular/compiler-cli/src/transformers/util';
 import {Todo, todoToFirebase} from '../models/todo';
 import {MetaList, MetaListToFirebase} from '../models/metaList';
+import {Updater} from '../models/updater';
 
 /*
 export interface SharingNotif {
@@ -197,14 +198,21 @@ export class ListService {
     return this.listCollection.doc(list.id).ref.withConverter(listToFirebase).set(list);
   }
 
+  public updateListName(list: List): Promise<void> {
+    return this.listCollection.doc(list.id).update({name: list.name});
+  }
+
   public updateTodo(todo: Todo, listID: string): Promise<void>{
     return this.listCollection.doc(listID).collection('todos').doc(todo.id).ref.withConverter(todoToFirebase).set(todo);
   }
+  public updateTodoName(u: Updater, listID: string): Promise<void>{
+    return this.listCollection.doc(listID).collection('todos').doc(u.id).update({name: u.field});
+  }
 
-  deleteTodo(todo: Todo, listId: string): void {
-    this.listCollection.doc(listId).collection('todos').doc(todo.id).delete()
-        .then(() => this.popupService.presentToast('list ' + todo.name + ' removed'))
-        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + todo.name));
+  deleteTodo(u: Updater, listId: string): void {
+    this.listCollection.doc(listId).collection('todos').doc(u.id).delete()
+        .then(() => this.popupService.presentToast('list ' + u.field + ' removed'))
+        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + u.field));
   }
 
   creatTodo(todo: Todo, listId): void {

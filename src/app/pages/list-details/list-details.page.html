@@ -6,20 +6,25 @@
     </ion-buttons>
     <ion-title>{{ (list | async)?.name }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
+      <ion-button *ngIf="editing" [disabled]="TodosToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
+      <ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
+      <ion-button *ngIf="editing" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
+      <ion-button *ngIf="!editing" expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-progress-bar *ngIf="showLoader" type="indeterminate"></ion-progress-bar>
 <ion-content *ngIf="!showLoader">
   <ion-list>
-    <ion-item-sliding *ngFor="let todo of todos | async">
-      <ion-item [routerLink]="['/list-details/' + this.listID + '/todo-details/' + todo.id]">
-        <ion-label>{{ todo.name }}</ion-label>
+    <ion-item-sliding *ngFor="let todo of todos | async"  >
+      <ion-item (click)="routeToDetail(todo.id)" >
+        <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(todo)" ></ion-checkbox>
+        <ion-label *ngIf="!editing" >{{ todo.name }}</ion-label>
+        <ion-input [(ngModel)]="todo.name" *ngIf="editing"  (ngModelChange)="addToUpdateTodos(todo)"></ion-input>
       </ion-item>
 
       <ion-item-options side="end">
-        <ion-item-option (click)="delete(todo, this.listID)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
+        <ion-item-option *ngIf="!editing" (click)="delete(todo, this.listID)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>

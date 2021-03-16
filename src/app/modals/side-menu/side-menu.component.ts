@@ -33,8 +33,6 @@ export class SideMenuComponent implements OnInit {
 
   ngOnInit() {
     this.uService.UserSettings.subscribe((us) => {
-          console.log('WSH');
-          console.log(us);
           this.forceOCR = us.forceOfflineOcr;
           this.currentUs = us;
         }

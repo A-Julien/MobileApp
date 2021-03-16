@@ -13,7 +13,7 @@ import {PopupService} from '../../services/popup.service';
 import {List} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
-import {last, map, takeLast} from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
@@ -148,13 +148,9 @@ export class HomePage implements OnInit {
     if (!this.editing) { this.router.navigate(['/list-details/' + id]); }
   }
 
-  startEdit() {
-      this.editing = true;
-  }
+  startEdit() { this.editing = true; }
 
-  stopEdit() {
-    this.editing = false;
-  }
+  stopEdit() { this.editing = false; }
 
   addToDel(list: List){
     if (this.listToRm.indexOf(list) !== -1){

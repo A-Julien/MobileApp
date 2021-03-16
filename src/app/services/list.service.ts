@@ -197,8 +197,8 @@ export class ListService {
     return this.listCollection.doc(list.id).ref.withConverter(listToFirebase).set(list);
   }
 
-  public updateTodo(todo: Todo, listID: string){
-    this.listCollection.doc(listID).collection('todos').doc(todo.id).ref.withConverter(todoToFirebase).set(todo);
+  public updateTodo(todo: Todo, listID: string): Promise<void>{
+    return this.listCollection.doc(listID).collection('todos').doc(todo.id).ref.withConverter(todoToFirebase).set(todo);
   }
 
   deleteTodo(todo: Todo, listId: string): void {

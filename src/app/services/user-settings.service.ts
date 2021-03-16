@@ -4,26 +4,27 @@ import {USettings, USettingsToFirebase} from '../models/settings';
 import {Observable} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 import {AngularFireAuth} from '@angular/fire/auth';
+import {todoToFirebase} from "../models/todo";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserSettingsService {
   private readonly USERSETTINGCOLLECTION = '/UserSetting';
-  private UsCollection: AngularFirestoreCollection<USettings>;
+  private UsCollection: AngularFirestoreCollection;
 
   constructor(
       private afs: AngularFirestore,
       private auth: AngularFireAuth
   ) {
-    this.UsCollection = this.afs.collection<USettings>(this.USERSETTINGCOLLECTION);
+    this.UsCollection = this.afs.collection(this.USERSETTINGCOLLECTION);
   }
 
   public async createUsettings(userUid: string): Promise<void> {
     const us = new USettings(userUid);
     us.forceOfflineOcr = false;
 
-    this.UsCollection.ref.withConverter(USettingsToFirebase).add(us);
+    await this.UsCollection.ref.withConverter(USettingsToFirebase).add(us);
   }
 
   uSexist(userUid: string) {
@@ -37,11 +38,18 @@ export class UserSettingsService {
 
   }
 
+  public updateUs(us: USettings): Promise<void> {
+    return this.UsCollection.doc(us.id).ref.withConverter(USettingsToFirebase).set(us);
+  }
+
   get UserSettings(): Observable<USettings>{
+    console.log('UserSettings');
     return this.auth.authState.pipe(
         switchMap(user => this.afs.collection(this.USERSETTINGCOLLECTION,
                 ref => ref.where('userUid', '==', user.uid)).snapshotChanges()),
-        map(actions => this.convertSnapData<USettings>(actions))
+        map(actions => {
+           return  (this.convertSnapData<USettings>(actions))[0];
+        })
     );
   }
 

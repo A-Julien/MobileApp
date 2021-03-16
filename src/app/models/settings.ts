@@ -3,8 +3,8 @@ import {DocumentData, QueryDocumentSnapshot, SnapshotOptions} from '@angular/fir
 export class USettings {
 
     id: string;
-    userUid: string;
 
+    userUid: string;
     forceOfflineOcr: boolean;
 
     constructor(userUid: string) {

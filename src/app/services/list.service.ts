@@ -90,7 +90,12 @@ export class ListService {
   }
 
   public getOneTodo(listID: string, todoId: string): Observable<Todo> {
-    return this.listCollection.doc(listID).collection<Todo>('todos').doc(todoId).valueChanges();
+    return this.listCollection.doc(listID).collection<Todo>('todos').doc(todoId).get().pipe(
+        map( data => {
+          const todo: Todo = { id: data.id, ...data.data() as Todo };
+          return todo;
+        })
+    );
   }
 
   public getOne(id: string): List {

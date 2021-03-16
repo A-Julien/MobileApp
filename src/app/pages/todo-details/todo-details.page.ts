@@ -31,25 +31,11 @@ export class TodoDetailsPage implements OnInit {
     this.todo = new Todo('', '');
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.todoId = this.route.snapshot.paramMap.get('todoId');
     this.listId = this.route.snapshot.paramMap.get('listId');
 
-    /*this.todo = this.listService.getOneDB(listId).pipe(
-        map( data => {
-          return data.todos.find(todo => todo.id === todoId);
-        })
-    );*/
-    this.listService.getOneTodo(this.listId, this.todoId).subscribe( (t) => {
-      this.todo = t;
-    });
-    // this.todo.subscribe(m => {console.log('INTODO', m); });
-    /*this.todo = this.listService.getOneDB(listId).pipe(
-      map(list => {
-            return list.todos.find( todo => todo.id === todoId);
-          }
-      )
-    );*/
+    this.todo = await this.listService.getOneTodo(this.listId, this.todoId).toPromise();
   }
 
   save() {
@@ -58,7 +44,6 @@ export class TodoDetailsPage implements OnInit {
   }
 
   async OcrDigital(type: string) {
-
     // const picture = await  this.photoService.takePicture();
     const picture = await  this.photoService.takePictureDataUrl();
     const loader = await this.popUpService.presentLoading('Processing...');

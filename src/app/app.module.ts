@@ -10,7 +10,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { CreateListComponent } from './modals/create-list/create-list.component';
 import { CreateTodoComponent } from './modals/create-todo/create-todo.component';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AngularFireModule} from '@angular/fire';
 import { AngularFireAnalyticsModule} from '@angular/fire/analytics';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
@@ -23,19 +23,20 @@ import {EmailComposer} from '@ionic-native/email-composer/ngx';
 @NgModule({
   declarations: [AppComponent, CreateListComponent, CreateTodoComponent, SideMenuComponent],
   entryComponents: [],
-  imports: [
-      BrowserModule,
-      IonicModule.forRoot(),
-      AppRoutingModule,
-      ReactiveFormsModule,
-      AngularFireModule.initializeApp(environment.firebaseConfig),
-      AngularFirestoreModule.enablePersistence(),
-      AngularFireAnalyticsModule,
-      AngularFirestoreModule,
-      HttpClientModule,
-      AngularCropperjsModule,
-      ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
-  ],
+    imports: [
+        BrowserModule,
+        IonicModule.forRoot(),
+        AppRoutingModule,
+        ReactiveFormsModule,
+        AngularFireModule.initializeApp(environment.firebaseConfig),
+        AngularFirestoreModule.enablePersistence(),
+        AngularFireAnalyticsModule,
+        AngularFirestoreModule,
+        HttpClientModule,
+        AngularCropperjsModule,
+        ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
+        FormsModule
+    ],
   providers: [
     StatusBar,
     EmailComposer,

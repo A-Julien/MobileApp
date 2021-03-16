@@ -50,7 +50,7 @@
     </div>
     <div class="nav-item">
       <ion-item class="force-background">
-        <ion-toggle value="false"></ion-toggle>
+        <ion-toggle [(ngModel)]="forceOCR" (ionChange)="changeForceOcr()" ></ion-toggle>
         <ion-label>Force offline ocr</ion-label>
       </ion-item>
       <span class="divider"></span>

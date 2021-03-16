@@ -20,7 +20,7 @@
       <ion-item (click)="routeToDetail(todo.id)" >
         <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(todo)" ></ion-checkbox>
         <ion-label *ngIf="!editing" >{{ todo.name }}</ion-label>
-        <ion-input *ngIf="editing" [(ngModel)]="todo.name" (ngModelChange)="addToUpdateTodos(todo)"></ion-input>
+        <ion-input *ngIf="editing" [(ngModel)]="todo.name" (ngModelChange)="addToUpdateTodoName(todo)"></ion-input>
       </ion-item>
 
       <ion-item-options side="end">

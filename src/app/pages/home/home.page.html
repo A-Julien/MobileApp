@@ -34,7 +34,7 @@
       <ion-item  (click)="routeToTodos(list.id)">
         <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)" [(ngModel)]="list.isChecked"></ion-checkbox>
         <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
-        <ion-input *ngIf="editing" [(ngModel)]="list.name" (ngModelChange)="addToUpdateList(todo)"></ion-input>
+        <ion-input *ngIf="editing" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 
         <ion-badge slot="end" color="danger" *ngIf="isNewList(list.id) && !editing">new</ion-badge>
         <ion-badge slot="end" color="primary" *ngIf="list.share && !editing">shared</ion-badge>

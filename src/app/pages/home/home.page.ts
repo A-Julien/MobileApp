@@ -21,6 +21,7 @@ import { Plugins } from '@capacitor/core';
 import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
 import {Router} from '@angular/router';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
+import {Updater} from '../../models/updater';
 
 const { Network } = Plugins;
 
@@ -37,7 +38,7 @@ export class HomePage implements OnInit {
 
   editing = false;
   listToRm: List[];
-  listToUpdate: List[];
+  listToUpdateName: Updater[];
 
   nbNotif: number;
   private metalist: MetaList[];
@@ -54,7 +55,7 @@ export class HomePage implements OnInit {
   ){
     this.nbNotif = 0;
     this.listToRm = [];
-    this.listToUpdate = [];
+    this.listToUpdateName = [];
 
     this.lists = this.listService.getAllListDB().pipe(
         map(list => {
@@ -152,7 +153,25 @@ export class HomePage implements OnInit {
 
   startEdit() { this.editing = true; }
 
-  stopEdit() { this.editing = false; }
+  async stopEdit() {
+    this.editing = false;
+    const nbList =  this.listToUpdateName.length;
+
+    let msg = 'Update Name of ' + nbList + ' list';
+    if ( nbList > 1) { msg = 'Update Name of ' + nbList + ' lists'; }
+    const loader = await this.popUpService.presentLoading(msg);
+
+    this.listToUpdateName.forEach(u => {
+      this.updateListName(u);
+    });
+    this.listToUpdateName = [];
+
+    await loader.dismiss();
+  }
+
+  async updateListName(u: Updater){
+    await this.listService.updateListName(u);
+  }
 
   addToDel(list: List){
     if (this.listToRm.indexOf(list) !== -1){
@@ -184,7 +203,12 @@ export class HomePage implements OnInit {
       return await popover.present();
   }
 
-  addToUpdateList(list: List) {
-
+  addToUpdateListName(list: List) {
+    const index = this.listToUpdateName.findIndex(t => t.id === list.id);
+    if (index !== -1){
+      this.listToUpdateName[index].field = list.name;
+      return;
+    }
+    this.listToUpdateName.push(new Updater(list.id, list.name));
   }
 }

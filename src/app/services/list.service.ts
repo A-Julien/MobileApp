@@ -198,8 +198,8 @@ export class ListService {
     return this.listCollection.doc(list.id).ref.withConverter(listToFirebase).set(list);
   }
 
-  public updateListName(list: List): Promise<void> {
-    return this.listCollection.doc(list.id).update({name: list.name});
+  public updateListName(u: Updater): Promise<void> {
+    return this.listCollection.doc(u.id).update({name: u.field});
   }
 
   public updateTodo(todo: Todo, listID: string): Promise<void>{

@@ -86,7 +86,7 @@ export class ListDetailsPage implements OnInit {
 
     this.todosToUpdate.forEach(u => {
       console.log('update todo ', u.field);
-      this.updateTodo(u);
+      this.updateTodoName(u);
     });
     this.todosToUpdate = [];
 
@@ -94,7 +94,7 @@ export class ListDetailsPage implements OnInit {
 
   }
 
-  async updateTodo(u: Updater){
+  async updateTodoName(u: Updater){
     await this.listService.updateTodoName(u, this.listID);
   }
 
@@ -129,7 +129,7 @@ export class ListDetailsPage implements OnInit {
     if (!this.editing) { this.router.navigate(['/list-details/' + this.listID + '/todo-details/' + TodoId]); }
   }
 
-  addToUpdateTodos(todo: Todo): void {
+  addToUpdateTodoName(todo: Todo): void {
     console.log(this.todosToUpdate.length);
     const index = this.todosToUpdate.findIndex(t => t.id === todo.id);
     if (index !== -1){

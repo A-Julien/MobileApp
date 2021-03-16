@@ -17,7 +17,7 @@
 <p align="center">
 A simple todo list App with O.C.R support 
 <br />
-<a href="https://mobileapp-e7f03.web.app/loginRegister"><strong>Explore the App »</strong></a>
+<a href="https://mobileapp-e7f03.web.app"><strong>Explore the App »</strong></a>
 <br />
 <br />
 <a href="https://github.com/A-Julien/MobileApp/issues">Report Bug</a>
@@ -143,7 +143,7 @@ Contributions are what make the open source community such an amazing place to b
 
 * Alaimo Julien - [julien.alaimo@gmail.com](julien.alaimo@gmail.com)
 
-* Hugo Feydel - []()
+* Hugo Feydel - [feydel.hugo@gmail.com]()
 
 Project Link: [https://github.com/A-Julien/MobileApp](https://github.com/A-Julien/MobileApp)
 

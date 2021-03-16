@@ -7,6 +7,10 @@ import firebase from 'firebase';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
 import {UserSettingsService} from '../../services/user-settings.service';
 import {USettings} from '../../models/settings';
+import {ListService} from '../../services/list.service';
+import {PopupService} from '../../services/popup.service';
+import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
+import {PopoverController} from "@ionic/angular";
 
 @Component({
   selector: 'app-side-menu',
@@ -20,15 +24,21 @@ export class SideMenuComponent implements OnInit {
   private forceOCR: boolean;
   private currentUs: USettings;
 
+  nbNotif: number;
+
   constructor(
       private auth: AngularFireAuth,
       private authService: AuthenticationService,
       private router: Router,
       private emailComposer: EmailComposer,
-      private uService: UserSettingsService
+      private uService: UserSettingsService,
+      private listService: ListService,
+      public popupService: PopupService,
+      private popOverController: PopoverController
   ) {
     this.user = this.authService.authState;
     this.forceOCR = false;
+    this.nbNotif = 0;
   }
 
   ngOnInit() {
@@ -37,6 +47,16 @@ export class SideMenuComponent implements OnInit {
           this.currentUs = us;
         }
     );
+    const listsShared = this.listService.getAllSharedListDB();
+
+    listsShared.subscribe(ml => {
+      this.nbNotif = 0;
+      ml.forEach(meta => {
+        if (!meta.notify && meta.newOwner === this.authService.userEmail){
+          this.nbNotif += 1;
+        }
+      });
+    });
   }
 
   async logout() {
@@ -63,4 +83,19 @@ export class SideMenuComponent implements OnInit {
 
     this.emailComposer.open(email);
   }
+
+  public async popShareHistory(ev) {
+    const popover = await this.popOverController.create({
+      component: ShareHistoryComponent,
+      cssClass: 'notif',
+      event: ev,
+      mode: 'ios',
+      translucent: true,
+      keyboardClose: true,
+      showBackdrop: true
+    });
+
+    return await popover.present();
+  }
+
 }

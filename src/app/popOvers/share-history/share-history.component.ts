@@ -3,7 +3,7 @@ import {ListService} from '../../services/list.service';
 import {Observable} from 'rxjs';
 import {MetaList} from '../../models/metaList';
 import {Router} from '@angular/router';
-import {PopoverController} from '@ionic/angular';
+import {MenuController, PopoverController} from '@ionic/angular';
 
 @Component({
   selector: 'app-share-history',
@@ -17,7 +17,8 @@ export class ShareHistoryComponent implements OnInit {
   constructor(
       private listService: ListService,
       private router: Router,
-      public popOverCtrl: PopoverController
+      public popOverCtrl: PopoverController,
+      public menuController: MenuController,
   ) { }
 
   ngOnInit() {
@@ -31,6 +32,7 @@ export class ShareHistoryComponent implements OnInit {
 
   routeToTodos(listID: string) {
     this.close();
+    this.menuController.toggle();
     this.router.navigate(['/list-details/' + listID]);
   }
 }

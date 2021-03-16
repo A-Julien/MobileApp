@@ -16,14 +16,23 @@
   <ion-menu-toggle auto-hide="false" [routerLink]="['home']">
     <span class="divider"></span>
     <div class="nav-item">
-      <ion-icon class="icon" name="home-outline"></ion-icon>
-      <ion-label>Home</ion-label>
+      <ion-item class="force-background">
+        <ion-icon class="icon" name="home-outline"></ion-icon>
+        <ion-label>Home</ion-label>
+      </ion-item>
       <span class="divider"></span>
     </div>
-
   </ion-menu-toggle>
+  <div class="nav-item"  (click)="popShareHistory($event)">
+    <ion-item class="force-background">
+      <ion-icon class="icon" name="notifications-outline"></ion-icon>
+      <ion-label>Notification</ion-label>
+      <ion-badge  color="danger">{{ nbNotif }}</ion-badge>
+    </ion-item>
+    <span class="divider"></span>
+  </div>
 </div>
-<!--<div class="nav">
+<!--<div class="nav"><ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
 <ion-menu-toggle auto-hide="false">
     <span class="divider"></span>
       <div class="nav-item">

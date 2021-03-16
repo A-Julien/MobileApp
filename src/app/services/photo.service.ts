@@ -38,4 +38,5 @@ export class PhotoService {
       width: 1080
     });
   }
+
 }

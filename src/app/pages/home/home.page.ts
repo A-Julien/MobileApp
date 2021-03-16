@@ -1,9 +1,8 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit } from '@angular/core';
 import {
   AlertController,
   ModalController,
   IonItemSliding,
-  ActionSheetController,
   PopoverController
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
@@ -204,7 +203,7 @@ export class HomePage implements OnInit {
   }
 
   addToUpdateListName(list: List) {
-    const index = this.listToUpdateName.findIndex(t => t.id === list.id);
+    const index = this.listToUpdateName.findIndex(l => l.id === list.id);
     if (index !== -1){
       this.listToUpdateName[index].field = list.name;
       return;

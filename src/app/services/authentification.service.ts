@@ -99,7 +99,7 @@ export class AuthenticationService {
                                 errMsg = 'User not found';
                                 break;
                         }
-
+                        this.popupService.presentAlert(errMsg, 'Login failed !');
                         return reject(errMsg);
                     })
             );

@@ -54,13 +54,13 @@ export class HomePage implements OnInit {
 
     this.lists = this.listService.lists.pipe(
         map(list => {
-          console.log('ischecked 0');
           list.forEach(l => l.isChecked = false);
           return list;
         })
     );
-    this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
-    this.listsShared = this.listService.getAllSharedListDB();
+    // this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
+
+    this.listsShared = this.listService.listShare;
     this.listsShared.subscribe(ml => {
       this.metalist = ml;
       this.nbNotif = 0;
@@ -77,7 +77,7 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit(): void {
-    this.listsShared = this.listService.getAllSharedListDB();
+    this.listsShared = this.listService.listShare;
   }
 
   async presentModal() {

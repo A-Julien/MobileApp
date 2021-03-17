@@ -52,7 +52,7 @@ export class ListDetailsPage implements OnInit {
     );
     this.todos.subscribe(() => this.showLoader = false);
 
-    this.listService.getAllSharedListDB().subscribe( data => {
+    this.listService.listShare.subscribe( data => {
       data.forEach(d => {
         if (d.listID === this.listID && d.newOwner === this.auth.userEmail && !d.notify){
           this.listService.removedNotyficationShared(d);

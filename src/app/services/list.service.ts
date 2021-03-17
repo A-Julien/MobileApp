@@ -11,14 +11,7 @@ import {Todo, todoToFirebase} from '../models/todo';
 import {MetaList, MetaListToFirebase} from '../models/metaList';
 import {Updater} from '../models/updater';
 
-/*
-export interface SharingNotif {
-  id: string;
-  newOwner: string;
-  owner: string;
-  listID: string;
-  notify: boolean;
-}*/
+
 
 @Injectable({
   providedIn: 'root'
@@ -31,35 +24,40 @@ export class ListService {
   private sharingCollection: AngularFirestoreCollection<MetaList>;
   // tslint:disable-next-line:variable-name
   private _lists: Observable<List[]>;
+  // tslint:disable-next-line:variable-name
+  private _listShare: Observable<MetaList[]>;
 
   constructor(private afs: AngularFirestore,
               private auth: AuthenticationService,
               private popupService: PopupService) {
     this._lists = null;
-    /*this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION,
-        ref => ref.where('owners', 'array-contains-any',
-            [this.auth.userEmail, this.auth.userId]));*/
+    this._listShare = null;
+
     this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION);
 
     this.sharingCollection = this.afs.collection(this.SHARECOLLECTION);
-    /*this.sharingCollection = this.afs.collection(this.SHARECOLLECTION,
-        ref => ref.where('newOwner', '==', this.auth.userEmail));*/
-    // this._lists = this.getAllListDB();
+
     this.auth.authState.subscribe((user) => {
       if (user === null){
         this._lists = null;
+        this._listShare = null;
         return;
       }
       this._lists = this.getAllListDB();
+      this._listShare = this.getAllSharedListDB();
     });
   }
 
+
+  get listShare(): Observable<MetaList[]> {
+    return this._listShare;
+  }
 
   get lists(): Observable<List[]> {
     return this._lists;
   }
 
-  getAllSharedListDB(): Observable<MetaList[]> {
+  private getAllSharedListDB(): Observable<MetaList[]> {
     return this.auth.authState.pipe(
         switchMap(user => this.afs.collection(this.SHARECOLLECTION, ref => ref.where('newOwner', '==', user.email)).snapshotChanges()),
         map(actions => this.convertSnapData<List>(actions))

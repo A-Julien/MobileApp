@@ -22,7 +22,7 @@ export class ShareHistoryComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.listsShared = this.listService.getAllSharedListDB();
+    this.listsShared = this.listService.listShare;
   }
 
   close() {

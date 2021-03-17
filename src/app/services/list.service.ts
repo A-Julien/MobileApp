@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import {List, listToFirebase} from '../models/list';
 import {AuthenticationService} from './authentification.service';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
-import {Observable, Subject} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {Observable, of } from 'rxjs';
+import {map, switchMap, tap} from 'rxjs/operators';
 import {PopupService} from './popup.service';
 import firebase from 'firebase';
-import {userError} from '@angular/compiler-cli/src/transformers/util';
 import {Todo, todoToFirebase} from '../models/todo';
 import {MetaList, MetaListToFirebase} from '../models/metaList';
 import {Updater} from '../models/updater';
@@ -23,51 +22,52 @@ export class ListService {
   private listCollection: AngularFirestoreCollection<List>;
   private sharingCollection: AngularFirestoreCollection<MetaList>;
   // tslint:disable-next-line:variable-name
-  private _lists: Observable<List[]>;
   // tslint:disable-next-line:variable-name
-  private _listShare: Observable<MetaList[]>;
 
   constructor(private afs: AngularFirestore,
               private auth: AuthenticationService,
               private popupService: PopupService) {
-    this._lists = null;
-    this._listShare = null;
+
 
     this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION);
 
     this.sharingCollection = this.afs.collection(this.SHARECOLLECTION);
 
-    this.auth.authState.subscribe((user) => {
-      if (user === null){
-        this._lists = null;
-        this._listShare = null;
+    /*this.auth.authState.subscribe((user) => {
+      if (user){
+        console.log('user log, get list');
+        this._lists = this.getAllListDB();
+        this._listShare = this.getAllSharedListDB();
         return;
       }
-      this._lists = this.getAllListDB();
-      this._listShare = this.getAllSharedListDB();
-    });
+      console.log('remove observable');
+      this._lists = null;
+      this._listShare = null;
+    });*/
   }
 
 
-  get listShare(): Observable<MetaList[]> {
+  /*get listShare(): Observable<MetaList[]> {
     return this._listShare;
   }
 
   get lists(): Observable<List[]> {
     return this._lists;
-  }
+  }*/
 
-  private getAllSharedListDB(): Observable<MetaList[]> {
-    return this.auth.authState.pipe(
-        switchMap(user => this.afs.collection(this.SHARECOLLECTION, ref => ref.where('newOwner', '==', user.email)).snapshotChanges()),
+  get listShare(): Observable<MetaList[]> {
+    return this.auth.u$.pipe(
+        switchMap(user => user ? this.afs.collection(this.SHARECOLLECTION,
+                ref => ref.where('newOwner', '==', user.email)).snapshotChanges() : of([])),
         map(actions => this.convertSnapData<List>(actions))
     );
   }
 
-   private getAllListDB(): Observable<List[]> {
-     return this.auth.authState.pipe(
-         switchMap(user => this.afs.collection(this.LISTCOLLECTION, ref => ref.where('owners', 'array-contains-any',
-             [user.email, user.uid])).snapshotChanges()),
+   get lists(): Observable<List[]> {
+     return this.auth.u$.pipe(
+         tap(console.log),
+         switchMap(user => user ? this.afs.collection(this.LISTCOLLECTION, ref => ref.where('owners', 'array-contains-any',
+             [user.email, user.uid])).snapshotChanges() : of([])),
          map(actions => this.convertSnapData<List>(actions))
      );
   }
@@ -159,7 +159,7 @@ export class ListService {
   }
 
   private removedSharedList(listID: string){
-    this.getAllSharedListDB().subscribe((sl) => {
+    this.listShare.subscribe((sl) => {
       sl.forEach((l) => {
         if (l.listID === listID) { this.sharingCollection.doc(l.id).delete(); }
       });
@@ -186,7 +186,7 @@ export class ListService {
 
     this.updateList(list);
 
-    this.getAllSharedListDB().subscribe((sl) => {
+    this.listShare.subscribe((sl) => {
     sl.forEach((l) => {
         if (l.newOwner === userEmailToRm && l.listID === list.id) {
           this.sharingCollection.doc(l.id).delete();

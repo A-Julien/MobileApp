@@ -28,11 +28,11 @@
 </ion-content>
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
   <ion-list >
-    <ion-item-sliding  *ngFor="let list of lists | async" #slidingItem>
+    <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem>
 
       <!--<ion-item  [routerLink]="['/list-details/' + list.id]">-->
       <ion-item  (click)="routeToTodos(list.id)">
-        <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)" [(ngModel)]="list.isChecked"></ion-checkbox>
+        <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)"></ion-checkbox>
         <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
         <ion-input *ngIf="editing" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 

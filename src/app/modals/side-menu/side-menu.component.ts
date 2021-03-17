@@ -49,7 +49,7 @@ export class SideMenuComponent implements OnInit {
     );
     const listsShared = this.listService.listShare;
 
-    listsShared.subscribe(ml => {
+    listsShared?.subscribe(ml => {
       this.nbNotif = 0;
       ml.forEach(meta => {
         if (!meta.notify && meta.newOwner === this.authService.userEmail){

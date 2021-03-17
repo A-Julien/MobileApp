@@ -15,8 +15,6 @@ import {AuthenticationService} from '../../services/authentification.service';
 import { map } from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
-import {OcrProviderService} from '../../services/ocr-provider.service';
-import { Plugins } from '@capacitor/core';
 import {Router} from '@angular/router';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
 import {Updater} from '../../models/updater';
@@ -28,8 +26,8 @@ import {Updater} from '../../models/updater';
 })
 export class HomePage implements OnInit {
 
-  lists: Observable<List[]>;
-  listsShared: Observable<MetaList[]>;
+  lists$: Observable<List[]>;
+  listsShared$: Observable<MetaList[]>;
   showLoading = true;
 
   editing = false;
@@ -52,16 +50,14 @@ export class HomePage implements OnInit {
     this.listToRm = [];
     this.listToUpdateName = [];
 
-    this.lists = this.listService.lists.pipe(
-        map(list => {
-          list.forEach(l => l.isChecked = false);
-          return list;
-        })
-    );
     // this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
+  }
 
-    this.listsShared = this.listService.listShare;
-    this.listsShared.subscribe(ml => {
+  ngOnInit(): void {
+    this.lists$ = this.listService.lists;
+
+    this.listsShared$ = this.listService.listShare;
+    this.listsShared$.subscribe(ml => {
       this.metalist = ml;
       this.nbNotif = 0;
       ml.forEach(meta => {
@@ -71,13 +67,9 @@ export class HomePage implements OnInit {
       });
     });
 
-    this.lists.subscribe((listArray) => {
+    this.lists$?.subscribe(() => {
       this.showLoading = false;
     });
-  }
-
-  ngOnInit(): void {
-    this.listsShared = this.listService.listShare;
   }
 
   async presentModal() {
@@ -90,7 +82,7 @@ export class HomePage implements OnInit {
 
   isNewList(listId: string) {
     let res = false;
-    this.metalist.forEach( ml => {
+    this.metalist?.forEach( ml => {
       if (ml.listID === listId && !ml.notify && ml.newOwner === this.auth.userEmail) { res =  true; }
     });
     return res;
@@ -116,7 +108,7 @@ export class HomePage implements OnInit {
   }
 
   public isNew(list: List): Observable<MetaList> {
-   return this.listsShared.pipe(
+   return this.listsShared$.pipe(
         map(data => {
           return data.find( d => d.listID === list.id && d.owner !== this.auth.userEmail);
         })

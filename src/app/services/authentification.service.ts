@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { Observable } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import firebase from 'firebase';
 import {Router} from '@angular/router';
 import {AlertController, ToastController} from '@ionic/angular';
@@ -22,11 +22,17 @@ export class AuthenticationService {
   private fbToken = null;
   private fbLogin: FacebookLoginPlugin;
 
+  public u$ = new BehaviorSubject<firebase.User>(null);
+
   constructor(private auth: AngularFireAuth,
               private router: Router,
               private http: HttpClient,
               private popupService: PopupService,
               private uServivce: UserSettingsService) {
+
+    this.auth.onAuthStateChanged(user => {
+        this.u$.next(user);
+    });
 
     this.fbLogin = FacebookLogin;
     this.auth.authState.subscribe(user => { console.log('userhchange', user); this.user = user; });

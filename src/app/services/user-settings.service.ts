@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
 import {USettings, USettingsToFirebase} from '../models/settings';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
-import {AngularFireAuth} from '@angular/fire/auth';
-import {todoToFirebase} from "../models/todo";
+import {AuthenticationService} from './authentification.service';
+import {AngularFireAuth} from "@angular/fire/auth";
 
 @Injectable({
   providedIn: 'root'
@@ -42,10 +42,9 @@ export class UserSettingsService {
   }
 
   get UserSettings(): Observable<USettings>{
-    console.log('UserSettings');
     return this.auth.authState.pipe(
-        switchMap(user => this.afs.collection(this.USERSETTINGCOLLECTION,
-                ref => ref.where('userUid', '==', user.uid)).snapshotChanges()),
+        switchMap(user => user ? this.afs.collection(this.USERSETTINGCOLLECTION,
+                ref => ref.where('userUid', '==', user.uid)).snapshotChanges() : of()),
         map(actions => {
            return  (this.convertSnapData<USettings>(actions))[0];
         })

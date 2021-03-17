@@ -30,6 +30,6 @@ export class AppComponent {
     }
 
     closed() {
-        this.popoverControler.dismiss();
+        this.popoverControler.dismiss().catch(console.log);
     }
 }

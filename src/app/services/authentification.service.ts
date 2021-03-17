@@ -9,7 +9,7 @@ import '@codetrix-studio/capacitor-google-auth';
 import {FacebookLogin, FacebookLoginPlugin} from '@capacitor-community/facebook-login';
 import {HttpClient} from '@angular/common/http';
 import {PopupService} from './popup.service';
-import {UserSettingsService} from "./user-settings.service";
+import {UserSettingsService} from './user-settings.service';
 
 registerWebPlugin(FacebookLogin);
 

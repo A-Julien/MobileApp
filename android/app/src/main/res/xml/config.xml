@@ -6,5 +6,9 @@
     <param name="android-package" value="de.appplant.cordova.emailcomposer.EmailComposer"/>
   </feature>
 
+  <feature name="NetworkStatus">
+    <param name="android-package" value="org.apache.cordova.networkinformation.NetworkManager"/>
+  </feature>
+
   
 </widget>

@@ -4,17 +4,17 @@ import {LoadingController} from '@ionic/angular';
 import {HttpClient} from '@angular/common/http';
 
 
-const { createWorker } = require('tesseract.js');
+const { createWorker, createScheduler } = require('tesseract.js');
 import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OcrProviderService {
-  private worker = createWorker({
-    langPath: '../../assets/lang-data',
-    logger: m => console.log(m), // Add logger here
-  });
+  private scheduler = createScheduler();
+  private worker1;
+  private worker2;
+
   public readonly DOCUMENT_TEXT_TYPE = 'DOCUMENT_TEXT_DETECTION';
   public readonly DOCUMENT_HAND_TYPE = 'DOCUMENT_HAND_DETECTION';
 
@@ -22,7 +22,25 @@ export class OcrProviderService {
       private popUpService: PopupService,
       private loadingController: LoadingController,
       private http: HttpClient
-  ) {}
+  ) {
+    this.worker1 = createWorker({
+      workerPath: '/assets/lib/worker.min.js',
+      langPath: '/assets/lang-data',
+      corePath: '/assets/lib/tesseract-core.wasm.js',
+      logger: m => console.log(m),
+      /*langPath: '../../assets/lang-data',
+      logger: m => console.log(m), // Add logger here*/
+     });
+
+    this.worker2 = createWorker({
+      workerPath: '/assets/lib/worker.min.js',
+      langPath: '/assets/lang-data',
+      corePath: '/assets/lib/tesseract-core.wasm.js',
+      logger: m => console.log(m),
+      /*langPath: '../../assets/lang-data',
+      logger: m => console.log(m), // Add logger here*/
+    });
+}
 
   OnLineOcrGoogleVisio(base64Image: string, detectionType: string) {
     console.log(base64Image);
@@ -70,17 +88,30 @@ export class OcrProviderService {
     );*/
   }
 
-  public async offLineOcrTesseract(picture): Promise<string>{
+  public async offLineOcrTesseract(picture) {
     console.log('INPGOTO');
     console.log(picture);
+    // return await this.recognizeFile(picture);
+
     const loader = await this.popUpService.presentLoading('Please wait...');
-    await this.worker.load();
-    await this.worker.loadLanguage('fra');
-    await this.worker.initialize('fra');
+    await this.worker1.load();
+    await this.worker2.load();
+    await this.worker1.loadLanguage('fra');
+    await this.worker1.initialize('fra');
+    await this.worker2.loadLanguage('fra');
+    await this.worker2.initialize('fra');
+
+    console.log('lanch worker');
+    /*const results = await Promise.all(Array(10).fill(0).map(() => (
+        this.scheduler.addJob('recognize', picture)
+    )));
+    console.log(results);
+    await this.scheduler.terminate(); // It also terminates all workers.
+    return results;*/
     console.log('INPGOTO');
-    const { data: { text } } = await this.worker.recognize(picture);
+    const { data: { text } } = await this.worker1.recognize(picture);
     loader.dismiss();
-    await this.worker.terminate();
+    await this.worker1.terminate();
     return text;
   }
 

@@ -3,7 +3,7 @@ import {Todo} from '../../models/todo';
 import {ActivatedRoute} from '@angular/router';
 import {ListService} from '../../services/list.service';
 import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
-import {Network} from '@capacitor/core';
+import { Network } from '@ionic-native/network/ngx';
 import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
 import {PopupService} from '../../services/popup.service';
@@ -21,13 +21,16 @@ export class TodoDetailsPage implements OnInit {
   private todoId: string;
   public todoContent;
 
+  public netStatus: boolean;
+
   constructor(
       private route: ActivatedRoute,
       private listService: ListService,
       private photoService: PhotoService,
       public modalController: ModalController,
       private ocrService: OcrProviderService,
-      private popUpService: PopupService) {
+      private popUpService: PopupService,
+      private network: Network) {
     this.todo = new Todo('', '');
   }
 
@@ -36,6 +39,7 @@ export class TodoDetailsPage implements OnInit {
     this.listId = this.route.snapshot.paramMap.get('listId');
 
     this.todo = await this.listService.getOneTodo(this.listId, this.todoId).toPromise();
+
   }
 
   save() {
@@ -58,9 +62,9 @@ export class TodoDetailsPage implements OnInit {
     await modal.present().then(() => loader.dismiss());
     const { data } = await modal.onWillDismiss();
 
-    const status = await Network.getStatus();
     let TextOcr = '';
-    if (status.connected){
+
+    if (navigator.onLine && false){
       if (type === 'document'){
         const obRes = await this.ocrService.OnLineOcrGoogleVisio(data.substring(23), this.ocrService.DOCUMENT_TEXT_TYPE);
         const response = await obRes.toPromise();

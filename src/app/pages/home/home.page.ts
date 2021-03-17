@@ -18,6 +18,7 @@ import {PhotoService} from '../../services/photo.service';
 import {Router} from '@angular/router';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
 import {Updater} from '../../models/updater';
+import { ItemReorderEventDetail } from '@ionic/core';
 
 @Component({
   selector: 'app-home',
@@ -70,6 +71,17 @@ export class HomePage implements OnInit {
     this.lists$?.subscribe(() => {
       this.showLoading = false;
     });
+  }
+
+  doReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+    // The `from` and `to` properties contain the index of the item
+    // when the drag started and ended, respectively
+    console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
+
+    // Finish the reorder and position the item in the DOM based on
+    // where the gesture ended. This method can also be called directly
+    // by the reorder group
+    ev.detail.complete();
   }
 
   async addListModal() {

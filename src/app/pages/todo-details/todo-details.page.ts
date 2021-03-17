@@ -7,6 +7,8 @@ import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
 import {PopupService} from '../../services/popup.service';
 import {ModalController} from '@ionic/angular';
+import {UserSettingsService} from '../../services/user-settings.service';
+import {USettings} from '../../models/settings';
 
 @Component({
   selector: 'app-todo-details',
@@ -22,17 +24,22 @@ export class TodoDetailsPage implements OnInit {
 
   public netStatus: boolean;
 
+  private userPref: USettings;
+
   constructor(
       private route: ActivatedRoute,
       private listService: ListService,
       private photoService: PhotoService,
       public modalController: ModalController,
       private ocrService: OcrProviderService,
-      private popUpService: PopupService) {
+      private popUpService: PopupService,
+      private userSettings: UserSettingsService) {
     this.todo = new Todo('', '');
   }
 
   async ngOnInit() {
+    this.userSettings.UserSettings.subscribe(upref => this.userPref = upref);
+
     this.todoId = this.route.snapshot.paramMap.get('todoId');
     this.listId = this.route.snapshot.paramMap.get('listId');
 
@@ -57,12 +64,14 @@ export class TodoDetailsPage implements OnInit {
       }
     });
 
+
+
     await modal.present().then(() => loader.dismiss());
     const { data } = await modal.onWillDismiss();
 
     let TextOcr = '';
 
-    if (navigator.onLine){
+    if (navigator.onLine && !this.userPref.forceOfflineOcr){
       if (type === 'document'){
         const obRes = await this.ocrService.OnLineOcrGoogleVisio(data.substring(23), this.ocrService.DOCUMENT_TEXT_TYPE);
         const response = await obRes.toPromise();

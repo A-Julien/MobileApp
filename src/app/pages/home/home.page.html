@@ -28,25 +28,26 @@
 </ion-content>
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
   <ion-list >
-    <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem>
+    <ion-reorder-group [disabled]="!editing" (ionItemReorder)="doReorder($event)">
+      <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem>
 
-      <!--<ion-item  [routerLink]="['/list-details/' + list.id]">-->
-      <ion-item  (click)="routeToTodos(list.id)">
-        <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)"></ion-checkbox>
-        <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
-        <ion-input *ngIf="editing" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
+        <ion-item  (click)="routeToTodos(list.id)">
+          <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)"></ion-checkbox>
+          <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
+          <ion-input *ngIf="editing" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 
-        <ion-badge slot="end" color="danger" *ngIf="isNewList(list.id) && !editing">new</ion-badge>
-        <ion-badge slot="end" color="primary" *ngIf="list.share && !editing">shared</ion-badge>
-      </ion-item>
+          <ion-badge slot="end" color="danger" *ngIf="isNewList(list.id) && !editing">new</ion-badge>
+          <ion-badge slot="end" color="primary" *ngIf="list.share && !editing">shared</ion-badge>
+          <ion-reorder slot="end"></ion-reorder>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option *ngIf="!editing"  (click)="delete(list)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
+        </ion-item-options>
 
-      <ion-item-options side="end">
-        <ion-item-option *ngIf="!editing"  (click)="delete(list)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
-      </ion-item-options>
-
-      <ion-item-options  side="start">
-        <ion-item-option *ngIf="!editing" [disabled]="list.owner !== auth.userId" (click)="share(list,slidingItem)" color="primary"><ion-icon name="share-social-outline"></ion-icon></ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
+        <ion-item-options  side="start">
+          <ion-item-option *ngIf="!editing" [disabled]="list.owner !== auth.userId" (click)="share(list,slidingItem)" color="primary"><ion-icon name="share-social-outline"></ion-icon></ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-reorder-group>
   </ion-list>
 </ion-content>

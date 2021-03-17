@@ -72,10 +72,10 @@ export class HomePage implements OnInit {
     });
   }
 
-  async presentModal() {
+  async addListModal() {
     const modal = await this.modalController.create({
       component: CreateListComponent,
-      cssClass: ['share-modal']
+      cssClass: ['add-modal']
     });
     return await modal.present();
   }

@@ -65,7 +65,7 @@ export class ListDetailsPage implements OnInit {
   async presentModal() {
     const modal = await this.modalController.create({
       component: CreateTodoComponent,
-      cssClass:  ['share-modal'],
+      cssClass:  ['add-modal-todo'],
       componentProps: {
         // @ts-ignore
         listId : this.listID

@@ -19,7 +19,7 @@
       <ion-button *ngIf="editing" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
       <ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
       <ion-button *ngIf="editing" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
-      <ion-button *ngIf="!editing" expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
+      <ion-button *ngIf="!editing" expand="block" (click)="addListModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

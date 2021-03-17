@@ -1,6 +1,6 @@
 <ion-header translucent>
   <ion-toolbar>
-    <ion-title>Creat new list</ion-title>
+    <ion-title>Share your List</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismissModal()">Close</ion-button>
     </ion-buttons>
@@ -10,11 +10,18 @@
 <ion-content fullscreen>
   <form [formGroup]="newShareForm" (ngSubmit)="share()" novalidate>
     <ion-item>
-      <ion-item slot="start">
+
+      <ion-buttons slot="end">
+        <ion-button [disabled]="newShareForm.invalid" type="submit" color="primary">
+          <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-input name="email" formControlName="email" placeholder="emboucaneur@cretin.com" required></ion-input>
+      <!--<ion-item >
         <ion-label position="floating">Email</ion-label>
         <ion-input type="email" name="email" formControlName="email" required></ion-input>
-      </ion-item>
-      <ion-button [disabled]="newShareForm.invalid" type="submit" color="primary"  slot="end"><ion-icon name="add-circle-outline"></ion-icon></ion-button>
+      </ion-item>*/
+      <ion-button [disabled]="newShareForm.invalid" type="submit" color="primary"  ><ion-icon name="add-circle-outline"></ion-icon></ion-button>-->
     </ion-item>
   </form>
 

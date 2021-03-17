@@ -29,12 +29,13 @@ export class ListService {
 
   private listCollection: AngularFirestoreCollection<List>;
   private sharingCollection: AngularFirestoreCollection<MetaList>;
-  private lists: List[];
+  // tslint:disable-next-line:variable-name
+  private _lists: Observable<List[]>;
 
   constructor(private afs: AngularFirestore,
               private auth: AuthenticationService,
               private popupService: PopupService) {
-    this.lists = new Array<List>();
+    this._lists = null;
     /*this.listCollection = this.afs.collection<List>(this.LISTCOLLECTION,
         ref => ref.where('owners', 'array-contains-any',
             [this.auth.userEmail, this.auth.userId]));*/
@@ -43,9 +44,20 @@ export class ListService {
     this.sharingCollection = this.afs.collection(this.SHARECOLLECTION);
     /*this.sharingCollection = this.afs.collection(this.SHARECOLLECTION,
         ref => ref.where('newOwner', '==', this.auth.userEmail));*/
-
+    // this._lists = this.getAllListDB();
+    this.auth.authState.subscribe((user) => {
+      if (user === null){
+        this._lists = null;
+        return;
+      }
+      this._lists = this.getAllListDB();
+    });
   }
 
+
+  get lists(): Observable<List[]> {
+    return this._lists;
+  }
 
   getAllSharedListDB(): Observable<MetaList[]> {
     return this.auth.authState.pipe(
@@ -54,7 +66,7 @@ export class ListService {
     );
   }
 
-   getAllListDB(): Observable<List[]> {
+   private getAllListDB(): Observable<List[]> {
      return this.auth.authState.pipe(
          switchMap(user => this.afs.collection(this.LISTCOLLECTION, ref => ref.where('owners', 'array-contains-any',
              [user.email, user.uid])).snapshotChanges()),
@@ -68,10 +80,6 @@ export class ListService {
       const id = res.payload.doc.id;
       return {id, ...data } as T;
     });
-  }
-
-  public getAll(): List[] {
-    return this.lists;
   }
 
   public getOneDB(id: string): Observable<List>{
@@ -97,10 +105,6 @@ export class ListService {
           return todo;
         })
     );
-  }
-
-  public getOne(id: string): List {
-    return this.lists.find(list => list.id === id);
   }
 
   public async createList(list: List): Promise<void> {

@@ -35,7 +35,6 @@ export class UserSettingsService {
        this.createUsettings(userUid);
       }
     });
-
   }
 
   public updateUs(us: USettings): Promise<void> {

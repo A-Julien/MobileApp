@@ -65,7 +65,6 @@ export class AuthenticationService {
                           errMsg = 'Password is too weak';
                           break;
                   }
-
                   reject(errMsg);
               });
       });
@@ -181,6 +180,9 @@ async isLoggedIn(): Promise<boolean> {
                             case 'auth/wrong-password':
                                 errMsg = 'Wrong password';
                                 break;
+                            default:
+                                errMsg = err.code;
+                                break;
                         }
                         this.popupService.presentAlert(errMsg);
                         reject(errMsg);
@@ -193,24 +195,22 @@ async isLoggedIn(): Promise<boolean> {
 
   async logout(): Promise<void> {
       return new Promise((resolve, reject) => {
-          if (this.auth.currentUser) {
               this.auth.signOut()
                   .then(() => {
-                      this.router.navigate(['/loginRegister']);
                       if (this.fbToken) { this.FbLogout(); }
                       console.log('LOG Out');
                       this.user = null;
+                      this.router.navigate(['/loginRegister']);
                       resolve();
                   }).catch((error) => {
                   reject();
               });
-          }
       });
   }
 
     private async FbLogout() {
-        await Plugins.FacebookLogin.logout();
         this.fbToken = null;
+        await Plugins.FacebookLogin.logout();
     }
 
     get userId(): string {

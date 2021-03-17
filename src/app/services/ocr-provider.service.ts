@@ -44,7 +44,6 @@ export class OcrProviderService {
 
   OnLineOcrGoogleVisio(base64Image: string, detectionType: string) {
     console.log(base64Image);
-    console.log('GOOGOLE');
     let body: any = {
       requests: [
         {
@@ -60,7 +59,6 @@ export class OcrProviderService {
         }
       ]
     };
-    console.log('GOOGOLE2');
     if (detectionType === this.DOCUMENT_HAND_TYPE){
       body = {
         requests: [
@@ -82,16 +80,12 @@ export class OcrProviderService {
     }
     // tslint:disable-next-line:max-line-length
     return this.http.post('https://eu-vision.googleapis.com/v1/images:annotate?key=' + environment.googleCloudVisionAPIKey, JSON.stringify(body));
-        /*.subscribe(data => {
-          console.log(data);
-        }
-    );*/
+
   }
 
   public async offLineOcrTesseract(picture) {
     console.log('INPGOTO');
     console.log(picture);
-    // return await this.recognizeFile(picture);
 
     const loader = await this.popUpService.presentLoading('Please wait...');
     await this.worker1.load();

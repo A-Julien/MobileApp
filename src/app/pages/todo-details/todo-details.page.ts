@@ -62,7 +62,7 @@ export class TodoDetailsPage implements OnInit {
 
     let TextOcr = '';
 
-    if (navigator.onLine && false){
+    if (navigator.onLine){
       if (type === 'document'){
         const obRes = await this.ocrService.OnLineOcrGoogleVisio(data.substring(23), this.ocrService.DOCUMENT_TEXT_TYPE);
         const response = await obRes.toPromise();
@@ -76,13 +76,11 @@ export class TodoDetailsPage implements OnInit {
         TextOcr = response.responses[0].fullTextAnnotation.text;
       }
 
-      // this.listService.creatTodo(new Todo('testOCR', TextOcr), this.listId);
       this.todo.content = this.todo.content + '\n' + TextOcr;
       return;
     }
     console.log('OFFLINE');
     TextOcr = await this.ocrService.offLineOcrTesseract(data);
     this.todo.content = this.todo.content + '\n' + TextOcr;
-    // this.listService.creatTodo(new Todo('testOCR', TextOcr), this.listId);
   }
 }

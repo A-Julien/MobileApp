@@ -20,10 +20,10 @@ export class PopupService {
     toast.present();
   }
 
-  public async presentAlert(msg: string) {
+  public async presentAlert(msg: string, header: string = 'Alert') {
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
-      header: 'Alert',
+      header: header,
       // subHeader: 'Subtitle',
       message: msg,
       buttons: ['OK']

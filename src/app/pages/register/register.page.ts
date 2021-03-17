@@ -26,7 +26,7 @@ export class RegisterPage implements OnInit {
 
   signUp() {
     if (this.loginForm.get('password').value !== this.loginForm.get('passwordConf').value){
-      this.popupService.presentAlert('password not identical');
+      this.popupService.presentAlert('Password not identical', 'Password error !');
       return;
     }
     this.authService.SignUp(this.loginForm.get('login').value, this.loginForm.get('password').value);

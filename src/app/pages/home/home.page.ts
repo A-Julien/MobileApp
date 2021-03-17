@@ -17,12 +17,9 @@ import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
 import { Plugins } from '@capacitor/core';
-import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
 import {Router} from '@angular/router';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
 import {Updater} from '../../models/updater';
-
-const { Network } = Plugins;
 
 @Component({
   selector: 'app-home',
@@ -48,7 +45,6 @@ export class HomePage implements OnInit {
               private popUpService: PopupService,
               public auth: AuthenticationService,
               private photoService: PhotoService,
-              private ocrService: OcrProviderService,
               private popOverController: PopoverController,
               private router: Router
   ){
@@ -56,7 +52,7 @@ export class HomePage implements OnInit {
     this.listToRm = [];
     this.listToUpdateName = [];
 
-    this.lists = this.listService.getAllListDB().pipe(
+    this.lists = this.listService.lists.pipe(
         map(list => {
           console.log('ischecked 0');
           list.forEach(l => l.isChecked = false);
@@ -125,25 +121,6 @@ export class HomePage implements OnInit {
           return data.find( d => d.listID === list.id && d.owner !== this.auth.userEmail);
         })
     );
-  }
-
-  async takePicture() {
-    const status = await Network.getStatus();
-    const picture = await  this.photoService.takePicture();
-
-    const modal = await this.modalController.create({
-      component: CropImgComponent,
-      cssClass: ['crop-modal'],
-      componentProps: {
-        imageToCrop: picture?.dataUrl
-      }
-    });
-
-    await modal.present();
-    const { data } = await modal.onWillDismiss();
-
-    await this.ocrService.offLineOcrTesseract(data);
-    // this.ocrService.OnLineOcrGoogleVisio(data.substring(23));
   }
 
   routeToTodos(id: string){

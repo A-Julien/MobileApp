@@ -23,9 +23,9 @@ export class PhotoService {
     return Camera.getPhoto({
       resultType: CameraResultType.DataUrl,
       source: CameraSource.Camera,
-      quality: 100
-      /*height: 1920,
-      width: 1080*/
+      quality: 100,
+      height: 1920,
+      width: 1080
     });
   }
 

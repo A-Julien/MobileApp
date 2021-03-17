@@ -1,8 +1,6 @@
 <ion-app>
-  <ion-menu contentId="main-content" type="overlay">
+  <ion-menu (ionDidClose)="closed()" contentId="main-content" type="overlay">
     <app-side-menu></app-side-menu>
   </ion-menu>
-
-
   <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

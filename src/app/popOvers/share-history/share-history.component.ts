@@ -32,7 +32,7 @@ export class ShareHistoryComponent implements OnInit {
 
   routeToTodos(listID: string) {
     this.close();
-    this.menuController.toggle();
+    this.menuController.close();
     this.router.navigate(['/list-details/' + listID]);
   }
 }

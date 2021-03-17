@@ -69,7 +69,6 @@ export class SideMenuComponent implements OnInit {
 
   async changeForceOcr(){
     this.currentUs.forceOfflineOcr = this.forceOCR;
-    console.log(this.currentUs[0]);
     await this.uService.updateUs(this.currentUs);
   }
 

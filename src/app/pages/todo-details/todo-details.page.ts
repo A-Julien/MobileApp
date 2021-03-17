@@ -73,13 +73,12 @@ export class TodoDetailsPage implements OnInit {
         // @ts-ignore
         TextOcr = response.responses[0].fullTextAnnotation.text;
       }
-      // firebas-tools
-      //ng add @angular/pwa
+
       // this.listService.creatTodo(new Todo('testOCR', TextOcr), this.listId);
       this.todo.content = this.todo.content + '\n' + TextOcr;
       return;
     }
-
+    console.log('OFFLINE');
     TextOcr = await this.ocrService.offLineOcrTesseract(data);
     this.todo.content = this.todo.content + '\n' + TextOcr;
     // this.listService.creatTodo(new Todo('testOCR', TextOcr), this.listId);

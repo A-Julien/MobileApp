@@ -143,66 +143,50 @@ async isLoggedIn(): Promise<boolean> {
     return u !== null;
   }
 
-    async signInWithFacebook() {
-        const FACEBOOK_PERMISSIONS = ['email', 'user_birthday'];
-        const result = await this.fbLogin.login({ permissions: FACEBOOK_PERMISSIONS });
 
-        if (result.accessToken && result.accessToken.userId) {
-            this.fbToken = result.accessToken;
-            this.loadUserData();
-        } else if (result.accessToken && !result.accessToken.userId) {
-            this.getCurrentToken();
-        } else {
-            this.popupService.presentAlert('Facebook Login Failed');
-        }
-    }
+    async signInWithFacebook(): Promise<firebase.User> {
+        const FACEBOOK_PERMISSIONS = [
+            'email',
+            'user_birthday',
+            'user_photos',
+            'user_gender',
+        ];
 
-    async getCurrentToken() {
-        const result = await this.fbLogin.getCurrentAccessToken();
-        if (result.accessToken) {
-            this.fbToken = result.accessToken;
-            this.loadUserData();
-        } else {
-            // Not logged in.
-        }
-    }
-
-    async loadUserData(): Promise<firebase.User> {
-        const url = `https://graph.facebook.com/${this.fbToken.userId}?fields=id,name,picture.width(720),birthday,email&access_token=${this.fbToken.fbToken}`;
-        this.user = await this.http.get(url);
-        if (this.user === null){
-            await this.popupService.presentAlert('Facebook Login Failed');
-            return;
-        }
-        const credential = firebase.auth.FacebookAuthProvider.credential(this.fbToken.fbToken);
-        return new Promise((resolve, reject) => {
-            this.auth.signInAndRetrieveDataWithCredential(credential)
-                .then((u) => {
-                    this.popupService.presentToast('Successfully signed in!');
-                    this.uServivce.uSexist(u.user.uid);
-                    this.router.navigate(['/home']);
-                    resolve();
-                })
-                .catch(err => {
-                    let errMsg = 'Unknown error';
-                    switch (err.code) {
-                        case 'auth/invalid-email':
-                            errMsg = 'Email is invalid';
-                            break;
-                        case 'auth/user-disabled':
-                            errMsg = 'User is disabled';
-                            break;
-                        case 'auth/user-not-found':
-                            errMsg = 'User not found';
-                            break;
-                        case 'auth/wrong-password':
-                            errMsg = 'Wrong password';
-                            break;
-                    }
-                    this.popupService.presentAlert(errMsg);
-                    reject(errMsg);
-                });
+        const result = await Plugins.FacebookLogin.login({
+            permissions: FACEBOOK_PERMISSIONS,
         });
+        if (result && result.accessToken) {
+            this.fbToken = result.accessToken;
+            const credential = firebase.auth.FacebookAuthProvider.credential(result.accessToken.token);
+            return new Promise((resolve, reject) => {
+                this.auth.signInAndRetrieveDataWithCredential(credential)
+                    .then((u) => {
+                        this.popupService.presentToast('Successfully signed in!');
+                        this.uServivce.uSexist(u.user.uid);
+                        this.router.navigate(['/home']);
+                        resolve();
+                    })
+                    .catch(err => {
+                        let errMsg = 'Unknown error';
+                        switch (err.code) {
+                            case 'auth/invalid-email':
+                                errMsg = 'Email is invalid';
+                                break;
+                            case 'auth/user-disabled':
+                                errMsg = 'User is disabled';
+                                break;
+                            case 'auth/user-not-found':
+                                errMsg = 'User not found';
+                                break;
+                            case 'auth/wrong-password':
+                                errMsg = 'Wrong password';
+                                break;
+                        }
+                        this.popupService.presentAlert(errMsg);
+                        reject(errMsg);
+                    });
+            });
+        }
 
   }
 
@@ -225,7 +209,7 @@ async isLoggedIn(): Promise<boolean> {
   }
 
     private async FbLogout() {
-        await this.fbLogin.logout();
+        await Plugins.FacebookLogin.logout();
         this.fbToken = null;
     }
 

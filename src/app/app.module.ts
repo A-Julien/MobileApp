@@ -20,7 +20,6 @@ import {SideMenuComponent} from './modals/side-menu/side-menu.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
 
-
 @NgModule({
   declarations: [AppComponent, CreateListComponent, CreateTodoComponent, SideMenuComponent],
   entryComponents: [],

@@ -66,10 +66,10 @@ You can add List; share List with other user. You have a minimal side menu. App 
 
 ## OCR 
 
-<kbd><img src="readmeImg/ss3.png" alt="ss3 width=50%"></kbd>
+<kbd><img src="readmeImg/ss3.png" alt="ss3" width=50%></kbd>
 
 You can use OCR in todo. The app allow you to crop your picture. Tolist use the GoogleVisionApi to make ocr
-detection. If you car about your personal info, you can force the offline ocr mode (Use Tesseract JS).
+detection. If you care about your personal info, you can force the offline ocr mode (Use Tesseract JS).
 But it will be less accurate and longer !
 
 

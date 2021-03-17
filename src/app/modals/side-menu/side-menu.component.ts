@@ -10,7 +10,7 @@ import {USettings} from '../../models/settings';
 import {ListService} from '../../services/list.service';
 import {PopupService} from '../../services/popup.service';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
-import {PopoverController} from "@ionic/angular";
+import {PopoverController} from '@ionic/angular';
 
 @Component({
   selector: 'app-side-menu',

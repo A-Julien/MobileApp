@@ -3,7 +3,6 @@ import {Todo} from '../../models/todo';
 import {ActivatedRoute} from '@angular/router';
 import {ListService} from '../../services/list.service';
 import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
-import { Network } from '@ionic-native/network/ngx';
 import {PhotoService} from '../../services/photo.service';
 import {OcrProviderService} from '../../services/ocr-provider.service';
 import {PopupService} from '../../services/popup.service';
@@ -29,8 +28,7 @@ export class TodoDetailsPage implements OnInit {
       private photoService: PhotoService,
       public modalController: ModalController,
       private ocrService: OcrProviderService,
-      private popUpService: PopupService,
-      private network: Network) {
+      private popUpService: PopupService) {
     this.todo = new Todo('', '');
   }
 

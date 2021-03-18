@@ -4,7 +4,7 @@
       <ion-menu-button autoHide="false"></ion-menu-button>
     </ion-buttons>
 
-    <ion-item slot="start">
+    <ion-item *ngIf="!exSearch" slot="start">
       <ion-title style="padding: 0">Lists</ion-title>
       <ion-buttons>
           <ion-button *ngIf="!editing" (click)='popShareHistory($event)'>
@@ -15,12 +15,13 @@
       </ion-buttons>
     </ion-item>
 
-    <ion-buttons slot="end">
+    <ion-buttons *ngIf="!exSearch" slot="end">
       <ion-button *ngIf="editing" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
       <ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
       <ion-button *ngIf="editing" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
       <ion-button *ngIf="!editing" expand="block" (click)="addListModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
     </ion-buttons>
+    <ion-searchbar #searchBar  (ionInput)="searhInput($event)" class="transi" (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" *ngIf="showLoading">

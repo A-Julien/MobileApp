@@ -1,18 +1,18 @@
-import {Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {
   AlertController,
   ModalController,
   IonItemSliding,
-  PopoverController
+  PopoverController, AnimationController, IonSearchbar
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
-import {Observable} from 'rxjs';
+import {combineLatest, Observable} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
 import {List} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
-import { map } from 'rxjs/operators';
+import {map, startWith, switchMap} from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
 import {Router} from '@angular/router';
@@ -27,6 +27,8 @@ import { ItemReorderEventDetail } from '@ionic/core';
 })
 export class HomePage implements OnInit {
 
+  @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
+
   lists$: Observable<List[]>;
   listsShared$: Observable<MetaList[]>;
   showLoading = true;
@@ -34,6 +36,7 @@ export class HomePage implements OnInit {
   editing = false;
   listToRm: List[];
   listToUpdateName: Updater[];
+  public exSearch = false;
 
   nbNotif: number;
   private metalist: MetaList[];
@@ -45,17 +48,33 @@ export class HomePage implements OnInit {
               public auth: AuthenticationService,
               private photoService: PhotoService,
               private popOverController: PopoverController,
-              private router: Router
+              private router: Router,
+              private animationCtrl: AnimationController
   ){
     this.nbNotif = 0;
     this.listToRm = [];
     this.listToUpdateName = [];
 
-    // this.lists.subscribe((l) => l.forEach((ll) => console.log(ll.owner)));
   }
 
   ngOnInit(): void {
-    this.lists$ = this.listService.lists;
+
+    const searchFilter$ = this.searchBar.ionChange.pipe(
+        map(event => (event.target as HTMLInputElement).value),
+        startWith('')
+    );
+
+    this.lists$ = combineLatest([
+        this.listService.lists,
+        searchFilter$
+    ]).pipe(
+        map(([lists, filter]) =>
+            lists.filter(
+                list =>
+                    list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+            )
+        )
+    );
 
     this.listsShared$ = this.listService.listShare;
     this.listsShared$.subscribe(ml => {
@@ -190,5 +209,19 @@ export class HomePage implements OnInit {
       return;
     }
     this.listToUpdateName.push(new Updater(list.id, list.name));
+  }
+
+  expendSearch() {
+    (document.querySelector('.transi') as HTMLElement).style.width = 'content-box';
+    this.exSearch = true;
+  }
+
+  unExpendSearch() {
+    (document.querySelector('.transi') as HTMLElement).style.width = 'auto';
+    this.exSearch = false;
+  }
+
+  searhInput(ev) {
+
   }
 }

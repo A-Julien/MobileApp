@@ -27,8 +27,7 @@ export class AuthenticationService {
   constructor(private auth: AngularFireAuth,
               private router: Router,
               private http: HttpClient,
-              private popupService: PopupService,
-              private uServivce: UserSettingsService) {
+              private popupService: PopupService) {
 
     this.auth.onAuthStateChanged(user => {
         this.u$.next(user);
@@ -84,7 +83,6 @@ export class AuthenticationService {
                     .then(user => {
                         if (user.user.emailVerified) {
                             this.router.navigateByUrl('/home', {replaceUrl: true});
-                            this.uServivce.uSexist(user.user.uid);
                             resolve(user.user);
                         } else {
                             this.auth.signOut();
@@ -167,7 +165,6 @@ async isLoggedIn(): Promise<boolean> {
                 this.auth.signInAndRetrieveDataWithCredential(credential)
                     .then((u) => {
                         this.popupService.presentToast('Successfully signed in!');
-                        this.uServivce.uSexist(u.user.uid);
                         this.router.navigate(['/home']);
                         resolve();
                     })
@@ -238,7 +235,6 @@ async isLoggedIn(): Promise<boolean> {
                 this.auth.signInAndRetrieveDataWithCredential(credential)
                     .then((u) => {
                         this.popupService.presentToast('Welcome back !', 1000);
-                        this.uServivce.uSexist(u.user.uid);
                         this.router.navigate(['/home']);
                         resolve();
                     })

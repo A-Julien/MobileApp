@@ -1,62 +1,71 @@
-import { Injectable } from '@angular/core';
-import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
-import {USettings, USettingsToFirebase} from '../models/settings';
-import {Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {USettings} from '../models/settings';
+import {BehaviorSubject} from 'rxjs';
+import {Plugins} from '@capacitor/core';
 import {AuthenticationService} from './authentification.service';
-import {AngularFireAuth} from "@angular/fire/auth";
+
+const { Storage } = Plugins;
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserSettingsService {
-  private readonly USERSETTINGCOLLECTION = '/UserSetting';
-  private UsCollection: AngularFirestoreCollection;
+  private curentUs: USettings;
+
+  private curentUs$ = new BehaviorSubject<USettings>(new USettings(''));
 
   constructor(
-      private afs: AngularFirestore,
-      private auth: AngularFireAuth
+      private auth: AuthenticationService
   ) {
-    this.UsCollection = this.afs.collection(this.USERSETTINGCOLLECTION);
-  }
+    this.curentUs = null;
 
-  public async createUsettings(userUid: string): Promise<void> {
-    const us = new USettings(userUid);
-    us.forceOfflineOcr = false;
-
-    await this.UsCollection.ref.withConverter(USettingsToFirebase).add(us);
-  }
-
-  uSexist(userUid: string) {
-    console.log('WESHE');
-    this.afs.collection<USettings>(this.USERSETTINGCOLLECTION,
-        ref => ref.where('userUid', '==', userUid)).snapshotChanges().subscribe(res => {
-      if (res.length <= 0) {
-       this.createUsettings(userUid);
-      }
-    });
-  }
-
-  public updateUs(us: USettings): Promise<void> {
-    return this.UsCollection.doc(us.id).ref.withConverter(USettingsToFirebase).set(us);
-  }
-
-  get UserSettings(): Observable<USettings>{
-    return this.auth.authState.pipe(
-        switchMap(user => user ? this.afs.collection(this.USERSETTINGCOLLECTION,
-                ref => ref.where('userUid', '==', user.uid)).snapshotChanges() : of()),
-        map(actions => {
-           return  (this.convertSnapData<USettings>(actions))[0];
-        })
+    this.auth.u$.subscribe(
+        user => user ? this.getUs(user.uid) : this.logout()
     );
   }
 
-  private convertSnapData<T>(datas){
-    return datas.map( res => {
-      const data = res.payload.doc.data();
-      const id = res.payload.doc.id;
-      return {id, ...data } as T;
-    });
+  private logout(): void{
+    console.log('LOGOUT');
+    this.curentUs = null;
+    this.curentUs$.next(new USettings(''));
+  }
 
+
+  public async createUsettings(userUid: string): Promise<void> {
+    const us = new USettings('');
+    us.userUid = userUid;
+    us.forceOfflineOcr = false;
+
+    return this.setObject(us);
+  }
+
+  async getUs(userUid: string): Promise<void> {
+    await this.uSexist(userUid);
+    const ret = await Storage.get({ key: userUid });
+    this.curentUs =  new USettings(ret.value);
+    this.curentUs$.next(this.curentUs);
+  }
+
+  private async uSexist(userUid: string) {
+    const ret = await Storage.get({ key: userUid });
+    if (!ret.value){
+      await this.createUsettings(userUid);
+    }
+  }
+
+  public updateUs(us: USettings): Promise<void> {
+    return this.setObject(us);
+  }
+
+  private setObject(us: USettings ): Promise<void> {
+    return  Storage.set({
+      key: us.userUid,
+      value: JSON.stringify(us)
+    });
+  }
+
+  get UserSettings(): BehaviorSubject<USettings>{
+    return this.curentUs$;
   }
 }

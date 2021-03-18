@@ -1,4 +1,3 @@
-import {DocumentData, QueryDocumentSnapshot, SnapshotOptions} from '@angular/fire/firestore';
 
 export class USettings {
 
@@ -7,26 +6,11 @@ export class USettings {
     userUid: string;
     forceOfflineOcr: boolean;
 
-    constructor(userUid: string) {
-        this.userUid = userUid;
-        this.forceOfflineOcr = false;
-
+    constructor(jsonStr: string) {
+        if (jsonStr.length <= 1) { return; }
+        const jsonObj: any = JSON.parse(jsonStr);
+        for (const prop in jsonObj) {
+            this[prop] = jsonObj[prop];
+        }
     }
 }
-export const USettingsToFirebase = {
-    toFirestore(us: USettings): DocumentData {
-        return {
-            userUid: us.userUid,
-            forceOfflineOcr: us.forceOfflineOcr
-        };
-    },
-    fromFirestore(
-        snapshot: QueryDocumentSnapshot<USettings>,
-        options: SnapshotOptions
-    ): USettings {
-        const data = snapshot.data(options);
-        const id = snapshot.id;
-
-        return {id, ...data};
-    }
-};

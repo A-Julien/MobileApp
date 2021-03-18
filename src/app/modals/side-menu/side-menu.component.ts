@@ -21,7 +21,7 @@ export class SideMenuComponent implements OnInit {
 
   user: Observable<firebase.User>;
   readonly version = '0.0.5';
-  private forceOCR: boolean;
+  forceOCR: boolean;
   private currentUs: USettings;
 
   nbNotif: number;

@@ -86,8 +86,6 @@ export class OcrProviderService {
   public async offLineOcrTesseract(picture) {
     console.log('INPGOTO');
     console.log(picture);
-
-    const loader = await this.popUpService.presentLoading('Please wait...');
     await this.worker1.load();
     await this.worker2.load();
     await this.worker1.loadLanguage('fra');
@@ -104,7 +102,6 @@ export class OcrProviderService {
     return results;*/
     console.log('INPGOTO');
     const { data: { text } } = await this.worker1.recognize(picture);
-    loader.dismiss();
     await this.worker1.terminate();
     return text;
   }

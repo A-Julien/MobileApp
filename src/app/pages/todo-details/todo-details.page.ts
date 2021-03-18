@@ -55,7 +55,7 @@ export class TodoDetailsPage implements OnInit {
   async OcrDigital(type: string) {
     // const picture = await  this.photoService.takePicture();
     const picture = await  this.photoService.takePictureDataUrl();
-    const loader = await this.popUpService.presentLoading('Processing...');
+    let loader = await this.popUpService.presentLoading('Processing...');
     const modal = await this.modalController.create({
       component: CropImgComponent,
       cssClass: ['crop-modal'],
@@ -68,6 +68,7 @@ export class TodoDetailsPage implements OnInit {
 
     await modal.present().then(() => loader.dismiss());
     const { data } = await modal.onWillDismiss();
+    loader = await this.popUpService.presentLoading('Please wait...');
 
     let TextOcr = '';
 
@@ -86,6 +87,7 @@ export class TodoDetailsPage implements OnInit {
       }
 
       this.todo.content = this.todo.content + '\n' + TextOcr;
+      await loader.dismiss();
       return;
     }
     console.log('OFFLINE');

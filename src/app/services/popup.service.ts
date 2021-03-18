@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AlertController, LoadingController, PopoverController, ToastController} from '@ionic/angular';
+import {AlertController, LoadingController, MenuController, PopoverController, ToastController} from '@ionic/angular';
 import {ShareHistoryComponent} from '../popOvers/share-history/share-history.component';
 
 @Injectable({
@@ -9,8 +9,7 @@ export class PopupService {
 
   constructor(private toastController: ToastController,
               private alertController: AlertController,
-              private loadingController: LoadingController,
-              private popOverController: PopoverController) { }
+              private loadingController: LoadingController) { }
 
  public async presentToast(msg: string, timeToShow = 5000) {
     const toast = await this.toastController.create({

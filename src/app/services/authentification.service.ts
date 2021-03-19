@@ -173,7 +173,13 @@ async isLoggedIn(): Promise<boolean> {
             const credential = firebase.auth.FacebookAuthProvider.credential(result.accessToken.token);
             return new Promise((resolve, reject) => {
                 this.auth.signInAndRetrieveDataWithCredential(credential)
-                    .then((u) => {
+                    .then(async (user) => {
+                        await this.userInfoService.uSexist(user.user.uid);
+                        if (this.userInfoService.userInfo.isNew){
+                            await this.router.navigateByUrl('/welcome', {replaceUrl: true});
+                            await this.userInfoService.notANewUser();
+                            return resolve(user.user);
+                        }
                         this.popupService.presentToast('Successfully signed in!');
                         this.router.navigate(['/home']);
                         resolve();
@@ -243,7 +249,15 @@ async isLoggedIn(): Promise<boolean> {
         return new Promise((resolve, reject) => {
             firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(async () =>
                 this.auth.signInAndRetrieveDataWithCredential(credential)
-                    .then((u) => {
+                    .then(async (user) => {
+                        await this.userInfoService.uSexist(user.user.uid);
+                        if (this.userInfoService.userInfo.isNew){
+                            console.log('auth new');
+                            await this.router.navigateByUrl('/welcome', {replaceUrl: true});
+                            await this.userInfoService.notANewUser();
+                            return resolve(user.user);
+                        }
+                        console.log('auth pas new');
                         this.popupService.presentToast('Welcome back !', 1000);
                         this.router.navigate(['/home']);
                         resolve();

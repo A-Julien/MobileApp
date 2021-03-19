@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import {Injectable, NgModule} from '@angular/core';
+import {BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule} from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -19,10 +19,28 @@ import { AngularCropperjsModule } from 'angular-cropperjs';
 import {SideMenuComponent} from './modals/side-menu/side-menu.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
+import { LongPressDirective } from './directives/long-press.directive';
+import {LocationStrategy, PathLocationStrategy} from '@angular/common';
+import 'hammerjs';
+// custom configuration Hammerjs
+@Injectable()
+export class HammerConfig extends HammerGestureConfig {
+    overrides = {
+        // I will only use the swap gesture so
+        // I will deactivate the others to avoid overlaps
+        pinch: { enable: false },
+        rotate: { enable: false }
+    } as any;
+}
 
 @NgModule({
-  declarations: [AppComponent, CreateListComponent, CreateTodoComponent, SideMenuComponent],
-  entryComponents: [],
+    declarations: [
+        AppComponent,
+        CreateListComponent,
+        CreateTodoComponent,
+        SideMenuComponent
+    ],
+    entryComponents: [],
     imports: [
         BrowserModule,
         IonicModule.forRoot(),
@@ -35,14 +53,18 @@ import {EmailComposer} from '@ionic-native/email-composer/ngx';
         HttpClientModule,
         AngularCropperjsModule,
         ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
-        FormsModule
+        FormsModule,
+        HammerModule
     ],
-  providers: [
-    StatusBar,
-    EmailComposer,
-    SplashScreen,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
-  ],
-  bootstrap: [AppComponent]
+    providers: [
+        StatusBar,
+        EmailComposer,
+        SplashScreen,
+        {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
+        {provide: LocationStrategy, useClass: PathLocationStrategy}
+        ],
+    exports: [
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {}

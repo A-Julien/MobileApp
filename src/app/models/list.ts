@@ -11,7 +11,7 @@ export class List {
     share: boolean;
     owners: string[];
 
-    isChecked: boolean;
+    isChecked = false;
 
     constructor(name: string) {
         this.isChecked = false;

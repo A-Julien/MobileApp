@@ -1,9 +1,10 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, NgZone, OnInit, QueryList, ViewChild, Renderer2} from '@angular/core';
 import {
   AlertController,
   ModalController,
   IonItemSliding,
-  PopoverController, AnimationController, IonSearchbar
+  PopoverController,
+  IonSearchbar, GestureController
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
@@ -12,13 +13,14 @@ import {PopupService} from '../../services/popup.service';
 import {List} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
-import {map, startWith, switchMap} from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
 import {Router} from '@angular/router';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
 import {Updater} from '../../models/updater';
 import { ItemReorderEventDetail } from '@ionic/core';
+
 
 import {
   Plugins,
@@ -35,7 +37,11 @@ const { Haptics } = Plugins;
 })
 export class HomePage implements OnInit {
 
+
   @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
+
+  /*@ViewChild('slidingItem', {read: ElementRef}) listElems: QueryList<ElementRef>; */
+  longPressActive = false;
 
   lists$: Observable<List[]>;
   listsShared$: Observable<MetaList[]>;
@@ -57,13 +63,16 @@ export class HomePage implements OnInit {
               private photoService: PhotoService,
               private popOverController: PopoverController,
               private router: Router,
-              private animationCtrl: AnimationController
+              private renderer: Renderer2
+
   ){
     this.nbNotif = 0;
     this.listToRm = [];
     this.listToUpdateName = [];
 
   }
+
+
 
   ngOnInit(): void {
 
@@ -98,6 +107,39 @@ export class HomePage implements OnInit {
     this.lists$?.subscribe(() => {
       this.showLoading = false;
     });
+  }
+
+  private hapticsImpact(style = HapticsImpactStyle.Heavy) {
+    Haptics.impact({
+      style: style
+    });
+  }
+
+  ItemLongPress(ev, list){
+    console.log(list);
+    if (this.editing === 2) {
+      console.log('wath ?');
+      // this.renderer.addClass(ev.target, 'selected');
+      this.addToDel(list);
+    } else {
+      this.routeToTodos(list.id);
+    }
+  }
+
+  longPress(ev, list) {
+    if (this.editing === 1) { return; }
+    console.log(ev);
+    if (this.editing === 0){
+      setTimeout(() => {
+        this.hapticsImpact();
+        this.longPressActive = true;
+        console.log('LONGPRESSS!');
+        // this.renderer.addClass(ev.target, 'selected');
+        this.editing = 2;
+        list.isChecked = true;
+        this.addToDel(list);
+      }, 500);
+    }
   }
 
   doReorder(ev: CustomEvent<ItemReorderEventDetail>) {
@@ -197,6 +239,9 @@ export class HomePage implements OnInit {
         this.delete(list);
     });
     this.listToRm = [];
+    if (this.longPressActive) {
+      this.cancelEdit();
+    }
     await loader.dismiss();
   }
 
@@ -231,15 +276,7 @@ export class HomePage implements OnInit {
   searhInput(ev) {
 
   }
-  hapticsImpact(style = HapticsImpactStyle.Heavy) {
-    Haptics.impact({
-      style
-    });
-  }
 
-  test() {
-    this.hapticsImpact(HapticsImpactStyle.Medium);
-  }
 
   async openOption(ev) {
     const popover = await this.popOverController.create({
@@ -269,8 +306,10 @@ export class HomePage implements OnInit {
         this.listToUpdateName = [];
         break;
       case 2:
+        this.listToRm.forEach(l => l.isChecked = false);
         this.listToRm = [];
     }
+    this.longPressActive = false;
     this.editing = 0;
   }
 

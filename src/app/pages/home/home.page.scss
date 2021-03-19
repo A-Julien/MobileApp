@@ -74,4 +74,8 @@
  }
 
 
+ .selected {
+   --background: lightslategray;
+ }
+ion-item:hover { background-color: lightslategray !important; }
 

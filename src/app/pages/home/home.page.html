@@ -35,11 +35,11 @@
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
   <ion-list >
     <ion-reorder-group [disabled]="!editing" (ionItemReorder)="doReorder($event)">
-      <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem>
+      <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem >
 
-        <ion-item button (press)="test()" >
+        <ion-item  button (press)="longPress($event, list)" (click)="ItemLongPress($event, list)">
           <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
-          <ion-checkbox *ngIf="editing === 2" slot="start" (ionChange)="addToDel(list)" ></ion-checkbox>
+          <ion-checkbox *ngIf="editing === 2" [ngModel]="list.isChecked" slot="start" ></ion-checkbox>
           <ion-label *ngIf="editing !== 1" >{{ list.name }}</ion-label>
           <ion-input *ngIf="editing === 1" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 
@@ -63,7 +63,7 @@
     <ion-icon name="close-circle" (click)="cancelEdit()" ></ion-icon>
   </ion-chip>
 
-  <ion-fab *ngIf="editing === 2" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab *ngIf="editing === 0" vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="addListModal()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>

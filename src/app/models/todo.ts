@@ -7,6 +7,8 @@ export class Todo {
     content: string;
     isDone: boolean;
 
+    isChecked = false;
+
     constructor(name: string, content: string) {
         this.name = name;
         this.content = content;

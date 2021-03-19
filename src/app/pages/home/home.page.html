@@ -24,7 +24,7 @@
        </ion-button>
 
      </ion-buttons>
-    <ion-searchbar [hidden]="editing" #searchBar  (ionInput)="searhInput($event)"  (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
+    <ion-searchbar [hidden]="editing" #searchBar  (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 

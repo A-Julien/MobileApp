@@ -1,16 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { ListService} from '../../services/list.service';
-import {ModalController} from '@ionic/angular';
+import {IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {combineLatest, Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 import {List} from '../../models/list';
 import {Todo} from '../../models/todo';
 import {AuthenticationService} from '../../services/authentification.service';
 import {PopupService} from '../../services/popup.service';
 import {Updater} from '../../models/updater';
+import {OptionsComponent} from '../../popOvers/options/options.component';
 
+import {
+  Plugins,
+  HapticsImpactStyle
+} from '@capacitor/core';
+
+const { Haptics } = Plugins;
 
 @Component({
   selector: 'app-list-details',
@@ -18,18 +25,24 @@ import {Updater} from '../../models/updater';
   styleUrls: ['./list-details.page.scss'],
 })
 export class ListDetailsPage implements OnInit {
+
+  @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
+
   listID: string;
   listName: string;
   showLoader = true;
 
-  editing = false;
-  todosToRm: Updater[];
+  editing = 0;
+  todosToRm: Todo[];
   todosToUpdate: Updater[];
 
+  longPressActive = false;
+  public exSearch = false;
 
+  nbNotif: number;
 
-  public list: Observable<List>;
-  public todos: Observable<Todo[]>;
+  public list$: Observable<List>;
+  public todos$: Observable<Todo[]>;
 
   constructor(
       private route: ActivatedRoute,
@@ -37,20 +50,40 @@ export class ListDetailsPage implements OnInit {
       public modalController: ModalController,
       private auth: AuthenticationService,
       private popUpService: PopupService,
-      private router: Router)
+      private router: Router,
+      private popOverController: PopoverController)
   { }
 
   ngOnInit() {
     this.todosToRm = [];
     this.todosToUpdate = [];
     this.listID = this.route.snapshot.paramMap.get('listId');
-    this.list = this.listService.getOneDB(this.listID);
-    this.todos = this.list.pipe(
+    this.list$ = this.listService.getOneDB(this.listID);
+    const todoFromList = this.list$.pipe(
         map(list => {
           return list.todos;
         })
     );
-    this.todos.subscribe(() => this.showLoader = false);
+
+    const searchFilter$ = this.searchBar.ionChange.pipe(
+        map(event => (event.target as HTMLInputElement).value),
+        startWith('')
+    );
+
+    this.todos$ = combineLatest([
+      todoFromList,
+      searchFilter$
+    ]).pipe(
+        map(([todo, filter]) =>
+            todo.filter(
+                list =>
+                    list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+            )
+        )
+    );
+
+
+    this.todos$.subscribe(() => this.showLoader = false);
 
     this.listService.listShare.subscribe( data => {
       data.forEach(d => {
@@ -60,9 +93,15 @@ export class ListDetailsPage implements OnInit {
         }
       });
     });
+
+    this.listService.listShare.subscribe( data => {
+      data.forEach(d => {
+        if (!d.notify && d.newOwner === this.auth.userEmail){this.nbNotif += 1; }
+      });
+    });
   }
 
-  async presentModal() {
+  async addTodoModal() {
     const modal = await this.modalController.create({
       component: CreateTodoComponent,
       cssClass:  ['add-modal-todo'],
@@ -74,10 +113,8 @@ export class ListDetailsPage implements OnInit {
     return await modal.present();
   }
 
-  startEdit() { this.editing = true; }
-
   async stopEdit() {
-    this.editing = false;
+    this.editing = 0;
     const nbTodos =  this.todosToUpdate.length;
 
     let msg = 'Update Name of ' + nbTodos + ' todo';
@@ -99,18 +136,50 @@ export class ListDetailsPage implements OnInit {
   }
 
   addToDel(todo: Todo){
-    const index = this.todosToUpdate.findIndex(t => t.id === todo.id);
-    if (index !== -1){
-      this.todosToRm = this.todosToRm.filter(t => t.id !== todo.id);
+    if (this.todosToRm.indexOf(todo) !== -1){
+      this.todosToRm = this.todosToRm.filter(t => t !== todo);
       return;
     }
-    this.todosToRm.push(new Updater(todo.id, todo.name));
+    this.todosToRm.push(todo);
   }
 
   delete(u: Updater, listId) {
       this.listService.deleteTodo(u, listId);
   }
 
+  private hapticsImpact(style = HapticsImpactStyle.Heavy) {
+    Haptics.impact({
+      style: style
+    });
+  }
+
+
+  ItemLongPress(ev, todo: Todo){
+    console.log(todo);
+    if (this.editing === 2) {
+      console.log('wath ?');
+      // this.renderer.addClass(ev.target, 'selected');
+      this.addToDel(todo);
+    } else {
+      this.routeToDetail(todo.id);
+    }
+  }
+
+  longPress(ev, todo: Todo) {
+    if (this.editing === 1) { return; }
+    console.log(ev);
+    if (this.editing === 0){
+      setTimeout(() => {
+        this.hapticsImpact();
+        this.longPressActive = true;
+        console.log('LONGPRESSS!');
+        // this.renderer.addClass(ev.target, 'selected');
+        this.editing = 2;
+        todo.isChecked = true;
+        this.addToDel(todo);
+      }, 500);
+    }
+  }
 
   async delSelect() {
     const nbTodos = this.todosToRm.length;
@@ -119,7 +188,7 @@ export class ListDetailsPage implements OnInit {
     const loader = await this.popUpService.presentLoading(msg);
 
     this.todosToRm.forEach(todo => {
-      this.delete(todo, this.listID);
+      this.delete(new Updater(todo.id, todo.name), this.listID);
     });
     this.todosToRm = [];
     await loader.dismiss();
@@ -137,5 +206,52 @@ export class ListDetailsPage implements OnInit {
       return;
     }
     this.todosToUpdate.push(new Updater(todo.id, todo.name));
+  }
+
+  expendSearch() {
+    this.exSearch = true;
+  }
+
+  unExpendSearch() {
+    this.exSearch = false;
+  }
+
+  async openOption(ev) {
+    const popover = await this.popOverController.create({
+      component: OptionsComponent,
+      cssClass: 'popoverOption',
+      id: 'options',
+      event: ev,
+      translucent: false,
+      mode: 'ios'
+    });
+    await popover.present();
+    const { data } = await popover.onWillDismiss();
+    console.log('choice ', data);
+    switch (data){
+      case 1:
+        this.editing = 1;
+        break;
+      case 2:
+        this.editing = 2;
+        break;
+    }
+  }
+
+  cancelEdit() {
+    switch (this.editing){
+      case 1:
+        this.todosToUpdate = [];
+        break;
+      case 2:
+        this.todosToRm.forEach(t => t.isChecked = false);
+        this.todosToRm = [];
+    }
+    this.longPressActive = false;
+    this.editing = 0;
+  }
+
+  addToDelAll() {
+
   }
 }

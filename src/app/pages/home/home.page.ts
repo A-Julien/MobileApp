@@ -20,6 +20,13 @@ import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.
 import {Updater} from '../../models/updater';
 import { ItemReorderEventDetail } from '@ionic/core';
 
+import {
+  Plugins,
+  HapticsImpactStyle
+} from '@capacitor/core';
+
+const { Haptics } = Plugins;
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -212,16 +219,23 @@ export class HomePage implements OnInit {
   }
 
   expendSearch() {
-    (document.querySelector('.transi') as HTMLElement).style.width = 'content-box';
     this.exSearch = true;
   }
 
   unExpendSearch() {
-    (document.querySelector('.transi') as HTMLElement).style.width = 'auto';
     this.exSearch = false;
   }
 
   searhInput(ev) {
 
+  }
+  hapticsImpact(style = HapticsImpactStyle.Heavy) {
+    Haptics.impact({
+      style: style
+    });
+  }
+
+  test() {
+    this.hapticsImpact(HapticsImpactStyle.Medium);
   }
 }

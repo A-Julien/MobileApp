@@ -2,26 +2,27 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
     </ion-buttons>
 
-    <ion-item *ngIf="!exSearch" slot="start">
-      <ion-title style="padding: 0">Lists</ion-title>
-      <ion-buttons>
+    <!--< <ion-item *ngIf="!exSearch" slot="start">
+       ion-title style="padding: 0">Lists</ion-title>
+      <ion-buttons *ngIf="!exSearch" slot="start">
           <ion-button *ngIf="!editing" (click)='popShareHistory($event)'>
           <ion-icon  name="notifications-outline"></ion-icon>
           <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
-          <!--[class.badge-one]="unread < 10" [class.badge-two]="unread >= 10"-->
+
         </ion-button>
       </ion-buttons>
-    </ion-item>
+   < </ion-item>-->
 
-    <ion-buttons *ngIf="!exSearch" slot="end">
-      <ion-button *ngIf="editing" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
-      <ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
-      <ion-button *ngIf="editing" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
-      <ion-button *ngIf="!editing" expand="block" (click)="addListModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
+     <ion-buttons *ngIf="!exSearch" slot="end">
+       <ion-button *ngIf="editing" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
+       <ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
+       <ion-button *ngIf="editing" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
+       <!--<ion-button *ngIf="!editing" expand="block" (click)="addListModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>-->
     </ion-buttons>
-    <ion-searchbar #searchBar  (ionInput)="searhInput($event)" class="transi" (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
+    <ion-searchbar [hidden]="editing" #searchBar  (ionInput)="searhInput($event)"  (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" *ngIf="showLoading">
@@ -30,9 +31,9 @@
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
   <ion-list >
     <ion-reorder-group [disabled]="!editing" (ionItemReorder)="doReorder($event)">
-      <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem>
+      <ion-item-sliding *ngFor="let list of lists$ | async" #slidingItem>
 
-        <ion-item  (click)="routeToTodos(list.id)">
+        <ion-item (press)="test()" >
           <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)"></ion-checkbox>
           <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
           <ion-input *ngIf="editing" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
@@ -51,4 +52,9 @@
       </ion-item-sliding>
     </ion-reorder-group>
   </ion-list>
+  <ion-fab [hidden]="editing" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="addListModal()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

@@ -9,7 +9,7 @@ import '@codetrix-studio/capacitor-google-auth';
 import {FacebookLogin, FacebookLoginPlugin} from '@capacitor-community/facebook-login';
 import {HttpClient} from '@angular/common/http';
 import {PopupService} from './popup.service';
-import {UserSettingsService} from './user-settings.service';
+import {UserInfoService} from './user-info.service';
 
 registerWebPlugin(FacebookLogin);
 
@@ -27,7 +27,8 @@ export class AuthenticationService {
   constructor(private auth: AngularFireAuth,
               private router: Router,
               private http: HttpClient,
-              private popupService: PopupService) {
+              private popupService: PopupService,
+              private userInfoService: UserInfoService) {
 
     this.auth.onAuthStateChanged(user => {
         this.u$.next(user);
@@ -80,8 +81,14 @@ export class AuthenticationService {
         return new Promise((resolve, reject) => {
             firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(async () =>
                 this.auth.signInWithEmailAndPassword(email, password)
-                    .then(user => {
+                    .then( async user => {
                         if (user.user.emailVerified) {
+                            await this.userInfoService.uSexist(user.user.uid);
+                            if (this.userInfoService.userInfo.isNew){
+                                await this.router.navigateByUrl('/welcome', {replaceUrl: true});
+                                await this.userInfoService.notANewUser();
+                                return resolve(user.user);
+                            }
                             this.router.navigateByUrl('/home', {replaceUrl: true});
                             resolve(user.user);
                         } else {
@@ -101,6 +108,9 @@ export class AuthenticationService {
                                 break;
                             case 'auth/user-not-found':
                                 errMsg = 'User not found';
+                                break;
+                            default:
+                                errMsg = err;
                                 break;
                         }
                         this.popupService.presentAlert(errMsg, 'Login failed !');

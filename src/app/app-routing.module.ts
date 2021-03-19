@@ -15,6 +15,11 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'welcome',
+    loadChildren: () => import('./slides/new-user/new-user.module').then(m => m.NewUserPageModule),
+    ...canActivate(UnauthorizedAccess)
+  },
+  {
     path: 'home',
     loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule),
     ...canActivate(UnauthorizedAccess)
@@ -50,6 +55,10 @@ const routes: Routes = [
     path: 'password-recovery',
     loadChildren: () => import('./pages/password-recovery/password-recovery.module').then( m => m.PasswordRecoveryPageModule),
     ...canActivate(redirectToLogin)
+  },
+  {
+    path: 'new-user',
+    loadChildren: () => import('./slides/new-user/new-user.module').then( m => m.NewUserPageModule)
   },
 ];
 

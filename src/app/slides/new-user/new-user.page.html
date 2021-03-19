@@ -1,0 +1,28 @@
+<ion-app>
+  <ion-content fullscreen class="ion-padding" scroll-y="false">
+    <ion-slides>
+      <ion-slide>
+        <div class="slide">
+          <img src="./assets/logo.png"/>
+          <h2>Welcome</h2>
+          <p>The <b>ToList</b> app is a simple todo list app with orc feature, let's learn how use it !</p>
+        </div>
+      </ion-slide>
+      <ion-slide>
+        <img src="./assets/slideImages/share-slide.png"/>
+        <h2>Share your list </h2>
+        <p><b>Tolist</b> Tolist offer the ossibility to share your list with other user by sliding right your list and click on the share icon. Enter the user email and that it !</p>
+      </ion-slide>
+      <ion-slide>
+        <img src="./assets/slideImages/ocr-slide.png"/>
+        <h2>What is OCR?</h2>
+        <p>With the <b>Optical character recognition</b>  you can scan your favorite document dans put it into your note !</p>
+      </ion-slide>
+      <ion-slide>
+        <img src="./assets/logo.png"/>
+        <h2>Ready to List?</h2>
+        <ion-button fill="clear" [routerLink]="['/home']" >Continue <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+      </ion-slide>
+    </ion-slides>
+  </ion-content>
+</ion-app>

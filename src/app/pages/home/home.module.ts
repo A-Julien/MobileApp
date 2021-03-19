@@ -10,6 +10,7 @@ import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing
 import {AngularCropperjsModule} from 'angular-cropperjs';
 import {CropImgComponent} from '../../modals/crop-img/crop-img.component';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
+import {OptionsComponent} from '../../popOvers/options/options.component';
 
 
 
@@ -25,6 +26,13 @@ import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.
   exports: [
     LoadingComponent
   ],
-  declarations: [HomePage, LoadingComponent, ManageSharingComponent, CropImgComponent, ShareHistoryComponent]
+  declarations: [
+      HomePage,
+      LoadingComponent,
+      ManageSharingComponent,
+      CropImgComponent,
+      ShareHistoryComponent,
+      OptionsComponent
+  ]
 })
 export class HomePageModule {}

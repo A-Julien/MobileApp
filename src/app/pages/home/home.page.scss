@@ -44,9 +44,34 @@
   --padding-end: 5px;
 }
 
+.badge-two-del {
+  position: absolute;
+  top: 17px;
+  right: 71px;
+  font-size: 0.6em;
+  --padding-start: 3px;
+  --padding-end: 3px;
+}
+
+.badge-one-del {
+  position: absolute;
+  top: 17px;
+  right: 71px;
+  font-size: 0.6em;
+  --padding-start: 5px;
+  --padding-end: 5px;
+}
+
  .sc-ion-searchbar-ios-h {
   padding-top: 0px;
   padding-bottom: 0px;
  }
+
+ .ion-chip-select {
+   position: fixed;
+   bottom: 2em;
+   right: 11em;
+ }
+
 
 

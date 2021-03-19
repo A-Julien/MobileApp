@@ -24,6 +24,7 @@ import {
   Plugins,
   HapticsImpactStyle
 } from '@capacitor/core';
+import {OptionsComponent} from '../../popOvers/options/options.component';
 
 const { Haptics } = Plugins;
 
@@ -40,7 +41,7 @@ export class HomePage implements OnInit {
   listsShared$: Observable<MetaList[]>;
   showLoading = true;
 
-  editing = false;
+  editing = 0;
   listToRm: List[];
   listToUpdateName: Updater[];
   public exSearch = false;
@@ -157,10 +158,10 @@ export class HomePage implements OnInit {
     if (!this.editing) { this.router.navigate(['/list-details/' + id]); }
   }
 
-  startEdit() { this.editing = true; }
+  // startEdit() { this.editing = true; }
 
   async stopEdit() {
-    this.editing = false;
+    this.editing = 0;
     const nbList =  this.listToUpdateName.length;
 
     let msg = 'Update Name of ' + nbList + ' list';
@@ -195,6 +196,7 @@ export class HomePage implements OnInit {
         console.log('delete list ', list.name);
         this.delete(list);
     });
+    this.listToRm = [];
     await loader.dismiss();
   }
 
@@ -231,11 +233,49 @@ export class HomePage implements OnInit {
   }
   hapticsImpact(style = HapticsImpactStyle.Heavy) {
     Haptics.impact({
-      style: style
+      style
     });
   }
 
   test() {
     this.hapticsImpact(HapticsImpactStyle.Medium);
   }
+
+  async openOption(ev) {
+    const popover = await this.popOverController.create({
+      component: OptionsComponent,
+      cssClass: 'popoverOption',
+      id: 'options',
+      event: ev,
+      translucent: false,
+      mode: 'ios'
+    });
+    await popover.present();
+    const { data } = await popover.onWillDismiss();
+    console.log('choice ', data);
+    switch (data){
+      case 1:
+          this.editing = 1;
+          break;
+      case 2:
+        this.editing = 2;
+        break;
+    }
+  }
+
+  cancelEdit() {
+    switch (this.editing){
+      case 1:
+        this.listToUpdateName = [];
+        break;
+      case 2:
+        this.listToRm = [];
+    }
+    this.editing = 0;
+  }
+
+  addToDelAll() {
+
+  }
 }
+

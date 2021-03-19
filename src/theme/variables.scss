@@ -341,11 +341,11 @@ body
   }
 }
 
-/*.popoverNotif {
-  .popover-content {
-    --width: auto;
-  }
-}*/
+.popoverOption {
+
+  --background: primary;
+
+}
 
 .notif {
   --backdrop-opacity: 50%;

@@ -1,47 +1,53 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-buttons slot="start">
+    <ion-buttons [hidden]="exSearch || editing" slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
       <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
+      <ion-checkbox *ngIf="editing === 2" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
+    </ion-buttons>
+    <ion-item *ngIf="editing == 1"><ion-label color="primary">Rename several lists</ion-label></ion-item>
+    <ion-item *ngIf="editing == 2"><ion-label color="primary">Delete several lists</ion-label></ion-item>
+    <ion-buttons  *ngIf="editing === 2" slot="start">
+         <ion-checkbox style="margin-left: 20px;" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
     </ion-buttons>
 
-    <!--< <ion-item *ngIf="!exSearch" slot="start">
-       ion-title style="padding: 0">Lists</ion-title>
-      <ion-buttons *ngIf="!exSearch" slot="start">
-          <ion-button *ngIf="!editing" (click)='popShareHistory($event)'>
-          <ion-icon  name="notifications-outline"></ion-icon>
-          <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
+    <ion-buttons *ngIf="!exSearch" slot="end">
+       <ion-button *ngIf="editing === 2" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
+       <ion-badge *ngIf="listToRm.length > 0 && editing === 2" [class.badge-one-del]="listToRm.length < 10" [class.badge-two-del]="listToRm.length >= 10"  color="danger">{{ listToRm.length }}</ion-badge>
+       <ion-button *ngIf="editing === 1" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
+       <!--<ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>-->
 
-        </ion-button>
-      </ion-buttons>
-   < </ion-item>-->
+       <ion-button *ngIf="!editing" (click)="openOption($event)" color="primary"> <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon></ion-button>
+       <ion-button *ngIf="editing !== 0" (click)="cancelEdit()" color="primary">
+         <ion-icon [hidden]="editing !== 1" color="danger" size="large" name="close-outline"></ion-icon>
+         <ion-icon [hidden]="editing !== 2" color="primary" size="large" name="close-outline"></ion-icon>
+       </ion-button>
 
-     <ion-buttons *ngIf="!exSearch" slot="end">
-       <ion-button *ngIf="editing" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
-       <ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
-       <ion-button *ngIf="editing" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
-       <!--<ion-button *ngIf="!editing" expand="block" (click)="addListModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>-->
-    </ion-buttons>
+     </ion-buttons>
     <ion-searchbar [hidden]="editing" #searchBar  (ionInput)="searhInput($event)"  (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
+
 <ion-content [fullscreen]="true" *ngIf="showLoading">
   <app-loading></app-loading>
 </ion-content>
+
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
   <ion-list >
     <ion-reorder-group [disabled]="!editing" (ionItemReorder)="doReorder($event)">
-      <ion-item-sliding *ngFor="let list of lists$ | async" #slidingItem>
+      <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem>
 
-        <ion-item (press)="test()" >
-          <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(list)"></ion-checkbox>
-          <ion-label *ngIf="!editing" >{{ list.name }}</ion-label>
-          <ion-input *ngIf="editing" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
+        <ion-item button (press)="test()" >
+          <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
+          <ion-checkbox *ngIf="editing === 2" slot="start" (ionChange)="addToDel(list)" ></ion-checkbox>
+          <ion-label *ngIf="editing !== 1" >{{ list.name }}</ion-label>
+          <ion-input *ngIf="editing === 1" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 
           <ion-badge slot="end" color="danger" *ngIf="isNewList(list.id) && !editing">new</ion-badge>
           <ion-badge slot="end" color="primary" *ngIf="list.share && !editing">shared</ion-badge>
           <ion-reorder slot="end"></ion-reorder>
         </ion-item>
+
         <ion-item-options side="end">
           <ion-item-option *ngIf="!editing"  (click)="delete(list)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
         </ion-item-options>
@@ -52,7 +58,12 @@
       </ion-item-sliding>
     </ion-reorder-group>
   </ion-list>
-  <ion-fab [hidden]="editing" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-chip class="ion-chip-select" [hidden]="editing !== 2"  color="danger">
+    <ion-label>{{ listToRm.length }} selected</ion-label>
+    <ion-icon name="close-circle" (click)="cancelEdit()" ></ion-icon>
+  </ion-chip>
+
+  <ion-fab *ngIf="editing === 2" vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="addListModal()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>

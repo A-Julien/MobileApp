@@ -16,10 +16,7 @@ export class LoginPage implements OnInit {
 
   constructor(
       private formBuilder: FormBuilder,
-      private auth: AuthenticationService,
-      private router: Router,
-      private popupService: PopupService) { }
-
+      private auth: AuthenticationService){}
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
       login: ['', [Validators.required, Validators.email]],
@@ -29,6 +26,5 @@ export class LoginPage implements OnInit {
 
   signIn() {
     this.auth.SignIn(this.loginForm.get('login').value, this.loginForm.get('password').value)
-        .catch(this.popupService.presentAlert);
   }
 }

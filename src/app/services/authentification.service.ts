@@ -114,7 +114,7 @@ export class AuthenticationService {
                                 break;
                         }
                         this.popupService.presentAlert(errMsg, 'Login failed !');
-                        return reject(errMsg);
+                        // reject(errMsg);
                     })
             );
         });
@@ -144,8 +144,8 @@ export class AuthenticationService {
                           errMsg = 'User not found';
                           break;
                   }
-
-                  reject(errMsg);
+                  this.popupService.presentAlert(errMsg, 'Password recovery failed !');
+                  // reject(errMsg);
               });
       });
   }
@@ -204,7 +204,7 @@ async isLoggedIn(): Promise<boolean> {
                                 break;
                         }
                         this.popupService.presentAlert(errMsg);
-                        reject(errMsg);
+                        // reject(errMsg);
                     });
             });
         }
@@ -279,8 +279,7 @@ async isLoggedIn(): Promise<boolean> {
                                 break;
                         }
                         this.popupService.presentAlert(errMsg);
-                        reject(errMsg);
-
+                        // reject(errMsg);
                     })
             );
         });

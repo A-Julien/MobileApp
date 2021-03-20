@@ -70,7 +70,7 @@
       </ion-item-sliding>
   </ion-list>
 
-  <ion-chip class="ion-chip-select" [hidden]="editing !== 2"  color="danger">
+  <ion-chip class="ion-chip-select" *ngIf="editing === 2 && todosToRm.length > 0"  color="danger">
     <ion-label>{{ todosToRm.length }} selected</ion-label>
     <ion-icon name="close-circle" (click)="cancelEdit()" ></ion-icon>
   </ion-chip>

@@ -58,9 +58,9 @@
       </ion-item-sliding>
     </ion-reorder-group>
   </ion-list>
-  <ion-chip class="ion-chip-select" [hidden]="editing !== 2"  color="danger">
+  <ion-chip class="ion-chip-select" *ngIf="editing ===2 && listToRm.length > 0"  color="danger">
     <ion-label>{{ listToRm.length }} selected</ion-label>
-    <ion-icon name="close-circle" (click)="cancelEdit()" ></ion-icon>
+    <ion-icon name="close-circle" (click)="cancelSelect()" ></ion-icon>
   </ion-chip>
 
   <ion-fab *ngIf="editing === 0" vertical="bottom" horizontal="end" slot="fixed">

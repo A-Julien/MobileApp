@@ -20,13 +20,13 @@ import {Router} from '@angular/router';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
 import {Updater} from '../../models/updater';
 import { ItemReorderEventDetail } from '@ionic/core';
+import {OptionsComponent} from '../../popOvers/options/options.component';
 
 
 import {
   Plugins,
   HapticsImpactStyle
 } from '@capacitor/core';
-import {OptionsComponent} from '../../popOvers/options/options.component';
 
 const { Haptics } = Plugins;
 
@@ -273,11 +273,6 @@ export class HomePage implements OnInit {
     this.exSearch = false;
   }
 
-  searhInput(ev) {
-
-  }
-
-
   async openOption(ev) {
     const popover = await this.popOverController.create({
       component: OptionsComponent,
@@ -298,6 +293,10 @@ export class HomePage implements OnInit {
         this.editing = 2;
         break;
     }
+  }
+  cancelSelect() {
+    this.listToRm.forEach(l => l.isChecked = false);
+    this.listToRm = [];
   }
 
   cancelEdit() {

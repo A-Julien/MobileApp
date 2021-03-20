@@ -237,6 +237,10 @@ export class ListDetailsPage implements OnInit {
         break;
     }
   }
+  cancelSelect() {
+    this.todosToRm.forEach(t => t.isChecked = false);
+    this.todosToRm = [];
+  }
 
   cancelEdit() {
     switch (this.editing){

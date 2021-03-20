@@ -114,7 +114,7 @@ export class AuthenticationService {
                                 break;
                         }
                         this.popupService.presentAlert(errMsg, 'Login failed !');
-                        // reject(errMsg);
+                        reject(errMsg);
                     })
             );
         });
@@ -204,7 +204,7 @@ async isLoggedIn(): Promise<boolean> {
                                 break;
                         }
                         this.popupService.presentAlert(errMsg);
-                        // reject(errMsg);
+                        reject(errMsg);
                     });
             });
         }
@@ -279,7 +279,7 @@ async isLoggedIn(): Promise<boolean> {
                                 break;
                         }
                         this.popupService.presentAlert(errMsg);
-                        // reject(errMsg);
+                        reject(errMsg);
                     })
             );
         });

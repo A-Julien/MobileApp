@@ -12,6 +12,8 @@ export class List {
     name: string;
     todos: Todo[];
 
+    category: string;
+
     owner: string;
     share: boolean;
     owners: string[];
@@ -27,6 +29,7 @@ export class List {
         this.owners = [];
         this.share = false;
         this.type = type;
+        this.category = '';
     }
 }
 
@@ -37,7 +40,8 @@ export const listToFirebase = {
             owner: list.owner,
             type: list.type,
             share: list.share,
-            owners: list.owners
+            owners: list.owners,
+            category: list.category
         };
     },
     fromFirestore(

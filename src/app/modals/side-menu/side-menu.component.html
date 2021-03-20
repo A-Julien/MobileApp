@@ -5,7 +5,7 @@
     </ion-avatar>
     <ion-label>
       <h3></h3>
-      <p>{{ ( user | async)?.email }}</p>
+      <p>{{ ( user$ | async)?.email }}</p>
     </ion-label>
     <ion-menu-toggle auto-hide="false">
         <ion-icon  class="icon" name="hammer-sharp"></ion-icon>
@@ -31,6 +31,20 @@
     </ion-item>
     <span class="divider"></span>
   </div>
+
+  <div class="nav-item" >
+    <ion-item class="force-background">
+      <ion-icon class="icon" name="folder-open-outline"></ion-icon>
+      <ion-label>Category</ion-label>
+    </ion-item>
+    <ion-list class="force-background ion-list-padding">
+      <ion-item button class="force-background category-padding" *ngFor="let category of (userInfo$ | async)?.categories">
+        <ion-icon class="icon" name="folder" size="small"></ion-icon>
+        <ion-label style="margin: 0; font-size: .8rem"> {{category}}</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
 </div>
 <!--<div class="nav"><ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
 <ion-menu-toggle auto-hide="false">

@@ -33,27 +33,7 @@ export class ListService {
 
     this.sharingCollection = this.afs.collection(this.SHARECOLLECTION);
 
-    /*this.auth.authState.subscribe((user) => {
-      if (user){
-        console.log('user log, get list');
-        this._lists = this.getAllListDB();
-        this._listShare = this.getAllSharedListDB();
-        return;
-      }
-      console.log('remove observable');
-      this._lists = null;
-      this._listShare = null;
-    });*/
   }
-
-
-  /*get listShare(): Observable<MetaList[]> {
-    return this._listShare;
-  }
-
-  get lists(): Observable<List[]> {
-    return this._lists;
-  }*/
 
   get listShare(): Observable<MetaList[]> {
     return this.auth.u$.pipe(

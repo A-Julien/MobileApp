@@ -6,10 +6,13 @@ export class UserInfo {
 
     isNew: boolean;
     userUid: string;
+    categories: string[];
 
     constructor(userUid: string) {
         this.isNew = false;
         this.userUid = userUid;
+        this.categories = [];
+        this.categories.push('All');
     }
 }
 
@@ -18,6 +21,7 @@ export const uInfoToFirebase = {
         return {
             isNew: uInfo.isNew,
             userUid: uInfo.userUid,
+            categories: uInfo.categories
         };
     },
     fromFirestore(

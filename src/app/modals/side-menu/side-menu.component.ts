@@ -11,6 +11,8 @@ import {ListService} from '../../services/list.service';
 import {PopupService} from '../../services/popup.service';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
 import {PopoverController} from '@ionic/angular';
+import {UserInfoService} from "../../services/user-info.service";
+import {UserInfo} from "../../models/userinfo";
 
 @Component({
   selector: 'app-side-menu',
@@ -19,7 +21,8 @@ import {PopoverController} from '@ionic/angular';
 })
 export class SideMenuComponent implements OnInit {
 
-  user: Observable<firebase.User>;
+  user$: Observable<firebase.User>;
+  userInfo$: Observable<UserInfo>;
   readonly version = '0.0.5';
   forceOCR: boolean;
   private currentUs: USettings;
@@ -34,14 +37,19 @@ export class SideMenuComponent implements OnInit {
       private uService: UserSettingsService,
       private listService: ListService,
       public popupService: PopupService,
-      private popOverController: PopoverController
+      private popOverController: PopoverController,
+      private uInfoService: UserInfoService
   ) {
-    this.user = this.authService.authState;
+    this.user$ = this.authService.authState;
     this.forceOCR = false;
     this.nbNotif = 0;
   }
 
   ngOnInit() {
+    this.userInfo$ = this.uInfoService.userInfoOb$;
+    this.userInfo$.subscribe(console.log);
+
+
     this.uService.UserSettings.subscribe((us) => {
           this.forceOCR = us.forceOfflineOcr;
           this.currentUs = us;

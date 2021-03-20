@@ -4,6 +4,8 @@ import {AngularFireAuth} from '@angular/fire/auth';
 import {Observable, of} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 import {uInfoToFirebase, UserInfo} from '../models/userinfo';
+import firebase from 'firebase';
+import {List} from '../models/list';
 
 @Injectable({
   providedIn: 'root'
@@ -15,19 +17,29 @@ export class UserInfoService {
 
   // tslint:disable-next-line:variable-name
   private _userInfo: UserInfo;
+  private _userInfoOb$: Observable<UserInfo>;
 
   constructor(
       private afs: AngularFirestore,
       private auth: AngularFireAuth
   ) {
     this.uInfoCollection = this.afs.collection(this.USERINFOCOLLECTION);
+    this._userInfoOb$ =  this.auth.authState.pipe(
+        switchMap(user =>
+            this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', user.uid)).snapshotChanges()),
+        map(actions => (this.convertSnapUfin<UserInfo>(actions))[0])
+    );
   }
-
   public async createUsettings(userUid: string): Promise<void> {
     this._userInfo = new UserInfo(userUid);
     this._userInfo.isNew = true;
 
     await this.uInfoCollection.ref.withConverter(uInfoToFirebase).add(this._userInfo);
+  }
+
+
+  get userInfoOb$(): Observable<UserInfo> {
+    return this._userInfoOb$;
   }
 
   async uSexist(userUid: string) {
@@ -49,6 +61,12 @@ export class UserInfoService {
     await uinf();
   }
 
+  public addCategory(CatName: string){
+    this.afs.collection(this.USERINFOCOLLECTION).doc(this._userInfo.id).update({
+      categories: firebase.firestore.FieldValue.arrayUnion(CatName)
+    });
+  }
+
   private updateUserInfo(userInfo: UserInfo): Promise<void> {
     return this.uInfoCollection.doc(userInfo.id).ref.withConverter(uInfoToFirebase).set(userInfo);
   }
@@ -68,5 +86,13 @@ export class UserInfoService {
       const data = d.data();
       const id = d.id;
       return {id, ...data } as T;
+  }
+
+  private convertSnapUfin<T>(datas){
+    return datas.map( res => {
+      const data = res.payload.doc.data();
+      const id = res.payload.doc.id;
+      return {id, ...data } as T;
+    });
   }
 }

@@ -9,6 +9,15 @@
   padding-bottom: var(--ion-safe-area-bottom);
   --border-style: none;
 }
+.ion-list-padding{
+  padding: 0;
+}
+.category-padding{
+  margin-left: 1em;
+  font-size: 1rem;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 .force-background {
   --ion-item-background: transparent;
   --border-style: none;

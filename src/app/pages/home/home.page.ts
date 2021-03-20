@@ -54,7 +54,7 @@ export class HomePage implements OnInit {
   showLoading = true;
 
   editing = 0;
-  listToRm: List[];
+  listToAction: List[];
   listToUpdateName: Updater[];
   listSelected: Checker[];
   public exSearch = false;
@@ -76,7 +76,7 @@ export class HomePage implements OnInit {
 
   ){
     this.nbNotif = 0;
-    this.listToRm = [];
+    this.listToAction = [];
     this.listToUpdateName = [];
     this.listSelected = [];
   }
@@ -176,10 +176,9 @@ export class HomePage implements OnInit {
     console.log(ev);
     if (this.editing === 0){
       setTimeout(() => {
-        // this.hapticsImpact();
+        this.hapticsImpact();
         this.longPressActive = true;
         console.log('LONGPRESSS!');
-        // this.renderer.addClass(ev.target, 'selected');
         this.editing = 2;
         list.isChecked = true;
         this.addToDel(list);
@@ -272,23 +271,23 @@ export class HomePage implements OnInit {
   }
 
   addToDel(list: List){
-    if (this.listToRm.indexOf(list) !== -1){
-      this.listToRm = this.listToRm.filter(l => l !== list);
+    if (this.listToAction.indexOf(list) !== -1){
+      this.listToAction = this.listToAction.filter(l => l !== list);
       return;
     }
     this.listSelected.find(l => l.id === list.id).isChecked = true;
-    this.listToRm.push(list);
+    this.listToAction.push(list);
   }
 
   async delSelect() {
-    let msg = 'deleting ' + this.listToRm.length + ' list';
-    if ( this.listToRm.length > 1) { msg = 'deleting ' + this.listToRm.length + ' lists'; }
+    let msg = 'deleting ' + this.listToAction.length + ' list';
+    if ( this.listToAction.length > 1) { msg = 'deleting ' + this.listToAction.length + ' lists'; }
     const loader = await this.popUpService.presentLoading(msg);
-    this.listToRm.forEach( list => {
+    this.listToAction.forEach(list => {
         console.log('delete list ', list.name);
         this.delete(list);
     });
-    this.listToRm = [];
+    this.listToAction = [];
     if (this.longPressActive) {
       this.cancelEdit();
     }
@@ -346,7 +345,7 @@ export class HomePage implements OnInit {
   }
   cancelSelect() {
     this.listSelected.forEach(l => l.isChecked = false);
-    this.listToRm = [];
+    this.listToAction = [];
   }
 
   cancelEdit() {
@@ -356,7 +355,7 @@ export class HomePage implements OnInit {
         break;
       case 2:
         this.listSelected.forEach(l => l.isChecked = false);
-        this.listToRm = [];
+        this.listToAction = [];
     }
     this.longPressActive = false;
     this.editing = 0;
@@ -377,9 +376,9 @@ export class HomePage implements OnInit {
   }
 
   async  addToCategory() {
-    const loader = await this.popUpService.presentLoading('Add ' + this.listToRm.length + ' lists to ' + this.catSelectRef.value);
+    const loader = await this.popUpService.presentLoading('Add ' + this.listToAction.length + ' lists to ' + this.catSelectRef.value);
     let warning = false;
-    for (const list of this.listToRm) {
+    for (const list of this.listToAction) {
       if (list.category !== 'None'){ warning = true; }
       await this.listService.updateListCategory(new Updater(list.id, this.catSelectRef.value)).catch(() => {
           loader.dismiss();

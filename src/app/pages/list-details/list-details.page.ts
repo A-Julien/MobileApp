@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { ListService} from '../../services/list.service';
-import {IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
+import {AlertController, IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
 import {combineLatest, Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -52,7 +52,8 @@ export class ListDetailsPage implements OnInit {
       private auth: AuthenticationService,
       private popUpService: PopupService,
       private router: Router,
-      private popOverController: PopoverController)
+      private popOverController: PopoverController,
+      private alertCtrl: AlertController)
   {
     this.todosSelected = [];
     this.todosToRm = [];
@@ -115,15 +116,37 @@ export class ListDetailsPage implements OnInit {
   }
 
   async addTodoModal() {
-    const modal = await this.modalController.create({
-      component: CreateTodoComponent,
-      cssClass:  ['add-modal-todo'],
-      componentProps: {
-        // @ts-ignore
-        listId : this.listID
-      }
+    const alert = await this.alertCtrl.create({
+      header: 'New todo',
+      mode: 'ios',
+      inputs: [
+        {
+          label: 'name',
+          name: 'todoName',
+          placeholder: 'Name'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Add',
+          handler: data => {
+            if (data.todoName) {
+              this.listService.creatTodo(new Todo(data.todoName, '') , this.listID);
+            } else {
+              return false;
+            }
+          }
+        }
+      ]
     });
-    return await modal.present();
+    await alert.present();
   }
 
   async stopEdit() {

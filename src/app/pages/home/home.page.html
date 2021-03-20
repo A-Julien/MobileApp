@@ -12,17 +12,17 @@
     </ion-buttons>
 
     <ion-buttons *ngIf="!exSearch" slot="end">
-      <ion-badge *ngIf="listToRm.length > 0 && editing === 2" class="badge-one-cat-add" [hidden]="listToRm.length === 0" color="primary">+</ion-badge>
+      <ion-badge *ngIf="listToAction.length > 0 && editing === 2" class="badge-one-cat-add" [hidden]="listToAction.length === 0" color="primary">+</ion-badge>
 
-      <ion-item *ngIf="editing === 2" [disabled]="listToRm.length === 0"  (click)="choiceCategory()">
+      <ion-item *ngIf="editing === 2" [disabled]="listToAction.length === 0" (click)="choiceCategory()">
         <ion-icon name="folder-open-outline"></ion-icon>
         <ion-select (ionChange)="addToCategory()" name="Category" [hidden]="true" mode="ios" #catSelect>
            <ion-label>Choose a category</ion-label>
             <ion-select-option [value]=category *ngFor="let category of (userInfo$ | async)?.categories">{{category}}</ion-select-option>
          </ion-select>
        </ion-item>
-       <ion-button *ngIf="editing === 2" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
-       <ion-badge *ngIf="listToRm.length > 0 && editing === 2" [class.badge-one-del]="listToRm.length < 10" [class.badge-two-del]="listToRm.length >= 10"  color="danger">{{ listToRm.length }}</ion-badge>
+       <ion-button *ngIf="editing === 2" [disabled]="listToAction.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
+       <ion-badge *ngIf="listToAction.length > 0 && editing === 2" [class.badge-one-del]="listToAction.length < 10" [class.badge-two-del]="listToAction.length >= 10" color="danger">{{ listToAction.length }}</ion-badge>
        <ion-button *ngIf="editing === 1" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
        <!--<ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>-->
 
@@ -67,8 +67,8 @@
       </ion-item-sliding>
     </ion-reorder-group>
   </ion-list>
-  <ion-chip class="ion-chip-select" *ngIf="editing ===2 && listToRm.length > 0"  color="danger">
-    <ion-label>{{ listToRm.length }} selected</ion-label>
+  <ion-chip class="ion-chip-select" *ngIf="editing ===2 && listToAction.length > 0" color="danger">
+    <ion-label>{{ listToAction.length }} selected</ion-label>
     <ion-icon name="close-circle" (click)="cancelSelect()" ></ion-icon>
   </ion-chip>
 

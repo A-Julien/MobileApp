@@ -33,46 +33,23 @@
   </div>
 
   <div class="nav-item" >
-    <ion-item class="force-background">
+    <ion-item button (click)="selectActiveCat('None')" class="force-background">
       <ion-icon class="icon" name="folder-open-outline"></ion-icon>
       <ion-label>Category</ion-label>
     </ion-item>
     <ion-list class="force-background ion-list-padding">
-      <ion-item button class="force-background category-padding" *ngFor="let category of (userInfo$ | async)?.categories">
+      <ion-item [hidden]="category === 'None'" button (click)="selectActiveCat(category)" class="force-background category-padding" *ngFor="let category of (userInfo$ | async)?.categories">
         <ion-icon class="icon" name="folder" size="small"></ion-icon>
-        <ion-label style="margin: 0; font-size: .8rem"> {{category}}</ion-label>
+        <ion-label class="category-label"> {{category}}</ion-label>
+      </ion-item>
+      <ion-item  class="force-background category-padding">
+       <ion-button [disabled]="newCategory.length < 1"  (click)="addCategory()" class="category-button" fill="clear"> <ion-icon slot="icon-only" class="icon" name="add-circle-outline" size="small"></ion-icon> </ion-button>
+        <ion-input [(ngModel)]="newCategory" class="force-background category-padding" mode="ios" placeholder="category"></ion-input>
       </ion-item>
     </ion-list>
   </div>
 
 </div>
-<!--<div class="nav"><ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
-<ion-menu-toggle auto-hide="false">
-    <span class="divider"></span>
-      <div class="nav-item">
-        <ion-icon class="icon" name="cog"></ion-icon>
-        <ion-label>Settings</ion-label>
-        <span class="divider"></span>
-      </div>
-
-</ion-menu-toggle>
-<ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
-  <div class="nav-item" [routerLink]="[p.url]">
-    <span class="icon">{{p.icon}}</span>
-    {{p.title}}
-    <span class="divider"></span>
-  </div>
-</ion-menu-toggle>
-</div>
-<div class="nav">
-  <ion-menu-toggle auto-hide="false">
-    <div class="nav-item">
-      <ion-icon  class="icon" name="hammer-sharp"></ion-icon>
-      <ion-label>User Settings</ion-label>
-      <span class="divider"></span>
-    </div>
-  </ion-menu-toggle>
-</div>-->
 
 <ion-footer>
   <div class="foot-nav">

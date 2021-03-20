@@ -12,6 +12,15 @@
     </ion-buttons>
 
     <ion-buttons *ngIf="!exSearch" slot="end">
+      <ion-badge *ngIf="listToRm.length > 0 && editing === 2" class="badge-one-cat-add" [hidden]="listToRm.length === 0" color="primary">+</ion-badge>
+
+      <ion-item *ngIf="editing === 2" [disabled]="listToRm.length === 0"  (click)="choiceCategory()">
+        <ion-icon name="folder-open-outline"></ion-icon>
+        <ion-select (ionChange)="addToCategory()" name="Category" [hidden]="true" mode="ios" #catSelect>
+           <ion-label>Choose a category</ion-label>
+            <ion-select-option [value]=category *ngFor="let category of (userInfo$ | async)?.categories">{{category}}</ion-select-option>
+         </ion-select>
+       </ion-item>
        <ion-button *ngIf="editing === 2" [disabled]="listToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
        <ion-badge *ngIf="listToRm.length > 0 && editing === 2" [class.badge-one-del]="listToRm.length < 10" [class.badge-two-del]="listToRm.length >= 10"  color="danger">{{ listToRm.length }}</ion-badge>
        <ion-button *ngIf="editing === 1" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>

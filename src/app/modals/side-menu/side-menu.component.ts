@@ -10,9 +10,9 @@ import {USettings} from '../../models/settings';
 import {ListService} from '../../services/list.service';
 import {PopupService} from '../../services/popup.service';
 import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.component';
-import {PopoverController} from '@ionic/angular';
-import {UserInfoService} from "../../services/user-info.service";
-import {UserInfo} from "../../models/userinfo";
+import {MenuController, PopoverController} from '@ionic/angular';
+import {UserInfoService} from '../../services/user-info.service';
+import {UserInfo} from '../../models/userinfo';
 
 @Component({
   selector: 'app-side-menu',
@@ -28,6 +28,7 @@ export class SideMenuComponent implements OnInit {
   private currentUs: USettings;
 
   nbNotif: number;
+  newCategory: string;
 
   constructor(
       private auth: AngularFireAuth,
@@ -38,8 +39,10 @@ export class SideMenuComponent implements OnInit {
       private listService: ListService,
       public popupService: PopupService,
       private popOverController: PopoverController,
-      private uInfoService: UserInfoService
+      private uInfoService: UserInfoService,
+      private menuCtrl: MenuController
   ) {
+    this.newCategory = '';
     this.user$ = this.authService.authState;
     this.forceOCR = false;
     this.nbNotif = 0;
@@ -47,8 +50,6 @@ export class SideMenuComponent implements OnInit {
 
   ngOnInit() {
     this.userInfo$ = this.uInfoService.userInfoOb$;
-    this.userInfo$.subscribe(console.log);
-
 
     this.uService.UserSettings.subscribe((us) => {
           this.forceOCR = us.forceOfflineOcr;
@@ -105,4 +106,13 @@ export class SideMenuComponent implements OnInit {
     return await popover.present();
   }
 
+  async addCategory() {
+    await this.uInfoService.addCategory(this.newCategory);
+    this.newCategory = '';
+  }
+
+  selectActiveCat(category: string) {
+    this.menuCtrl.close();
+    this.uInfoService.setActiveCategory(category);
+  }
 }

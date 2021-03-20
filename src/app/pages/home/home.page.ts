@@ -4,7 +4,7 @@ import {
   ModalController,
   IonItemSliding,
   PopoverController,
-  IonSearchbar, GestureController
+  IonSearchbar, GestureController, IonSelect
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
@@ -21,13 +21,14 @@ import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.
 import {Updater} from '../../models/updater';
 import { ItemReorderEventDetail } from '@ionic/core';
 import {OptionsComponent} from '../../popOvers/options/options.component';
-
+import {UserInfoService} from '../../services/user-info.service';
+import {UserInfo} from '../../models/userinfo';
 
 import {
   Plugins,
   HapticsImpactStyle
 } from '@capacitor/core';
-import firebase from 'firebase';
+
 
 const { Haptics } = Plugins;
 
@@ -38,11 +39,15 @@ const { Haptics } = Plugins;
 })
 export class HomePage implements OnInit {
 
+  @ViewChild('catSelect') catSelectRef: IonSelect;
+
   public cancelSelect$ = new BehaviorSubject(null);
   @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
 
   /*@ViewChild('slidingItem', {read: ElementRef}) listElems: QueryList<ElementRef>; */
   longPressActive = false;
+
+  categories: string[];
 
   lists$: Observable<List[]>;
   listsShared$: Observable<MetaList[]>;
@@ -56,6 +61,7 @@ export class HomePage implements OnInit {
 
   nbNotif: number;
   private metalist: MetaList[];
+  userInfo$: Observable<UserInfo>;
 
   constructor(private listService: ListService,
               private modalController: ModalController,
@@ -65,7 +71,8 @@ export class HomePage implements OnInit {
               private photoService: PhotoService,
               private popOverController: PopoverController,
               private router: Router,
-              private renderer: Renderer2
+              private uInfoService: UserInfoService,
+              private alertCtrl: AlertController
 
   ){
     this.nbNotif = 0;
@@ -78,6 +85,20 @@ export class HomePage implements OnInit {
 
   ngOnInit(): void {
 
+    this.userInfo$ = this.uInfoService.userInfoOb$.pipe(
+      map(usrInf => {
+        usrInf.categories = usrInf.categories.filter( cat => cat !== 'None');
+        usrInf.categories.unshift('None');
+        return usrInf;
+      })
+    );
+
+
+    this.uInfoService.userInfoOb$.subscribe( uInfo =>
+      this.categories = uInfo.categories
+    );
+
+
     const searchFilter$ = this.searchBar.ionChange.pipe(
         map(event => (event.target as HTMLInputElement).value),
         startWith('')
@@ -86,17 +107,20 @@ export class HomePage implements OnInit {
     this.lists$ = combineLatest([
         this.listService.lists,
         searchFilter$,
-        this.cancelSelect$
-    ]).pipe(
-        map(([lists, filter]) => {
+        this.cancelSelect$,
+        this.uInfoService.activeCategory$
+    ]).pipe (
+        map(([lists, filter, cancel, activeCategory]) => {
           this.listSelected = [];
           lists.forEach(l => {
               this.listSelected.push(new Checker(l.id));
             } );
-          return lists.filter(
+          lists = lists.filter(
                 list =>
-                    list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+                  list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
             );
+          if (activeCategory === 'None') { return lists; }
+          return lists.filter( list => list.category === activeCategory );
         }),
         map(listList => {
           listList.sort((a, b) => {
@@ -322,9 +346,7 @@ export class HomePage implements OnInit {
   }
   cancelSelect() {
     this.listSelected.forEach(l => l.isChecked = false);
-    setTimeout(() => {
-      this.listToRm = [];
-    }, 100);
+    this.listToRm = [];
   }
 
   cancelEdit() {
@@ -348,6 +370,28 @@ export class HomePage implements OnInit {
 
   addToDelAll() {
 
+  }
+
+  async choiceCategory(){
+    await this.catSelectRef.open();
+  }
+
+  async  addToCategory() {
+    const loader = await this.popUpService.presentLoading('Add ' + this.listToRm.length + ' lists to ' + this.catSelectRef.value);
+    let warning = false;
+    for (const list of this.listToRm) {
+      if (list.category !== 'None'){ warning = true; }
+      await this.listService.updateListCategory(new Updater(list.id, this.catSelectRef.value)).catch(() => {
+          loader.dismiss();
+          this.cancelEdit();
+          this.popUpService.presentAlert('An error was occurred', 'Error');
+      });
+    }
+    this.cancelEdit();
+    await loader.dismiss();
+    if (warning) {
+      await this.popUpService.presentAlert('Some list was already in a category and they was moved', 'Moved List');
+    }
   }
 }
 

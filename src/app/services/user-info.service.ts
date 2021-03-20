@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 import {uInfoToFirebase, UserInfo} from '../models/userinfo';
 import firebase from 'firebase';
@@ -19,20 +19,29 @@ export class UserInfoService {
   private _userInfo: UserInfo;
   private _userInfoOb$: Observable<UserInfo>;
 
+  public activeCategory$ = new BehaviorSubject<string>(null);
+
   constructor(
       private afs: AngularFirestore,
       private auth: AngularFireAuth
   ) {
     this.uInfoCollection = this.afs.collection(this.USERINFOCOLLECTION);
     this._userInfoOb$ =  this.auth.authState.pipe(
-        switchMap(user =>
-            this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', user.uid)).snapshotChanges()),
+        switchMap(user => user ?
+            this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', user.uid)).snapshotChanges() : of()),
         map(actions => (this.convertSnapUfin<UserInfo>(actions))[0])
     );
+
+    this.auth.authState.subscribe( user => {
+      if (user){
+        this.activeCategory$.next('None');
+      }
+    });
   }
   public async createUsettings(userUid: string): Promise<void> {
     this._userInfo = new UserInfo(userUid);
     this._userInfo.isNew = true;
+    this._userInfo.categories.push('None');
 
     await this.uInfoCollection.ref.withConverter(uInfoToFirebase).add(this._userInfo);
   }
@@ -61,10 +70,19 @@ export class UserInfoService {
     await uinf();
   }
 
-  public addCategory(CatName: string){
-    this.afs.collection(this.USERINFOCOLLECTION).doc(this._userInfo.id).update({
+  public async addCategory(CatName: string){
+
+    await this._userInfoOb$.pipe(
+        switchMap( uInfo => {
+          return this.afs.collection(this.USERINFOCOLLECTION).doc(uInfo.id).update({
+            categories: firebase.firestore.FieldValue.arrayUnion(CatName)
+          });
+        })
+    ).toPromise();
+
+    /*return this.afs.collection(this.USERINFOCOLLECTION).doc(this._userInfo.id).update({
       categories: firebase.firestore.FieldValue.arrayUnion(CatName)
-    });
+    });*/
   }
 
   private updateUserInfo(userInfo: UserInfo): Promise<void> {
@@ -94,5 +112,9 @@ export class UserInfoService {
       const id = res.payload.doc.id;
       return {id, ...data } as T;
     });
+  }
+
+  setActiveCategory(caterogy: string){
+    this.activeCategory$.next(caterogy);
   }
 }

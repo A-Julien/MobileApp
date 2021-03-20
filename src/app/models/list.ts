@@ -22,14 +22,14 @@ export class List {
 
     isChecked = false;
 
-    constructor(name: string, type: ListType) {
+    constructor(name: string, type: ListType, category: string) {
         this.isChecked = false;
         this.name = name;
         this.todos = [];
         this.owners = [];
         this.share = false;
         this.type = type;
-        this.category = '';
+        this.category = category;
     }
 }
 

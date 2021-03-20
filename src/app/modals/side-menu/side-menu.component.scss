@@ -12,12 +12,32 @@
 .ion-list-padding{
   padding: 0;
 }
+
 .category-padding{
   margin-left: 1em;
   font-size: 1rem;
   margin-top: 0px;
   margin-bottom: 0px;
 }
+
+.category-button {
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+}
+
+.category-input {
+  margin: 0;
+  padding: 0;
+  font-size: .8rem
+}
+
+.category-label {
+  margin: 0;
+  font-size: .7rem
+}
+
 .force-background {
   --ion-item-background: transparent;
   --border-style: none;
@@ -60,7 +80,7 @@
 
 .nav-item {
   padding: 0.75rem 0.5rem 0 0.5rem;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .nav-item span.divider {

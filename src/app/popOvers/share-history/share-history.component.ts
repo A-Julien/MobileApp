@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {MetaList} from '../../models/metaList';
 import {Router} from '@angular/router';
 import {MenuController, PopoverController} from '@ionic/angular';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-share-history',
@@ -12,7 +13,8 @@ import {MenuController, PopoverController} from '@ionic/angular';
 })
 export class ShareHistoryComponent implements OnInit {
 
-  listsShared: Observable<MetaList[]>;
+  listsShared$: Observable<MetaList[]>;
+  noSharing = true;
 
   constructor(
       private listService: ListService,
@@ -22,7 +24,8 @@ export class ShareHistoryComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.listsShared = this.listService.listShare;
+    this.listsShared$ = this.listService.listShare$;
+    this.listsShared$.subscribe(ml => this.noSharing = ml.length === 0 || !ml);
   }
 
   close() {

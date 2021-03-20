@@ -36,7 +36,7 @@ export class ListService {
 
   }
 
-  get listShare(): Observable<MetaList[]> {
+  get listShare$(): Observable<MetaList[]> {
     return this.auth.u$.pipe(
         switchMap(user => user ? this.afs.collection(this.SHARECOLLECTION,
                 ref => ref.where('newOwner', '==', user.email)).snapshotChanges() : of([])),
@@ -138,7 +138,7 @@ export class ListService {
   }
 
   private removedSharedList(listID: string){
-    this.listShare.subscribe((sl) => {
+    this.listShare$.subscribe((sl) => {
       sl.forEach((l) => {
         if (l.listID === listID) { this.sharingCollection.doc(l.id).delete(); }
       });
@@ -165,7 +165,7 @@ export class ListService {
 
     this.updateList(list);
 
-    this.listShare.subscribe((sl) => {
+    this.listShare$.subscribe((sl) => {
     sl.forEach((l) => {
         if (l.newOwner === userEmailToRm && l.listID === list.id) {
           this.sharingCollection.doc(l.id).delete();

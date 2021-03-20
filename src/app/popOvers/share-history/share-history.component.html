@@ -1,8 +1,14 @@
 <ion-list >
-  <ion-item (click)="routeToTodos(lists.listID)"  *ngFor="let lists of listsShared | async">
+  <ion-item *ngIf="noSharing" >
+    <ion-label class="no-friend">
+      You have apparently no friend
+    </ion-label>
+  </ion-item>
+  <ion-item (click)="routeToTodos(lists.listID)"  *ngFor="let lists of listsShared$ | async">
     <ion-icon *ngIf="!lists.notify" color="danger" size="small" name="ellipse"></ion-icon>
-    <ion-label>
+    <ion-label class="align-notif" >
       {{ lists.owner.split('@')[0] }} share with you {{ lists.listName }}
     </ion-label>
   </ion-item>
+
 </ion-list>

@@ -53,11 +53,13 @@ export class ListDetailsPage implements OnInit {
       private popUpService: PopupService,
       private router: Router,
       private popOverController: PopoverController)
-  { }
-
-  ngOnInit() {
+  {
+    this.todosSelected = [];
     this.todosToRm = [];
     this.todosToUpdate = [];
+  }
+
+  ngOnInit() {
     this.listID = this.route.snapshot.paramMap.get('listId');
     this.list$ = this.listService.getOneDB(this.listID);
     const todoFromList = this.list$.pipe(
@@ -161,9 +163,7 @@ export class ListDetailsPage implements OnInit {
 
 
   ItemLongPress(ev, todo: Todo){
-    console.log(todo);
     if (this.editing === 2) {
-      console.log('wath ?');
       // this.renderer.addClass(ev.target, 'selected');
       this.addToDel(todo);
     } else {
@@ -263,6 +263,7 @@ export class ListDetailsPage implements OnInit {
   }
 
   iAmCheck(id: string): boolean{
+    if (!id) { return false; }
     const i = this.todosSelected.findIndex(check => check.id === id);
     if (i === -1 ) { return false; }
     return this.todosSelected[i].isChecked;

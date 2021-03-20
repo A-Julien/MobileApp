@@ -110,7 +110,7 @@ export class ListService {
     list.owner = this.auth.userId;
 
     this.listCollection.ref.withConverter(listToFirebase).add(list)
-        .then(() => this.popupService.presentToast(list.name + 'create'))
+        .then(() => this.popupService.presentToast(list.name + 'create', 1000))
         .catch(() => this.popupService.presentAlert('error when created ' + list.name));
   }
 
@@ -141,7 +141,7 @@ export class ListService {
 
     if (list.owner === this.auth.userId){
       this.listCollection.doc(list.id).delete()
-          .then(() => this.popupService.presentToast('list ' + list.name + ' removed'))
+          .then(() => this.popupService.presentToast('list ' + list.name + ' removed', 1000))
           .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + list.name));
       this.removedSharedList(list.id);
       return;
@@ -153,7 +153,7 @@ export class ListService {
     }
 
     this.updateList(list)
-        .then(() => this.popupService.presentToast('list ' + list.name + ' removed'))
+        .then(() => this.popupService.presentToast('list ' + list.name + ' removed', 1000))
         .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + list.name));
     this.removedSharedList(list.id);
   }

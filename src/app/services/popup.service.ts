@@ -14,7 +14,8 @@ export class PopupService {
  public async presentToast(msg: string, timeToShow = 5000) {
     const toast = await this.toastController.create({
       message: msg,
-      duration: timeToShow
+      duration: timeToShow,
+      mode: 'ios'
     });
     toast.present();
   }
@@ -25,6 +26,7 @@ export class PopupService {
       header: header,
       // subHeader: 'Subtitle',
       message: msg,
+      mode: 'ios',
       buttons: ['OK']
     });
 

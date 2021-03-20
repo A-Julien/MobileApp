@@ -9,6 +9,7 @@ import firebase from 'firebase';
 import {Todo, todoToFirebase} from '../models/todo';
 import {MetaList, MetaListToFirebase} from '../models/metaList';
 import {Updater} from '../models/updater';
+import DocumentReference = firebase.firestore.DocumentReference;
 
 
 
@@ -85,13 +86,11 @@ export class ListService {
     );
   }
 
-  public async createList(list: List): Promise<void> {
+  public async createList(list: List): Promise<DocumentReference<List>> {
     list.owners.push(this.auth.userEmail);
     list.owner = this.auth.userId;
 
-    this.listCollection.ref.withConverter(listToFirebase).add(list)
-        .then(() => this.popupService.presentToast(list.name + 'create', 1000))
-        .catch(() => this.popupService.presentAlert('error when created ' + list.name));
+    return this.listCollection.ref.withConverter(listToFirebase).add(list);
   }
 
   public shareList(list: List, userEmail: string): Promise<any> {

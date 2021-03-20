@@ -4,6 +4,8 @@ import { List, ListType } from '../../models/list';
 import { ListService } from '../../services/list.service';
 import { ModalController } from '@ionic/angular';
 import {UserInfoService} from '../../services/user-info.service';
+import {Router} from '@angular/router';
+import {PopupService} from '../../services/popup.service';
 
 @Component({
   selector: 'app-create-list',
@@ -19,7 +21,9 @@ export class CreateListComponent implements OnInit {
   constructor(private modalController: ModalController,
               private formBuilder: FormBuilder,
               private listService: ListService,
-              private uInfoService: UserInfoService) {
+              private uInfoService: UserInfoService,
+              private router: Router,
+              private popupService: PopupService) {
     this.activeCategory = 'All';
   }
 
@@ -37,16 +41,41 @@ export class CreateListComponent implements OnInit {
     await this.modalController.dismiss();
   }
 
-  createNewList(){
+  async createNewList(){
+    const loader = await this.popupService.presentLoading('Adding ' + this.newListForm.get('name').value);
     if (this.newListForm.valid){
-      this.listService.createList(
+      const l = await this.listService.createList(
           new List(
               this.newListForm.get('name').value,
               this.newListForm.get('type').value,
               this.activeCategory
               ));
-      this.dismissModal();
+      if (l) { await this.popupService.presentToast(this.newListForm.get('name').value + 'create', 1000); }
+      else {
+       await loader.dismiss();
+       await this.popupService.presentAlert('error when created ' + this.newListForm.get('name').value);
+      }
+
+      switch (this.newListForm.get('type').value){
+        case '0':
+          this.routeToList(l.id);
+          break;
+        case '1':
+          this.routeToTodos(l.id);
+          break;
+      }
+      await loader.dismiss();
+      await this.dismissModal();
     }
+  }
+
+
+  private routeToList(id: string){
+     this.router.navigate(['/list-details/' + id]);
+  }
+
+  private routeToTodos(id: string){
+     this.router.navigate(['/list-details-todo/' + id]);
   }
 
   get errorControl() {

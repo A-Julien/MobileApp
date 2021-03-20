@@ -203,8 +203,10 @@ export class ListService {
   creatTodo(todo: Todo, listId): void {
     this.listCollection.doc(listId).collection('todos').ref.withConverter(todoToFirebase).add(todo)
         .then(() =>  this.popupService.presentToast(todo.name + ' added', 1000))
-        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + todo.name));
+        .catch(() => this.popupService.presentAlert('An error was occurred can not add ' + todo.name));
   }
 
-
+  creatTodo2(todo: Todo, listId): Promise<DocumentReference<Todo>> {
+    return this.listCollection.doc(listId).collection('todos').ref.withConverter(todoToFirebase).add(todo);
+  }
 }

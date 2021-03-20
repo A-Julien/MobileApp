@@ -54,6 +54,7 @@ export class CreateListComponent implements OnInit {
       else {
        await loader.dismiss();
        await this.popupService.presentAlert('error when created ' + this.newListForm.get('name').value);
+       return;
       }
 
       switch (this.newListForm.get('type').value){

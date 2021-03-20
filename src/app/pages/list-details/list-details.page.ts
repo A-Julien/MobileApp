@@ -136,9 +136,18 @@ export class ListDetailsPage implements OnInit {
         },
         {
           text: 'Add',
-          handler: data => {
+          handler: async data => {
             if (data.todoName) {
-              this.listService.creatTodo(new Todo(data.todoName, '') , this.listID);
+              const loader = await this.popUpService.presentLoading('Adding ' + data.todoName);
+              const t = await this.listService.creatTodo2(new Todo(data.todoName, '') , this.listID);
+              if (t) {
+                await this.popUpService.presentToast(data.todoName + ' added', 1000);
+                this.routeToDetail(t.id);
+                await loader.dismiss();
+              } else {
+                await loader.dismiss();
+                await this.popUpService.presentAlert('An error was occurred can not add ' + data.todoName);
+              }
             } else {
               return false;
             }

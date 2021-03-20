@@ -39,7 +39,7 @@
 
         <ion-item  button (press)="longPress($event, list)" (click)="ItemLongPress($event, list)">
           <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
-          <ion-checkbox *ngIf="editing === 2" [ngModel]="list.isChecked" slot="start" ></ion-checkbox>
+          <ion-checkbox *ngIf="editing === 2" [ngModel]="iAmCheck(list.id)" slot="start" ></ion-checkbox>
           <ion-label *ngIf="editing !== 1" >{{ list.name }}</ion-label>
           <ion-input *ngIf="editing === 1" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 

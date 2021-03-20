@@ -8,9 +8,9 @@ import {
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
-import {combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
-import {List} from '../../models/list';
+import {Checker, List} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
 import { map, startWith } from 'rxjs/operators';
@@ -27,6 +27,7 @@ import {
   Plugins,
   HapticsImpactStyle
 } from '@capacitor/core';
+import firebase from 'firebase';
 
 const { Haptics } = Plugins;
 
@@ -37,7 +38,7 @@ const { Haptics } = Plugins;
 })
 export class HomePage implements OnInit {
 
-
+  public cancelSelect$ = new BehaviorSubject(null);
   @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
 
   /*@ViewChild('slidingItem', {read: ElementRef}) listElems: QueryList<ElementRef>; */
@@ -50,6 +51,7 @@ export class HomePage implements OnInit {
   editing = 0;
   listToRm: List[];
   listToUpdateName: Updater[];
+  listSelected: Checker[];
   public exSearch = false;
 
   nbNotif: number;
@@ -69,7 +71,7 @@ export class HomePage implements OnInit {
     this.nbNotif = 0;
     this.listToRm = [];
     this.listToUpdateName = [];
-
+    this.listSelected = [];
   }
 
 
@@ -83,14 +85,19 @@ export class HomePage implements OnInit {
 
     this.lists$ = combineLatest([
         this.listService.lists,
-        searchFilter$
+        searchFilter$,
+        this.cancelSelect$
     ]).pipe(
-        map(([lists, filter]) =>
-            lists.filter(
+        map(([lists, filter]) => {
+          this.listSelected = [];
+          lists.forEach(l => {
+              this.listSelected.push(new Checker(l.id));
+            } );
+          return lists.filter(
                 list =>
                     list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
-            )
-        )
+            );
+        })
     );
 
     this.listsShared$ = this.listService.listShare;
@@ -111,7 +118,7 @@ export class HomePage implements OnInit {
 
   private hapticsImpact(style = HapticsImpactStyle.Heavy) {
     Haptics.impact({
-      style: style
+      style
     });
   }
 
@@ -131,7 +138,7 @@ export class HomePage implements OnInit {
     console.log(ev);
     if (this.editing === 0){
       setTimeout(() => {
-        this.hapticsImpact();
+        // this.hapticsImpact();
         this.longPressActive = true;
         console.log('LONGPRESSS!');
         // this.renderer.addClass(ev.target, 'selected');
@@ -227,6 +234,7 @@ export class HomePage implements OnInit {
       this.listToRm = this.listToRm.filter(l => l !== list);
       return;
     }
+    this.listSelected.find(l => l.id === list.id).isChecked = true;
     this.listToRm.push(list);
   }
 
@@ -274,6 +282,7 @@ export class HomePage implements OnInit {
   }
 
   async openOption(ev) {
+    console.log(this.listSelected);
     const popover = await this.popOverController.create({
       component: OptionsComponent,
       cssClass: 'popoverOption',
@@ -284,7 +293,6 @@ export class HomePage implements OnInit {
     });
     await popover.present();
     const { data } = await popover.onWillDismiss();
-    console.log('choice ', data);
     switch (data){
       case 1:
           this.editing = 1;
@@ -295,8 +303,10 @@ export class HomePage implements OnInit {
     }
   }
   cancelSelect() {
-    this.listToRm.forEach(l => l.isChecked = false);
-    this.listToRm = [];
+    this.listSelected.forEach(l => l.isChecked = false);
+    setTimeout(() => {
+      this.listToRm = [];
+    }, 100);
   }
 
   cancelEdit() {
@@ -305,11 +315,17 @@ export class HomePage implements OnInit {
         this.listToUpdateName = [];
         break;
       case 2:
-        this.listToRm.forEach(l => l.isChecked = false);
+        this.listSelected.forEach(l => l.isChecked = false);
         this.listToRm = [];
     }
     this.longPressActive = false;
     this.editing = 0;
+  }
+
+  iAmCheck(id: string): boolean{
+    const i = this.listSelected.findIndex(check => check.id === id);
+    if (i === -1 ) { return false; }
+    return this.listSelected[i].isChecked;
   }
 
   addToDelAll() {

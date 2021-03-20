@@ -42,6 +42,16 @@ export const listToFirebase = {
     }
 };
 
+export class Checker {
+    id: string;
+    isChecked = false;
+
+
+    constructor(id: string) {
+        this.id = id;
+    }
+}
+
 export const toFirebaseExtended = {
     toFirestore(list: List): DocumentData {
         return {

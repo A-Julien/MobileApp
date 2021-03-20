@@ -258,4 +258,8 @@ export class ListDetailsPage implements OnInit {
   addToDelAll() {
 
   }
+
+  async saveListName(ev) {
+   await this.listService.updateListName(new Updater(this.listID, ev.target.value));
+  }
 }

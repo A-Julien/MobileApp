@@ -9,6 +9,7 @@ import {PopupService} from '../../services/popup.service';
 import {ModalController} from '@ionic/angular';
 import {UserSettingsService} from '../../services/user-settings.service';
 import {USettings} from '../../models/settings';
+import {Updater} from "../../models/updater";
 
 @Component({
   selector: 'app-todo-details',
@@ -45,6 +46,11 @@ export class TodoDetailsPage implements OnInit {
 
     this.todo = await this.listService.getOneTodo(this.listId, this.todoId).toPromise();
 
+  }
+
+  async saveTodoName(ev) {
+    await this.listService.updateTodoName(new Updater(this.todoId, ev.target.value), this.listId);
+    this.todo.name = ev.target.value;
   }
 
   save() {

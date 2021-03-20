@@ -5,7 +5,7 @@ import {IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
 import {combineLatest, Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
-import {List} from '../../models/list';
+import {Checker, List} from '../../models/list';
 import {Todo} from '../../models/todo';
 import {AuthenticationService} from '../../services/authentification.service';
 import {PopupService} from '../../services/popup.service';
@@ -33,6 +33,7 @@ export class ListDetailsPage implements OnInit {
   showLoader = true;
 
   editing = 0;
+  todosSelected: Checker[];
   todosToRm: Todo[];
   todosToUpdate: Updater[];
 
@@ -74,12 +75,16 @@ export class ListDetailsPage implements OnInit {
       todoFromList,
       searchFilter$
     ]).pipe(
-        map(([todo, filter]) =>
-            todo.filter(
-                list =>
-                    list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
-            )
-        )
+        map(([todo, filter]) => {
+          this.todosSelected = [];
+          todo.forEach(t => {
+            this.todosSelected.push(new Checker(t.id));
+          } );
+          return todo.filter(
+              list =>
+                  list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+          );
+        })
     );
 
 
@@ -140,6 +145,7 @@ export class ListDetailsPage implements OnInit {
       this.todosToRm = this.todosToRm.filter(t => t !== todo);
       return;
     }
+    this.todosSelected.find(l => l.id === todo.id).isChecked = true;
     this.todosToRm.push(todo);
   }
 
@@ -237,8 +243,9 @@ export class ListDetailsPage implements OnInit {
         break;
     }
   }
+
   cancelSelect() {
-    this.todosToRm.forEach(t => t.isChecked = false);
+    this.todosSelected.forEach(t => t.isChecked = false);
     this.todosToRm = [];
   }
 
@@ -248,12 +255,19 @@ export class ListDetailsPage implements OnInit {
         this.todosToUpdate = [];
         break;
       case 2:
-        this.todosToRm.forEach(t => t.isChecked = false);
+        this.todosSelected.forEach(t => t.isChecked = false);
         this.todosToRm = [];
     }
     this.longPressActive = false;
     this.editing = 0;
   }
+
+  iAmCheck(id: string): boolean{
+    const i = this.todosSelected.findIndex(check => check.id === id);
+    if (i === -1 ) { return false; }
+    return this.todosSelected[i].isChecked;
+  }
+
 
   addToDelAll() {
 

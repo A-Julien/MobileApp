@@ -50,7 +50,7 @@
         <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
         <ion-checkbox *ngIf="editing === 2" [ngModel]="todo.isChecked" slot="start" ></ion-checkbox>
         <ion-label *ngIf="editing !== 1" >{{ todo.name }}</ion-label>
-        <ion-input *ngIf="editing === 1" [(ngModel)]="todo.name" (ngModelChange)="addToUpdateTodoName(todo)"></ion-input>
+        <ion-input *ngIf="editing === 1" [(ngModel)]="iAmCheck(todo.id)" (ngModelChange)="addToUpdateTodoName(todo)"></ion-input>
       </ion-item>
 
       <ion-item-options side="end">
@@ -73,7 +73,7 @@
 
   <ion-chip class="ion-chip-select" *ngIf="editing === 2 && todosToRm.length > 0"  color="danger">
     <ion-label>{{ todosToRm.length }} selected</ion-label>
-    <ion-icon name="close-circle" (click)="cancelEdit()" ></ion-icon>
+    <ion-icon name="close-circle" (click)="cancelSelect()" ></ion-icon>
   </ion-chip>
 
   <ion-fab *ngIf="editing === 0" vertical="bottom" horizontal="end" slot="fixed">

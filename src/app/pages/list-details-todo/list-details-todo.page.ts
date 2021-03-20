@@ -1,15 +1,15 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import { ListService} from '../../services/list.service';
-import {IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
-import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
-import {combineLatest, Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {AlertController, IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
 import {Checker, List} from '../../models/list';
 import {Todo} from '../../models/todo';
+import {Updater} from '../../models/updater';
+import {combineLatest, Observable} from 'rxjs';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ListService} from '../../services/list.service';
 import {AuthenticationService} from '../../services/authentification.service';
 import {PopupService} from '../../services/popup.service';
-import {Updater} from '../../models/updater';
+import {map, startWith} from 'rxjs/operators';
+import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
 import {OptionsComponent} from '../../popOvers/options/options.component';
 
 import {
@@ -20,11 +20,11 @@ import {
 const { Haptics } = Plugins;
 
 @Component({
-  selector: 'app-list-details',
-  templateUrl: './list-details.page.html',
-  styleUrls: ['./list-details.page.scss'],
+  selector: 'app-list-details-todo',
+  templateUrl: './list-details-todo.page.html',
+  styleUrls: ['./list-details-todo.page.scss'],
 })
-export class ListDetailsPage implements OnInit {
+export class ListDetailsTodoPage implements OnInit {
 
   @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
 
@@ -52,7 +52,8 @@ export class ListDetailsPage implements OnInit {
       private auth: AuthenticationService,
       private popUpService: PopupService,
       private router: Router,
-      private popOverController: PopoverController)
+      private popOverController: PopoverController,
+      private alertCtrl: AlertController)
   {
     this.todosSelected = [];
     this.todosToRm = [];
@@ -115,15 +116,42 @@ export class ListDetailsPage implements OnInit {
   }
 
   async addTodoModal() {
-    const modal = await this.modalController.create({
-      component: CreateTodoComponent,
-      cssClass:  ['add-modal-todo'],
-      componentProps: {
-        // @ts-ignore
-        listId : this.listID
-      }
-    });
-    return await modal.present();
+      const alert = await this.alertCtrl.create({
+        header: 'New todo',
+        mode: 'ios',
+        inputs: [
+          {
+            label: 'name',
+            name: 'todoName',
+            placeholder: 'Name'
+          },
+          {
+            name: 'descr',
+            placeholder: 'Description',
+            value: ''
+          }
+        ],
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: data => {
+              console.log('Cancel clicked');
+            }
+          },
+          {
+            text: 'Add',
+            handler: data => {
+              if (data.todoName) {
+                this.listService.creatTodo(new Todo(data.todoName, data.descr) , this.listID);
+              } else {
+                return false;
+              }
+            }
+          }
+        ]
+      });
+      await alert.present();
   }
 
   async stopEdit() {
@@ -158,22 +186,19 @@ export class ListDetailsPage implements OnInit {
   }
 
   delete(u: Updater, listId) {
-      this.listService.deleteTodo(u, listId);
+    this.listService.deleteTodo(u, listId);
   }
 
   private hapticsImpact(style = HapticsImpactStyle.Heavy) {
     Haptics.impact({
-      style: style
+      style
     });
   }
 
 
   ItemLongPress(ev, todo: Todo){
     if (this.editing === 2) {
-      // this.renderer.addClass(ev.target, 'selected');
       this.addToDel(todo);
-    } else {
-      this.routeToDetail(todo.id);
     }
   }
 
@@ -204,10 +229,6 @@ export class ListDetailsPage implements OnInit {
     });
     this.todosToRm = [];
     await loader.dismiss();
-  }
-
-  routeToDetail(TodoId: string) {
-    if (!this.editing) { this.router.navigate(['/list-details/' + this.listID + '/todo-details/' + TodoId]); }
   }
 
   addToUpdateTodoName(todo: Todo): void {
@@ -281,6 +302,20 @@ export class ListDetailsPage implements OnInit {
   }
 
   async saveListName(ev) {
-   await this.listService.updateListName(new Updater(this.listID, ev.target.value));
+    await this.listService.updateListName(new Updater(this.listID, ev.target.value));
+  }
+
+  async finishTodo(todo: Todo) {
+    if (todo.isDone){
+      todo.isDone = false;
+      await this.listService.updateTodo(todo, this.listID);
+      return;
+    }
+
+    if (!todo.isDone){
+      todo.isDone = true;
+      await this.listService.updateTodo(todo, this.listID);
+      return;
+    }
   }
 }

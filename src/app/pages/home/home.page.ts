@@ -10,7 +10,7 @@ import { CreateListComponent } from '../../modals/create-list/create-list.compon
 import { ListService} from '../../services/list.service';
 import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
-import {Checker, List} from '../../models/list';
+import {Checker, List, ListType} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
 import { map, startWith } from 'rxjs/operators';
@@ -97,6 +97,12 @@ export class HomePage implements OnInit {
                 list =>
                     list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
             );
+        }),
+        map(listList => {
+          listList.sort((a, b) => {
+            return a.name < b.name ? -1 : 1;
+          });
+          return listList;
         })
     );
 
@@ -122,14 +128,22 @@ export class HomePage implements OnInit {
     });
   }
 
-  ItemLongPress(ev, list){
-    console.log(list);
+  ItemLongPress(ev, list: List){
     if (this.editing === 2) {
-      console.log('wath ?');
-      // this.renderer.addClass(ev.target, 'selected');
       this.addToDel(list);
-    } else {
-      this.routeToTodos(list.id);
+      return;
+    }
+    console.log(list);
+    switch (list.type) {
+      case ListType.note:
+        this.routeToList(list.id);
+        break;
+      case ListType.todo:
+        this.routeToTodos(list.id);
+        break;
+      default:
+        console.log('lol');
+        break;
     }
   }
 
@@ -203,8 +217,12 @@ export class HomePage implements OnInit {
     );
   }
 
-  routeToTodos(id: string){
+  private routeToList(id: string){
     if (!this.editing) { this.router.navigate(['/list-details/' + id]); }
+  }
+
+  private routeToTodos(id: string){
+    if (!this.editing) { this.router.navigate(['/list-details-todo/' + id]); }
   }
 
   // startEdit() { this.editing = true; }

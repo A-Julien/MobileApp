@@ -22,6 +22,13 @@
         Minimum length 2
       </span>
     </ion-text>
+    <ion-item>
+      <ion-label>Type</ion-label>
+      <ion-select mode="ios" name="type"  formControlName="type">
+        <ion-select-option value='0'>Notes</ion-select-option>
+        <ion-select-option value='1'>Todo</ion-select-option>
+      </ion-select>
+    </ion-item>
     <ion-row>
       <ion-col>
         <ion-button [disabled]="newListForm.invalid" type="submit" color="primary" expand="block">Submit</ion-button>

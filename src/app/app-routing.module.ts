@@ -58,7 +58,13 @@ const routes: Routes = [
   },
   {
     path: 'new-user',
-    loadChildren: () => import('./slides/new-user/new-user.module').then( m => m.NewUserPageModule)
+    loadChildren: () => import('./slides/new-user/new-user.module').then( m => m.NewUserPageModule),
+    ...canActivate(UnauthorizedAccess)
+  },
+  {
+    path: 'list-details-todo/:listId',
+    loadChildren: () => import('./pages/list-details-todo/list-details-todo.module').then( m => m.ListDetailsTodoPageModule),
+    ...canActivate(UnauthorizedAccess)
   },
 ];
 

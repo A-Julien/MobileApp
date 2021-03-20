@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons [hidden]="exSearch || editing" slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
+      <ion-back-button></ion-back-button>
+      <ion-input  style="width: 7em;" (focusout)="saveListName($event)"  [value]="(list$ | async)?.name"></ion-input>
+    </ion-buttons>
+
+    <ion-item *ngIf="editing == 1"><ion-label color="primary">Rename several todos</ion-label></ion-item>
+    <ion-item *ngIf="editing == 2"><ion-label color="primary">Select multiple</ion-label></ion-item>
+    <ion-buttons  *ngIf="editing === 2" slot="start">
+      <ion-checkbox style="margin-left: 20px;" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
+    </ion-buttons>
+
+    <ion-buttons *ngIf="!exSearch" slot="end">
+      <ion-button *ngIf="editing === 2" [disabled]="todosToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
+      <ion-badge *ngIf="todosToRm.length > 0 && editing === 2" [class.badge-one-del]="todosToRm.length < 10" [class.badge-two-del]="todosToRm.length >= 10"  color="danger">{{ todosToRm.length }}</ion-badge>
+      <ion-button *ngIf="editing === 1" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
+      <!--<ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>-->
+
+      <ion-button *ngIf="!editing" (click)="openOption($event)" color="primary"> <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon></ion-button>
+      <ion-button *ngIf="editing !== 0" (click)="cancelEdit()" color="primary">
+        <ion-icon [hidden]="editing !== 1" color="danger" size="large" name="close-outline"></ion-icon>
+        <ion-icon [hidden]="editing !== 2" color="primary" size="large" name="close-outline"></ion-icon>
+      </ion-button>
+
+    </ion-buttons>
+    <ion-searchbar [hidden]="editing" #searchBar (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
+
+  </ion-toolbar>
+</ion-header>
+<!------------------------------------------- BODY --------------------------------------------------->
+<ion-progress-bar *ngIf="showLoader" type="indeterminate"></ion-progress-bar>
+<ion-content *ngIf="!showLoader">
+<ion-list>
+<ion-item-sliding  *ngFor="let todo of todos$ | async" #slidingItem >
+
+  <ion-item  button (press)="longPress($event, todo)" (click)="ItemLongPress($event, todo)">
+    <ion-checkbox mode="ios" *ngIf="editing === 0" [ngModel]="todo.isDone" (click)="finishTodo(todo)" slot="start" ></ion-checkbox>
+
+    <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
+    <ion-checkbox *ngIf="editing === 2" [ngModel]="todo.isChecked"  slot="start" ></ion-checkbox>
+    <ion-label *ngIf="editing !== 1" >
+      <h2 [class.strike]="todo.isDone">{{ todo.name }}</h2>
+      <p class="tab">{{ todo.content }}</p>
+    </ion-label>
+    <ion-input *ngIf="editing === 1" [(ngModel)]="todo.name" (ngModelChange)="addToUpdateTodoName(todo)"></ion-input>
+  </ion-item>
+
+  <ion-item-options side="end">
+    <ion-item-option *ngIf="!editing" (click)="delete({id: todo.id, field: todo.name}, this.listID)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
+  </ion-item-options>
+
+</ion-item-sliding>
+</ion-list>
+
+<ion-chip class="ion-chip-select" *ngIf="editing === 2 && todosToRm.length > 0"  color="danger">
+<ion-label>{{ todosToRm.length }} selected</ion-label>
+<ion-icon name="close-circle" (click)="cancelSelect()" ></ion-icon>
+</ion-chip>
+
+<ion-fab *ngIf="editing === 0" vertical="bottom" horizontal="end" slot="fixed">
+<ion-fab-button (click)="addTodoModal()">
+  <ion-icon name="add-outline"></ion-icon>
+</ion-fab-button>
+</ion-fab>
+</ion-content>
+

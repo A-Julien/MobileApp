@@ -19,15 +19,12 @@ import { AngularCropperjsModule } from 'angular-cropperjs';
 import {SideMenuComponent} from './modals/side-menu/side-menu.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
-import { LongPressDirective } from './directives/long-press.directive';
 import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 import 'hammerjs';
-// custom configuration Hammerjs
+
 @Injectable()
 export class HammerConfig extends HammerGestureConfig {
     overrides = {
-        // I will only use the swap gesture so
-        // I will deactivate the others to avoid overlaps
         pinch: { enable: false },
         rotate: { enable: false }
     } as any;

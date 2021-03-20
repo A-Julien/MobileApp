@@ -219,7 +219,7 @@ export class ListService {
 
   creatTodo(todo: Todo, listId): void {
     this.listCollection.doc(listId).collection('todos').ref.withConverter(todoToFirebase).add(todo)
-        .then(() =>  this.popupService.presentToast(todo.name + ' added'))
+        .then(() =>  this.popupService.presentToast(todo.name + ' added', 1000))
         .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + todo.name));
   }
 

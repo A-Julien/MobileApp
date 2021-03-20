@@ -2,6 +2,11 @@ import firebase from 'firebase';
 import {DocumentData, QueryDocumentSnapshot, SnapshotOptions} from '@angular/fire/firestore';
 import {Todo} from './todo';
 
+export enum ListType {
+    note = '0',
+    todo = '1'
+}
+
 export class List {
     id: string;
     name: string;
@@ -11,14 +16,17 @@ export class List {
     share: boolean;
     owners: string[];
 
+    type: ListType;
+
     isChecked = false;
 
-    constructor(name: string) {
+    constructor(name: string, type: ListType) {
         this.isChecked = false;
         this.name = name;
         this.todos = [];
         this.owners = [];
         this.share = false;
+        this.type = type;
     }
 }
 
@@ -27,6 +35,7 @@ export const listToFirebase = {
         return {
             name: list.name,
             owner: list.owner,
+            type: list.type,
             share: list.share,
             owners: list.owners
         };

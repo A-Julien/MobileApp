@@ -12,7 +12,10 @@
     <ion-item>
 
       <ion-buttons slot="end">
-        <ion-button [disabled]="newShareForm.invalid || -1 !== (sharedUsers$ | async)?.indexOf(newShareForm.get('email').value)" type="submit" color="primary">
+        <ion-button [disabled]="
+        newShareForm.invalid
+        || -1 !== (sharedUsers$ | async)?.indexOf(newShareForm.get('email').value)
+        || auth.userEmail === newShareForm.get('email').value" type="submit" color="primary">
           <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
         </ion-button>
       </ion-buttons>

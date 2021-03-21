@@ -113,7 +113,7 @@ export class AuthenticationService {
                                 errMsg = err;
                                 break;
                         }
-                        this.popupService.presentAlert(errMsg, 'Login failed !');
+
                         reject(errMsg);
                     })
             );

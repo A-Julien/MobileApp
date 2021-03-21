@@ -54,10 +54,12 @@ export class CreateListComponent implements OnInit {
       });
       if (l) { await this.popupService.presentToast(this.newListForm.get('name').value + 'create', 1000); }
       else {
-       await loader.dismiss();
-       await this.popupService.presentAlert('error when created ' + this.newListForm.get('name').value);
-       return;
+        await loader.dismiss();
+        await this.popupService.presentAlert('error when created ' + this.newListForm.get('name').value);
+        return;
       }
+
+      await this.uInfoService.addListToCategory(l.id, this.activeCategory);
 
       switch (this.newListForm.get('type').value){
         case '0':

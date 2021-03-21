@@ -24,7 +24,7 @@ export class ManageSharingComponent implements OnInit {
       private navParams: NavParams,
       private listService: ListService,
       private popupService: PopupService,
-      private auth: AuthenticationService
+      public auth: AuthenticationService
   ) {}
 
   ngOnInit() {
@@ -60,6 +60,7 @@ export class ManageSharingComponent implements OnInit {
 
   public share() {
     const email = this.newShareForm.get('email').value;
+    this.newShareForm.get('email').reset();
     this.listService.shareList(this.list, email)
         .then(() => this.popupService.presentToast(this.list.name + ' shared with ' + email + '!'))
         .catch(() => this.popupService.presentToast('Error, ' + this.list.name + ' not shared'));

@@ -23,15 +23,7 @@ import { ItemReorderEventDetail } from '@ionic/core';
 import {OptionsComponent} from '../../popOvers/options/options.component';
 import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
-
-import {
-  Plugins,
-  HapticsImpactStyle
-} from '@capacitor/core';
-import {Category} from "../../models/category";
-
-
-const { Haptics } = Plugins;
+import {Category} from '../../models/category';
 
 @Component({
   selector: 'app-home',
@@ -106,7 +98,7 @@ export class HomePage implements OnInit {
 
 
     this.uInfoService.userInfoOb$.subscribe( uInfo =>
-      this.categories = uInfo.categories
+      this.categories = uInfo?.categories
     );
 
 
@@ -157,16 +149,6 @@ export class HomePage implements OnInit {
     });
   }
 
-  private hapticsImpact(style = HapticsImpactStyle.Heavy) {
-    try {
-      Haptics.impact({
-        style
-      });
-    } catch (err){
-      console.log(err);
-    }
-  }
-
   ItemLongPress(ev, list: List){
     if (this.editing === 2) {
       this.addToDel(list);
@@ -191,7 +173,7 @@ export class HomePage implements OnInit {
     console.log(ev);
     if (this.editing === 0){
       setTimeout(() => {
-        this.hapticsImpact();
+        this.popUpService.hapticsImpact();
         this.longPressActive = true;
         console.log('LONGPRESSS!');
         this.editing = 2;

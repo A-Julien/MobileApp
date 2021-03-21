@@ -41,7 +41,7 @@ export class UserInfoService {
     this.uInfoCollection = this.afs.collection(this.USERINFOCOLLECTION);
     this._userInfoOb$ =  this.auth.authState.pipe(
         switchMap(user => user ?
-            this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', user.uid)).snapshotChanges() : of()),
+            this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', user.uid)).snapshotChanges() : of([])),
         map(actions => {
           return (this.convertSnapUfin<UserInfo>(actions))[0];
         }),

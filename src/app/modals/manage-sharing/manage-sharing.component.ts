@@ -16,7 +16,7 @@ import {AuthenticationService} from '../../services/authentification.service';
 export class ManageSharingComponent implements OnInit {
   newShareForm: FormGroup;
   private list: List = this.navParams.get('listParam');
-  sharedUsers: Observable<string[]>;
+  sharedUsers$: Observable<string[]>;
 
   constructor(
       private modalController: ModalController,
@@ -38,7 +38,7 @@ export class ManageSharingComponent implements OnInit {
           console.log(list.owners);
         })
     );
-    this.sharedUsers = this.listService.getOneList(this.list.id).pipe(
+    this.sharedUsers$ = this.listService.getOneList(this.list.id).pipe(
         map( (list) => list.owners.filter(
             user => user !== this.auth.userEmail
         ))
@@ -63,5 +63,11 @@ export class ManageSharingComponent implements OnInit {
     this.listService.shareList(this.list, email)
         .then(() => this.popupService.presentToast(this.list.name + ' shared with ' + email + '!'))
         .catch(() => this.popupService.presentToast('Error, ' + this.list.name + ' not shared'));
+  }
+
+  emailAlreadyShare() {
+    /*this.sharedUsers$.pipe(
+        map( sU => sU.indexOf(this.newShareForm..get('email').value))
+    );*/
   }
 }

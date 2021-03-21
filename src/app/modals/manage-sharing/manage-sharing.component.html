@@ -12,20 +12,15 @@
     <ion-item>
 
       <ion-buttons slot="end">
-        <ion-button [disabled]="newShareForm.invalid" type="submit" color="primary">
+        <ion-button [disabled]="newShareForm.invalid || -1 !== (sharedUsers$ | async)?.indexOf(newShareForm.get('email').value)" type="submit" color="primary">
           <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
       <ion-input name="email" formControlName="email" placeholder="emboucaneur@cretin.com" required></ion-input>
-      <!--<ion-item >
-        <ion-label position="floating">Email</ion-label>
-        <ion-input type="email" name="email" formControlName="email" required></ion-input>
-      </ion-item>*/
-      <ion-button [disabled]="newShareForm.invalid" type="submit" color="primary"  ><ion-icon name="add-circle-outline"></ion-icon></ion-button>-->
     </ion-item>
   </form>
 
-  <ion-item *ngFor="let user of sharedUsers | async">
+  <ion-item *ngFor="let user of sharedUsers$ | async">
     <ion-label>{{ user }}</ion-label>
     <ion-icon name="trash-outline" color="danger" slot="end" (click)="unShare(user)"></ion-icon>
   </ion-item>

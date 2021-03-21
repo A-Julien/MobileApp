@@ -43,7 +43,9 @@
         <ion-label class="category-label"> {{category.name}}</ion-label>
       </ion-item>
       <ion-item  class="force-background category-padding">
-       <ion-button [disabled]="newCategory.length < 1"  (click)="addCategory()" class="category-button" fill="clear"> <ion-icon slot="icon-only" class="icon" name="add-circle-outline" size="small"></ion-icon> </ion-button>
+        <ion-button [disabled]="newCategory.length < 1"  (click)="addCategory()" class="category-button" fill="clear">
+          <ion-icon slot="icon-only" color="light" class="icon" name="add-circle-outline" size="small"></ion-icon>
+        </ion-button>
         <ion-input [(ngModel)]="newCategory" class="force-background category-padding" mode="ios" placeholder="category"></ion-input>
       </ion-item>
     </ion-list>

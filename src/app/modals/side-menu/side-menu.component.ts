@@ -75,6 +75,7 @@ export class SideMenuComponent implements OnInit {
 
   async longPress(ev, category) {
     setTimeout(async () => {
+      this.popupService.hapticsImpact();
       console.log('longp', category);
       const popover = await this.popOverController.create({
         component: RmCatComponent,

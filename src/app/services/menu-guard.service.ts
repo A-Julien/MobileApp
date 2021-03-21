@@ -13,6 +13,8 @@ export class MenuGuardService {
   ) {}
 
   setMenuGuard(){
-    this.auth.u$.subscribe(user => user ? this.menuController.enable(true, 'main-content') : this.menuController.enable(false, 'main-content'));
+    this.auth.u$.subscribe(user =>
+        user ? this.menuController.enable(true, 'mainMenu') : this.menuController.enable(false, 'mainMenu')
+    );
   }
 }

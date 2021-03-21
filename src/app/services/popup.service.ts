@@ -2,6 +2,14 @@ import { Injectable } from '@angular/core';
 import {AlertController, LoadingController, MenuController, PopoverController, ToastController} from '@ionic/angular';
 import {ShareHistoryComponent} from '../popOvers/share-history/share-history.component';
 
+import {
+    Plugins,
+    HapticsImpactStyle
+} from '@capacitor/core';
+
+
+const { Haptics } = Plugins;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,6 +27,7 @@ export class PopupService {
     });
     toast.present();
   }
+
 
   public async presentAlert(msg: string, header: string = 'Alert') {
     const alert = await this.alertController.create({
@@ -40,5 +49,15 @@ export class PopupService {
         });
         await loading.present();
         return loading;
+    }
+
+    public hapticsImpact(style = HapticsImpactStyle.Heavy) {
+        try {
+            Haptics.impact({
+                style
+            });
+        } catch (err){
+            console.log(err);
+        }
     }
 }

@@ -183,10 +183,6 @@ export class ListService {
     return this.listCollection.doc(u.id).update({name: u.field});
   }
 
-  public updateListCategory(u: Updater): Promise<void> {
-    return this.listCollection.doc(u.id).update({category: u.field});
-  }
-
   public updateTodo(todo: Todo, listID: string): Promise<void>{
     return this.listCollection.doc(listID).collection('todos').doc(todo.id).ref.withConverter(todoToFirebase).set(todo);
   }

@@ -28,6 +28,7 @@ import {
   Plugins,
   HapticsImpactStyle
 } from '@capacitor/core';
+import {Category} from "../../models/category";
 
 
 const { Haptics } = Plugins;
@@ -62,6 +63,8 @@ export class HomePage implements OnInit {
   nbNotif: number;
   private metalist: MetaList[];
   userInfo$: Observable<UserInfo>;
+  userCat$: Observable<Category[]>;
+
 
   constructor(private listService: ListService,
               private modalController: ModalController,
@@ -71,7 +74,7 @@ export class HomePage implements OnInit {
               private photoService: PhotoService,
               private popOverController: PopoverController,
               private router: Router,
-              private uInfoService: UserInfoService,
+              public uInfoService: UserInfoService,
               private alertCtrl: AlertController
 
   ){
@@ -84,6 +87,14 @@ export class HomePage implements OnInit {
 
 
   ngOnInit(): void {
+    this.userCat$ = this.uInfoService.userCat$.pipe(
+        map(categories => {
+          /*categories = categories.filter( cat => cat.name !== 'None');
+          usrInf.categories.unshift('None');
+          return usrInf;*/
+          return categories;
+        })
+    );
 
     this.userInfo$ = this.uInfoService.userInfoOb$.pipe(
       map(usrInf => {
@@ -119,8 +130,8 @@ export class HomePage implements OnInit {
                 list =>
                   list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
             );
-          if (activeCategory === 'None') { return lists; }
-          return lists.filter( list => list.category === activeCategory );
+          if (activeCategory.name === 'None') { return lists; }
+          return lists.filter( list => activeCategory.lists.indexOf(list.id) !== -1 );
         }),
         map(listList => {
           listList.sort((a, b) => {
@@ -147,9 +158,13 @@ export class HomePage implements OnInit {
   }
 
   private hapticsImpact(style = HapticsImpactStyle.Heavy) {
-    Haptics.impact({
-      style
-    });
+    try {
+      Haptics.impact({
+        style
+      });
+    } catch (err){
+      console.log(err);
+    }
   }
 
   ItemLongPress(ev, list: List){
@@ -376,21 +391,17 @@ export class HomePage implements OnInit {
   }
 
   async  addToCategory() {
-    const loader = await this.popUpService.presentLoading('Add ' + this.listToAction.length + ' lists to ' + this.catSelectRef.value);
-    let warning = false;
+    const loader = await this.popUpService.presentLoading('Add ' + this.listToAction.length + ' lists to ' + this.catSelectRef.value.name);
     for (const list of this.listToAction) {
-      if (list.category !== 'None'){ warning = true; }
-      await this.listService.updateListCategory(new Updater(list.id, this.catSelectRef.value)).catch(() => {
-          loader.dismiss();
-          this.cancelEdit();
-          this.popUpService.presentAlert('An error was occurred', 'Error');
+      await this.uInfoService.addListToCategory(list.id, this.catSelectRef.value).catch((err) => {
+        loader.dismiss();
+        this.cancelEdit();
+        console.log(err);
+        this.popUpService.presentAlert('An error was occurred', 'Error');
       });
     }
     this.cancelEdit();
     await loader.dismiss();
-    if (warning) {
-      await this.popUpService.presentAlert('Some list was already in a category and they was moved', 'Moved List');
-    }
   }
 }
 

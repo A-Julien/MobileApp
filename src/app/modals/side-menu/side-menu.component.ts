@@ -13,6 +13,7 @@ import {ShareHistoryComponent} from '../../popOvers/share-history/share-history.
 import {MenuController, PopoverController} from '@ionic/angular';
 import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
+import {Category} from '../../models/category';
 
 @Component({
   selector: 'app-side-menu',
@@ -23,6 +24,7 @@ export class SideMenuComponent implements OnInit {
 
   user$: Observable<firebase.User>;
   userInfo$: Observable<UserInfo>;
+  userCat$: Observable<Category[]>;
   readonly version = '0.0.5';
   forceOCR: boolean;
   private currentUs: USettings;
@@ -50,6 +52,7 @@ export class SideMenuComponent implements OnInit {
 
   ngOnInit() {
     this.userInfo$ = this.uInfoService.userInfoOb$;
+    this.userCat$ = this.uInfoService.userCat$;
 
     this.uService.UserSettings.subscribe((us) => {
           this.forceOCR = us.forceOfflineOcr;
@@ -107,12 +110,18 @@ export class SideMenuComponent implements OnInit {
   }
 
   async addCategory() {
-    await this.uInfoService.addCategory(this.newCategory);
+    const newCat = new Category(this.newCategory);
+    newCat.lists.push('_catList_' + this.newCategory);
+    await this.uInfoService.addCategory(newCat);
     this.newCategory = '';
   }
 
-  selectActiveCat(category: string) {
+  selectActiveCat(category: Category) {
     this.menuCtrl.close();
+    if (!category){
+      this.uInfoService.setActiveCategory(new Category('None'));
+      return;
+    }
     this.uInfoService.setActiveCategory(category);
   }
 }

@@ -6,6 +6,7 @@ import { ModalController } from '@ionic/angular';
 import {UserInfoService} from '../../services/user-info.service';
 import {Router} from '@angular/router';
 import {PopupService} from '../../services/popup.service';
+import {Category} from '../../models/category';
 
 @Component({
   selector: 'app-create-list',
@@ -16,7 +17,7 @@ export class CreateListComponent implements OnInit {
 
   newListForm: FormGroup;
   type: ListType.todo;
-  activeCategory: string;
+  activeCategory: Category;
 
   constructor(private modalController: ModalController,
               private formBuilder: FormBuilder,
@@ -24,7 +25,6 @@ export class CreateListComponent implements OnInit {
               private uInfoService: UserInfoService,
               private router: Router,
               private popupService: PopupService) {
-    this.activeCategory = 'All';
   }
 
   ngOnInit(){
@@ -47,8 +47,7 @@ export class CreateListComponent implements OnInit {
       const l = await this.listService.createList(
           new List(
               this.newListForm.get('name').value,
-              this.newListForm.get('type').value,
-              this.activeCategory
+              this.newListForm.get('type').value
               ));
       if (l) { await this.popupService.presentToast(this.newListForm.get('name').value + 'create', 1000); }
       else {

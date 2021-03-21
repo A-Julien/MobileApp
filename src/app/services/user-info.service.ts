@@ -6,6 +6,8 @@ import {map, switchMap, tap} from 'rxjs/operators';
 import {uInfoToFirebase, UserInfo} from '../models/userinfo';
 import firebase from 'firebase';
 import {List} from '../models/list';
+import {Category, catToFirebase} from '../models/category';
+import {Todo} from '../models/todo';
 
 @Injectable({
   providedIn: 'root'
@@ -15,29 +17,47 @@ export class UserInfoService {
   private readonly USERINFOCOLLECTION = '/UserInfo';
   private uInfoCollection: AngularFirestoreCollection;
 
+  private activeCategory: Category;
+
   // tslint:disable-next-line:variable-name
   private _userInfo: UserInfo;
+  // tslint:disable-next-line:variable-name
   private _userInfoOb$: Observable<UserInfo>;
-
-  public activeCategory$ = new BehaviorSubject<string>(null);
+  // tslint:disable-next-line:variable-name
+  private _userCat$: Observable<Category[]>;
+  private uInfoId: string;
+  public activeCategory$ = new BehaviorSubject<Category>(null);
 
   constructor(
       private afs: AngularFirestore,
       private auth: AngularFireAuth
   ) {
+
+    this.activeCategory$.subscribe( cat => this.activeCategory = cat);
+
     this.uInfoCollection = this.afs.collection(this.USERINFOCOLLECTION);
     this._userInfoOb$ =  this.auth.authState.pipe(
         switchMap(user => user ?
             this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', user.uid)).snapshotChanges() : of()),
-        map(actions => (this.convertSnapUfin<UserInfo>(actions))[0])
+        map(actions => {
+          return (this.convertSnapUfin<UserInfo>(actions))[0];
+        }),
+        tap(u => u ? this.uInfoId = u.id : this.uInfoId = '')
+    );
+
+    this._userCat$ = this._userInfoOb$.pipe(
+        switchMap( info =>  info ?
+          this.uInfoCollection.doc(info.id).collection<Category>('Categories').snapshotChanges() : of([])),
+        map(actions => this.convertSnapUfin<Category>(actions))
     );
 
     this.auth.authState.subscribe( user => {
       if (user){
-        this.activeCategory$.next('None');
+        this.activeCategory$.next(new Category('None'));
       }
     });
   }
+
   public async createUsettings(userUid: string): Promise<void> {
     this._userInfo = new UserInfo(userUid);
     this._userInfo.isNew = true;
@@ -46,6 +66,10 @@ export class UserInfoService {
     await this.uInfoCollection.ref.withConverter(uInfoToFirebase).add(this._userInfo);
   }
 
+
+  get userCat$(): Observable<Category[]> {
+    return this._userCat$;
+  }
 
   get userInfoOb$(): Observable<UserInfo> {
     return this._userInfoOb$;
@@ -70,19 +94,33 @@ export class UserInfoService {
     await uinf();
   }
 
-  public async addCategory(CatName: string){
+  public async addCategory(cat: Category){
+    return  this.uInfoCollection.doc(this.uInfoId).collection('Categories').ref.withConverter(catToFirebase).add(cat);
+  }
 
-    await this._userInfoOb$.pipe(
-        switchMap( uInfo => {
-          return this.afs.collection(this.USERINFOCOLLECTION).doc(uInfo.id).update({
-            categories: firebase.firestore.FieldValue.arrayUnion(CatName)
-          });
-        })
-    ).toPromise();
+  public async addListToCategory(listId: string, category: Category){
+    const rmCat = async () => {
+      const col = this.uInfoCollection.doc(this.uInfoId)
+          .collection('Categories', ref => ref.where('lists', 'array-contains-any', [listId]));
+      const uSnaps = await col.get().toPromise();
 
-    /*return this.afs.collection(this.USERINFOCOLLECTION).doc(this._userInfo.id).update({
-      categories: firebase.firestore.FieldValue.arrayUnion(CatName)
-    });*/
+      const catToRm = this.convertSnapData<Category>(uSnaps.docs[0]);
+      await this.uInfoCollection.doc(this.uInfoId).collection('Categories').doc(catToRm.id).update({
+        lists: firebase.firestore.FieldValue.arrayRemove(listId)
+      });
+    };
+    await rmCat();
+
+    return this.updateListToCategory(listId, category);
+  }
+
+  public async updateListToCategory(listId: string, category: Category){
+    if (!category.lists) { category.lists = []; }
+    category.lists.push(listId);
+
+    return this.uInfoCollection.doc(this.uInfoId).collection('Categories')
+              .doc(category.id).ref.withConverter(catToFirebase).set(category)
+        .then(() => this.setActiveCategory(category));
   }
 
   private updateUserInfo(userInfo: UserInfo): Promise<void> {
@@ -114,7 +152,8 @@ export class UserInfoService {
     });
   }
 
-  setActiveCategory(caterogy: string){
+  setActiveCategory(caterogy: Category){
+    if (!caterogy.lists) {caterogy.lists = []; }
     this.activeCategory$.next(caterogy);
   }
 }

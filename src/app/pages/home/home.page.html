@@ -3,8 +3,6 @@
     <ion-buttons [hidden]="exSearch || editing" slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
       <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
-      <ion-label *ngIf="(uInfoService.activeCategory$ | async)?.name === 'None'">All</ion-label>
-      <ion-label *ngIf="(uInfoService.activeCategory$ | async)?.name !== 'None'">{{(uInfoService.activeCategory$ | async)?.name}}</ion-label>
       <ion-checkbox *ngIf="editing === 2" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
     </ion-buttons>
     <ion-item *ngIf="editing == 1"><ion-label color="primary">Rename several lists</ion-label></ion-item>
@@ -44,6 +42,10 @@
 </ion-content>
 
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
+  <ion-item *ngIf="(uInfoService.activeCategory$ | async)?.name !== 'None'" color="primary">
+    <ion-icon name="folder-open-outline"></ion-icon>
+    <ion-label class="cat-name" >{{(uInfoService.activeCategory$ | async)?.name}}</ion-label>
+  </ion-item>
   <ion-list >
     <ion-reorder-group [disabled]="!editing" (ionItemReorder)="doReorder($event)">
       <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem >

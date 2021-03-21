@@ -14,7 +14,7 @@ import {MenuController, PopoverController} from '@ionic/angular';
 import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
 import {Category} from '../../models/category';
-import {RmCatComponent} from "../../popOvers/rm-cat/rm-cat.component";
+import {RmCatComponent} from '../../popOvers/rm-cat/rm-cat.component';
 
 @Component({
   selector: 'app-side-menu',
@@ -141,9 +141,13 @@ export class SideMenuComponent implements OnInit {
     this.newCategory = '';
   }
 
-  selectActiveCat(category: Category) {
+  async selectActiveCat(category: Category) {
     // if (this.longPressActive) { return; }
-    this.menuCtrl.close();
+
+    await this.menuCtrl.close();
+    if (this.router.url !== '/home'){
+      this.router.navigateByUrl('/home', {replaceUrl: true});
+    }
     if (!category){
       this.uInfoService.setActiveCategory(new Category('None'));
       return;

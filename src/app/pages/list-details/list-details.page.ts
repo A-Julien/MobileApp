@@ -117,7 +117,7 @@ export class ListDetailsPage implements OnInit {
 
   async addTodoModal() {
     const alert = await this.alertCtrl.create({
-      header: 'New todo',
+      header: 'New note',
       mode: 'ios',
       inputs: [
         {

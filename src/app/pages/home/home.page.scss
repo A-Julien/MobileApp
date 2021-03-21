@@ -26,10 +26,14 @@
   text-decoration: none;
 }
 
+.cat-name{
+  padding-left: 20px;
+}
+
 .badge-two {
   position: absolute;
   top: 5px;
-  right: 25px;
+  right: 5px;
   font-size: 0.6em;
   --padding-start: 3px;
   --padding-end: 3px;
@@ -38,7 +42,7 @@
 .badge-one {
   position: absolute;
   top: 5px;
-  right: 25px;
+  right: 5px;
   font-size: 0.6em;
   --padding-start: 5px;
   --padding-end: 5px;

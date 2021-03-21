@@ -21,7 +21,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
 import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 import 'hammerjs';
-import {RmCatComponent} from "./popOvers/rm-cat/rm-cat.component";
+import {RmCatComponent} from './popOvers/rm-cat/rm-cat.component';
+import { pageTransition } from './transitions/page-transition';
 
 @Injectable()
 export class HammerConfig extends HammerGestureConfig {
@@ -42,7 +43,7 @@ export class HammerConfig extends HammerGestureConfig {
     entryComponents: [],
     imports: [
         BrowserModule,
-        IonicModule.forRoot(),
+        IonicModule.forRoot({ navAnimation: pageTransition }),
         AppRoutingModule,
         ReactiveFormsModule,
         AngularFireModule.initializeApp(environment.firebaseConfig),

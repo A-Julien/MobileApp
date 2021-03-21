@@ -63,7 +63,7 @@ export class ListDetailsPage implements OnInit {
   ngOnInit() {
     this.listID = this.route.snapshot.paramMap.get('listId');
     this.list$ = this.listService.getOneDB(this.listID);
-    const todoFromList = this.list$.pipe(
+    const todoFromList$ = this.list$.pipe(
         map(list => {
           return list.todos;
         })
@@ -75,7 +75,7 @@ export class ListDetailsPage implements OnInit {
     );
 
     this.todos$ = combineLatest([
-      todoFromList,
+      todoFromList$,
       searchFilter$
     ]).pipe(
         map(([todo, filter]) => {

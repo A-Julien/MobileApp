@@ -63,7 +63,7 @@ export class ListDetailsTodoPage implements OnInit {
   ngOnInit() {
     this.listID = this.route.snapshot.paramMap.get('listId');
     this.list$ = this.listService.getOneDB(this.listID);
-    const todoFromList = this.list$.pipe(
+    const todoFromList$ = this.list$.pipe(
         map(list => {
           return list.todos;
         })
@@ -75,7 +75,7 @@ export class ListDetailsTodoPage implements OnInit {
     );
 
     this.todos$ = combineLatest([
-      todoFromList,
+      todoFromList$,
       searchFilter$
     ]).pipe(
         map(([todo, filter]) => {
@@ -178,9 +178,12 @@ export class ListDetailsTodoPage implements OnInit {
 
   addToDel(todo: Todo){
     if (this.todosToRm.indexOf(todo) !== -1){
+      todo.isChecked = false;
+      this.todosSelected.find(l => l.id === todo.id).isChecked = false;
       this.todosToRm = this.todosToRm.filter(t => t !== todo);
       return;
     }
+    todo.isChecked = true;
     this.todosSelected.find(l => l.id === todo.id).isChecked = true;
     this.todosToRm.push(todo);
   }
@@ -272,7 +275,7 @@ export class ListDetailsTodoPage implements OnInit {
   }
 
   cancelSelect() {
-    this.todosSelected.forEach(t => t.isChecked = false);
+    this.todosSelected.forEach(l => l.isChecked = false);
     this.todosToRm = [];
   }
 

@@ -27,17 +27,6 @@
 
       </ion-buttons>
       <ion-searchbar [hidden]="editing" #searchBar (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
-    <!--<ion-buttons slot="start">
-      <ion-menu-button autoHide="false"></ion-menu-button>
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ (list | async)?.name }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button *ngIf="editing" [disabled]="todosToRm.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
-      <ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>
-      <ion-button *ngIf="editing" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
-      <ion-button *ngIf="!editing" expand="block" (click)="presentModal()"><ion-icon color="primary" size="large" name="add-outline"></ion-icon></ion-button>
-    </ion-buttons>-->
   </ion-toolbar>
 </ion-header>
 
@@ -48,7 +37,7 @@
 
       <ion-item  button (press)="longPress($event, todo)" (click)="ItemLongPress($event, todo)">
         <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
-        <ion-checkbox *ngIf="editing === 2" [ngModel]="todo.isChecked" slot="start" ></ion-checkbox>
+        <ion-checkbox *ngIf="editing === 2" [ngModel]="iAmCheck(todo.id)" slot="start" ></ion-checkbox>
         <ion-label *ngIf="editing !== 1" >{{ todo.name }}</ion-label>
         <ion-input *ngIf="editing === 1" [(ngModel)]="todo.name" (ngModelChange)="addToUpdateTodoName(todo)"></ion-input>
       </ion-item>
@@ -56,18 +45,6 @@
       <ion-item-options side="end">
         <ion-item-option *ngIf="!editing" (click)="delete({id: todo.id, field: todo.name}, this.listID)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
       </ion-item-options>
-
-
-      <!--<ion-item-sliding *ngFor="let todo of todos$ | async"  >
-        <ion-item (click)="routeToDetail(todo.id)" >
-          <ion-checkbox *ngIf="editing" slot="start" (ionChange)="addToDel(todo)" ></ion-checkbox>
-          <ion-label *ngIf="!editing" >{{ todo.name }}</ion-label>
-          <ion-input *ngIf="editing" [(ngModel)]="todo.name" (ngModelChange)="addToUpdateTodoName(todo)"></ion-input>
-        </ion-item>
-
-        <ion-item-options side="end">
-          <ion-item-option *ngIf="!editing" (click)="delete({id: todo.id, field: todo.name}, this.listID)" color="danger"><ion-icon name="trash-outline" color="dark"></ion-icon></ion-item-option>
-        </ion-item-options>-->
       </ion-item-sliding>
   </ion-list>
 

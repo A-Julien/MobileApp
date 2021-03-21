@@ -142,12 +142,14 @@ export class SideMenuComponent implements OnInit {
   }
 
   async selectActiveCat(category: Category) {
-    // if (this.longPressActive) { return; }
 
-    await this.menuCtrl.close();
     if (this.router.url !== '/home'){
+      await this.menuCtrl.close();
       this.router.navigateByUrl('/home', {replaceUrl: true});
+    } else {
+      this.menuCtrl.close();
     }
+
     if (!category){
       this.uInfoService.setActiveCategory(new Category('None'));
       return;

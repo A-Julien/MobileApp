@@ -40,7 +40,7 @@
     <ion-checkbox mode="ios" *ngIf="editing === 0" [ngModel]="todo.isDone" (click)="finishTodo(todo)" slot="start" ></ion-checkbox>
 
     <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
-    <ion-checkbox *ngIf="editing === 2" [ngModel]="todo.isChecked"  slot="start" ></ion-checkbox>
+    <ion-checkbox *ngIf="editing === 2" [ngModel]="iAmCheck(todo.id)"  slot="start" ></ion-checkbox>
     <ion-label *ngIf="editing !== 1" >
       <h2 [class.strike]="todo.isDone">{{ todo.name }}</h2>
       <p class="tab">{{ todo.content }}</p>

@@ -81,9 +81,7 @@ export class HomePage implements OnInit {
   ngOnInit(): void {
     this.userCat$ = this.uInfoService.userCat$.pipe(
         map(categories => {
-          /*categories = categories.filter( cat => cat.name !== 'None');
-          usrInf.categories.unshift('None');
-          return usrInf;*/
+          categories.unshift(new Category('None'));
           return categories;
         })
     );
@@ -372,10 +370,13 @@ export class HomePage implements OnInit {
     await this.catSelectRef.open();
   }
 
-  async  addToCategory() {
-    const loader = await this.popUpService.presentLoading('Add ' + this.listToAction.length + ' lists to ' + this.catSelectRef.value.name);
+  async  addToCategory(CatName = '') {
+    let newcat = this.catSelectRef.value;
+    if (CatName === 'None'){ newcat = new Category('None'); }
+
+    const loader = await this.popUpService.presentLoading('Add ' + this.listToAction.length + ' lists to ' + newcat.name);
     for (const list of this.listToAction) {
-      await this.uInfoService.addListToCategory(list.id, this.catSelectRef.value).catch((err) => {
+      await this.uInfoService.addListToCategory(list.id, newcat).catch((err) => {
         loader.dismiss();
         this.cancelEdit();
         console.log(err);

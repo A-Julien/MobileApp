@@ -64,7 +64,7 @@ export class UserInfoService {
   public async createUsettings(userUid: string): Promise<void> {
     this._userInfo = new UserInfo(userUid);
     this._userInfo.isNew = true;
-    this._userInfo.categories.push('None');
+    // this._userInfo.categories.push('None');
 
     await this.uInfoCollection.ref.withConverter(uInfoToFirebase).add(this._userInfo);
   }
@@ -116,7 +116,7 @@ export class UserInfoService {
 
     };
     await rmCat();
-
+    if (category.name === 'None') { this.setActiveCategory(category); return; }
     return this.updateListToCategory(listId, category);
   }
 

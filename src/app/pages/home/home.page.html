@@ -13,8 +13,11 @@
     </ion-buttons>
 
     <ion-buttons *ngIf="!exSearch" slot="end">
-      <ion-badge *ngIf="listToAction.length > 0 && editing === 2" class="badge-one-cat-add" [hidden]="listToAction.length === 0" color="primary">+</ion-badge>
-
+      <ion-badge *ngIf="listToAction.length > 0 && editing === 2" class="badge-one-cat-add" color="primary">+</ion-badge>
+      <ion-badge *ngIf="listToAction.length > 0 && editing === 2 && (uInfoService.activeCategory$ | async).name !== 'None'" class="badge-one-cat-rm"  color="danger">-</ion-badge>
+      <ion-item button  *ngIf="editing === 2 && (uInfoService.activeCategory$ | async).name !== 'None'" [disabled]="listToAction.length === 0" (click)="addToCategory('None')">
+        <ion-icon name="folder-open-outline"></ion-icon>
+      </ion-item>
       <ion-item button  *ngIf="editing === 2" [disabled]="listToAction.length === 0" (click)="choiceCategory()">
         <ion-icon name="folder-open-outline"></ion-icon>
         <ion-select (ionChange)="addToCategory()" name="Category" [hidden]="true" mode="ios" #catSelect>

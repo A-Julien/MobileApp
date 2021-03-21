@@ -35,7 +35,7 @@
   <div class="nav-item" >
     <ion-item button (click)="selectActiveCat(null)" class="force-background">
       <ion-icon class="icon" name="folder-open-outline"></ion-icon>
-      <ion-label>Category</ion-label>
+      <ion-label>All</ion-label>
     </ion-item>
     <ion-list class="force-background ion-list-padding">
       <ion-item button (press)="longPress($event, category)" (click)="selectActiveCat(category)" class="force-background category-padding" *ngFor="let category of userCat$ | async">

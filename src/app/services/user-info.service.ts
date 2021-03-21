@@ -8,7 +8,7 @@ import firebase from 'firebase';
 import {List} from '../models/list';
 import {Category, catToFirebase} from '../models/category';
 import {Todo} from '../models/todo';
-import {PopupService} from "./popup.service";
+import {PopupService} from './popup.service';
 
 @Injectable({
   providedIn: 'root'
@@ -107,10 +107,13 @@ export class UserInfoService {
           .collection(this.USERINFOCATEGORIES, ref => ref.where('lists', 'array-contains-any', [listId]));
       const uSnaps = await col.get().toPromise();
 
-      const catToRm = this.convertSnapData<Category>(uSnaps.docs[0]);
-      await this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES).doc(catToRm.id).update({
-        lists: firebase.firestore.FieldValue.arrayRemove(listId)
-      });
+      if (uSnaps.docs[0]){
+        const catToRm = this.convertSnapData<Category>(uSnaps.docs[0]);
+        await this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES).doc(catToRm.id).update({
+          lists: firebase.firestore.FieldValue.arrayRemove(listId)
+        });
+      }
+
     };
     await rmCat();
 

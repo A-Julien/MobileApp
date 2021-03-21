@@ -86,7 +86,7 @@ But it will be less accurate and longer !
 ### Collections
 * List -> contain all info for a list and a subCollection of todo.
 * Share -> we create 1 element when a user share a list with another user. That allow us to make notifications.
-* UserSetting -> Store user settings
+* UserInfo -> Store categories and util information
 
 ### Security configuration
 

@@ -38,7 +38,7 @@
        </ion-button>
 
      </ion-buttons>
-    <ion-searchbar [hidden]="editing" #searchBar  (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
+    <ion-searchbar animated="true" [hidden]="editing" #searchBar  (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
@@ -59,6 +59,8 @@
           <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
           <ion-checkbox *ngIf="editing === 2 || editing === 3" [ngModel]="iAmCheck(list.id)" slot="start" ></ion-checkbox>
           <ion-label *ngIf="editing !== 1" >{{ list.name }}</ion-label>
+          <ion-icon slot="start" *ngIf="list.type == 1 && editing === 0" name="checkmark-done-outline"></ion-icon>
+          <ion-icon slot="start" *ngIf="list.type == 0 && editing === 0" name="clipboard-outline"></ion-icon>
           <ion-input *ngIf="editing === 1" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 
           <ion-badge slot="end" color="danger" *ngIf="isNewList(list.id) && !editing">new</ion-badge>

@@ -25,8 +25,14 @@ export class PasswordRecoveryPage implements OnInit {
     });
   }
 
-  passwordRecovery() {
-    this.authService.PasswordRecovery(this.loginForm.get('login').value)
-        .catch(this.popupService.presentAlert);
+  async passwordRecovery() {
+    const loader = await this.popupService.presentLoading('Sending email..');
+
+    await this.authService.PasswordRecovery(this.loginForm.get('login').value)
+        .catch((err) => {
+          loader.dismiss();
+          this.popupService.presentAlert(err, 'An error append');
+        });
+    await loader.dismiss();
   }
 }

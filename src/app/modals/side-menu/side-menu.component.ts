@@ -100,10 +100,6 @@ export class SideMenuComponent implements OnInit {
    await this.authService.logout();
   }
 
-  openGithub() {
-    window.open('https://github.com/A-Julien/MobileApp', '_system');
-  }
-
   async changeForceOcr(){
     this.currentUs.forceOfflineOcr = this.forceOCR;
     await this.uService.updateUs(this.currentUs);
@@ -155,5 +151,17 @@ export class SideMenuComponent implements OnInit {
       return;
     }
     this.uInfoService.setActiveCategory(category);
+  }
+
+  openInsta() {
+    window.open('https://www.instagram.com/larouelibre4l/?fbclid=IwAR2364m6U0fzR75udlt_LPS-hOXlsCooVppsqI9yMGowwgaZEJd2Gp8OI_c', '_system');
+  }
+
+  openFb() {
+    window.open('https://www.facebook.com/LaRoueLibre4L/', '_system');
+  }
+
+  openGithub() {
+    window.open('https://github.com/A-Julien/MobileApp', '_system');
   }
 }

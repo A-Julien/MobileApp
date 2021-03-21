@@ -24,11 +24,18 @@ export class RegisterPage implements OnInit {
     });
   }
 
-  signUp() {
+  async signUp() {
+    const loader = await this.popupService.presentLoading('Creating account..');
+
     if (this.loginForm.get('password').value !== this.loginForm.get('passwordConf').value){
-      this.popupService.presentAlert('Password not identical', 'Password error !');
+      await loader.dismiss();
+      await this.popupService.presentAlert('Password not identical', 'Password error !');
       return;
     }
-    this.authService.SignUp(this.loginForm.get('login').value, this.loginForm.get('password').value);
+    this.authService.SignUp(this.loginForm.get('login').value, this.loginForm.get('password').value).catch((err) => {
+      this.popupService.presentAlert(err, 'Signup Failed');
+      loader.dismiss();
+    });
+    await loader.dismiss();
   }
 }

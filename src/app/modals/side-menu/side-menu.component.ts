@@ -14,6 +14,7 @@ import {MenuController, PopoverController} from '@ionic/angular';
 import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
 import {Category} from '../../models/category';
+import {RmCatComponent} from "../../popOvers/rm-cat/rm-cat.component";
 
 @Component({
   selector: 'app-side-menu',
@@ -28,6 +29,7 @@ export class SideMenuComponent implements OnInit {
   readonly version = '0.0.5';
   forceOCR: boolean;
   private currentUs: USettings;
+  private longPressActive = false;
 
   nbNotif: number;
   newCategory: string;
@@ -69,6 +71,28 @@ export class SideMenuComponent implements OnInit {
         }
       });
     });
+  }
+
+  async longPress(ev, category) {
+    setTimeout(async () => {
+      console.log('longp', category);
+      const popover = await this.popOverController.create({
+        component: RmCatComponent,
+        event: ev,
+        mode: 'ios',
+        translucent: true,
+        id: 'rmCat',
+        keyboardClose: true,
+        showBackdrop: true
+      });
+
+      await popover.present();
+      const { data } = await popover.onWillDismiss();
+      console.log('DATA ', data);
+      if (data) { this.uInfoService.removeCategory(category); }
+      this.longPressActive = true;
+
+    }, 500);
   }
 
   async logout() {
@@ -117,6 +141,7 @@ export class SideMenuComponent implements OnInit {
   }
 
   selectActiveCat(category: Category) {
+    // if (this.longPressActive) { return; }
     this.menuCtrl.close();
     if (!category){
       this.uInfoService.setActiveCategory(new Category('None'));

@@ -8,6 +8,7 @@ import firebase from 'firebase';
 import {List} from '../models/list';
 import {Category, catToFirebase} from '../models/category';
 import {Todo} from '../models/todo';
+import {PopupService} from "./popup.service";
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ import {Todo} from '../models/todo';
 export class UserInfoService {
 
   private readonly USERINFOCOLLECTION = '/UserInfo';
+  private readonly USERINFOCATEGORIES = 'Categories';
   private uInfoCollection: AngularFirestoreCollection;
 
   private activeCategory: Category;
@@ -30,7 +32,8 @@ export class UserInfoService {
 
   constructor(
       private afs: AngularFirestore,
-      private auth: AngularFireAuth
+      private auth: AngularFireAuth,
+      private popupService: PopupService
   ) {
 
     this.activeCategory$.subscribe( cat => this.activeCategory = cat);
@@ -47,7 +50,7 @@ export class UserInfoService {
 
     this._userCat$ = this._userInfoOb$.pipe(
         switchMap( info =>  info ?
-          this.uInfoCollection.doc(info.id).collection<Category>('Categories').snapshotChanges() : of([])),
+          this.uInfoCollection.doc(info.id).collection<Category>(this.USERINFOCATEGORIES).snapshotChanges() : of([])),
         map(actions => this.convertSnapUfin<Category>(actions))
     );
 
@@ -101,11 +104,11 @@ export class UserInfoService {
   public async addListToCategory(listId: string, category: Category){
     const rmCat = async () => {
       const col = this.uInfoCollection.doc(this.uInfoId)
-          .collection('Categories', ref => ref.where('lists', 'array-contains-any', [listId]));
+          .collection(this.USERINFOCATEGORIES, ref => ref.where('lists', 'array-contains-any', [listId]));
       const uSnaps = await col.get().toPromise();
 
       const catToRm = this.convertSnapData<Category>(uSnaps.docs[0]);
-      await this.uInfoCollection.doc(this.uInfoId).collection('Categories').doc(catToRm.id).update({
+      await this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES).doc(catToRm.id).update({
         lists: firebase.firestore.FieldValue.arrayRemove(listId)
       });
     };
@@ -118,13 +121,19 @@ export class UserInfoService {
     if (!category.lists) { category.lists = []; }
     category.lists.push(listId);
 
-    return this.uInfoCollection.doc(this.uInfoId).collection('Categories')
+    return this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES)
               .doc(category.id).ref.withConverter(catToFirebase).set(category)
         .then(() => this.setActiveCategory(category));
   }
 
   private updateUserInfo(userInfo: UserInfo): Promise<void> {
     return this.uInfoCollection.doc(userInfo.id).ref.withConverter(uInfoToFirebase).set(userInfo);
+  }
+
+  public removeCategory(category: Category){
+    this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES).doc(category.id).delete()
+        .then(() => this.popupService.presentToast('list ' + category.name + ' removed', 1000))
+        .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + category.name));
   }
 
   public notANewUser(): Promise<void>{

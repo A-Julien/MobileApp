@@ -21,6 +21,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
 import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 import 'hammerjs';
+import {RmCatComponent} from "./popOvers/rm-cat/rm-cat.component";
 
 @Injectable()
 export class HammerConfig extends HammerGestureConfig {
@@ -35,7 +36,8 @@ export class HammerConfig extends HammerGestureConfig {
         AppComponent,
         CreateListComponent,
         CreateTodoComponent,
-        SideMenuComponent
+        SideMenuComponent,
+        RmCatComponent
     ],
     entryComponents: [],
     imports: [

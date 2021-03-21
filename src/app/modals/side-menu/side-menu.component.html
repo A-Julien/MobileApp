@@ -38,7 +38,7 @@
       <ion-label>Category</ion-label>
     </ion-item>
     <ion-list class="force-background ion-list-padding">
-      <ion-item button (click)="selectActiveCat(category)" class="force-background category-padding" *ngFor="let category of userCat$ | async">
+      <ion-item button (press)="longPress($event, category)" (click)="selectActiveCat(category)" class="force-background category-padding" *ngFor="let category of userCat$ | async">
         <ion-icon class="icon" name="folder" size="small"></ion-icon>
         <ion-label class="category-label"> {{category.name}}</ion-label>
       </ion-item>

@@ -58,13 +58,22 @@ A simple todo list App with O.C.R support
 
 <kbd><img src="readmeImg/ss1.png" alt="ss1" width=50%></kbd>
 
-Tolist i s simply PWA. Tolist are deployed natively with Capacitor.
+Tolist is also a PWA (but for a better experience use the android version !). Tolist are deployed natively with Capacitor.
 
 <kbd><img src="readmeImg/ss2.png" alt="ss2"></kbd>
 
-You can add List; share List with other user. You have a minimal side menu. App style in dev !
+You can add List, share List with other user. You have a minimal side menu. App style in dev !
 
-## OCR 
+### Manage Categories
+<kbd><img src="readmeImg/ss5.png" alt="ss5" width=50%></kbd>
+
+Add, delete categories. You can manage your favorite list as you want it with this feature !
+
+### Type of List
+<kbd><img src="readmeImg/ss4.png" alt="ss4" ></kbd>
+The app provides two types of lists, Todo and Note (you can choose the type when you create it)
+
+### OCR 
 
 <kbd><img src="readmeImg/ss3.png" alt="ss3" width=50%></kbd>
 

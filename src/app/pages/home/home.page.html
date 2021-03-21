@@ -7,6 +7,7 @@
     </ion-buttons>
     <ion-item *ngIf="editing == 1"><ion-label color="primary">Rename several lists</ion-label></ion-item>
     <ion-item *ngIf="editing == 2"><ion-label color="primary">Select multiple</ion-label></ion-item>
+    <ion-item *ngIf="editing == 3"><ion-label color="primary">Delete multiple</ion-label></ion-item>
     <ion-buttons  *ngIf="editing === 2" slot="start">
          <ion-checkbox style="margin-left: 20px;" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
     </ion-buttons>
@@ -21,8 +22,8 @@
             <ion-select-option [value]=category *ngFor="let category of userCat$ | async">{{category.name}}</ion-select-option>
          </ion-select>
        </ion-item>
-       <ion-button *ngIf="editing === 2" [disabled]="listToAction.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
-       <ion-badge *ngIf="listToAction.length > 0 && editing === 2" [class.badge-one-del]="listToAction.length < 10" [class.badge-two-del]="listToAction.length >= 10" color="danger">{{ listToAction.length }}</ion-badge>
+       <ion-button *ngIf="editing === 2 || editing === 3" [disabled]="listToAction.length === 0" (click)="delSelect()" color="danger"><ion-icon name="trash-outline"></ion-icon></ion-button>
+       <ion-badge *ngIf="listToAction.length > 0 && (editing === 2 || editing === 3)" [class.badge-one-del]="listToAction.length < 10" [class.badge-two-del]="listToAction.length >= 10" color="danger">{{ listToAction.length }}</ion-badge>
        <ion-button *ngIf="editing === 1" (click)="stopEdit()" color="primary"><ion-icon name="save-outline"></ion-icon></ion-button>
        <!--<ion-button *ngIf="!editing" (click)="startEdit()" color="primary"><ion-icon name="pencil"></ion-icon></ion-button>-->
 
@@ -30,6 +31,7 @@
        <ion-button *ngIf="editing !== 0" (click)="cancelEdit()" color="primary">
          <ion-icon [hidden]="editing !== 1" color="danger" size="large" name="close-outline"></ion-icon>
          <ion-icon [hidden]="editing !== 2" color="primary" size="large" name="close-outline"></ion-icon>
+         <ion-icon [hidden]="editing !== 3" color="primary" size="large" name="close-outline"></ion-icon>
        </ion-button>
 
      </ion-buttons>
@@ -42,17 +44,17 @@
 </ion-content>
 
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
-  <ion-item *ngIf="(uInfoService.activeCategory$ | async)?.name !== 'None'" color="primary">
+  <ion-item *ngIf="(uInfoService.activeCategory$ | async)?.name !== 'None' && editing === 0" color="primary">
     <ion-icon name="folder-open-outline"></ion-icon>
     <ion-label class="cat-name" >{{(uInfoService.activeCategory$ | async)?.name}}</ion-label>
   </ion-item>
   <ion-list >
-    <ion-reorder-group [disabled]="!editing" (ionItemReorder)="doReorder($event)">
+    <ion-reorder-group [disabled]="true" (ionItemReorder)="doReorder($event)">
       <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem >
 
         <ion-item  button (press)="longPress($event, list)" (click)="ItemLongPress($event, list)">
           <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
-          <ion-checkbox *ngIf="editing === 2" [ngModel]="iAmCheck(list.id)" slot="start" ></ion-checkbox>
+          <ion-checkbox *ngIf="editing === 2 || editing === 3" [ngModel]="iAmCheck(list.id)" slot="start" ></ion-checkbox>
           <ion-label *ngIf="editing !== 1" >{{ list.name }}</ion-label>
           <ion-input *ngIf="editing === 1" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 
@@ -71,7 +73,7 @@
       </ion-item-sliding>
     </ion-reorder-group>
   </ion-list>
-  <ion-chip class="ion-chip-select" *ngIf="editing ===2 && listToAction.length > 0" color="danger">
+  <ion-chip class="ion-chip-select" *ngIf="(editing ===2 || editing === 3) && listToAction.length > 0" color="danger">
     <ion-label>{{ listToAction.length }} selected</ion-label>
     <ion-icon name="close-circle" (click)="cancelSelect()" ></ion-icon>
   </ion-chip>

@@ -1,10 +1,11 @@
-import {AfterViewInit, Component, ElementRef, NgZone, OnInit, QueryList, ViewChild, Renderer2} from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import {
   AlertController,
   ModalController,
   IonItemSliding,
   PopoverController,
-  IonSearchbar, GestureController, IonSelect
+  IonSearchbar,
+  IonSelect
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
@@ -37,7 +38,6 @@ export class HomePage implements OnInit {
   public cancelSelect$ = new BehaviorSubject(null);
   @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
 
-  /*@ViewChild('slidingItem', {read: ElementRef}) listElems: QueryList<ElementRef>; */
   longPressActive = false;
 
   categories: string[];
@@ -150,7 +150,7 @@ export class HomePage implements OnInit {
   }
 
   ItemLongPress(ev, list: List){
-    if (this.editing === 2) {
+    if (this.editing === 2 || this.editing === 3) {
       this.addToDel(list);
       return;
     }
@@ -245,8 +245,6 @@ export class HomePage implements OnInit {
     if (!this.editing) { this.router.navigate(['/list-details-todo/' + id]); }
   }
 
-  // startEdit() { this.editing = true; }
-
   async stopEdit() {
     this.editing = 0;
     const nbList =  this.listToUpdateName.length;
@@ -336,7 +334,7 @@ export class HomePage implements OnInit {
           this.editing = 1;
           break;
       case 2:
-        this.editing = 2;
+        this.editing = 3;
         break;
     }
   }
@@ -351,8 +349,10 @@ export class HomePage implements OnInit {
         this.listToUpdateName = [];
         break;
       case 2:
+      case 3:
         this.listSelected.forEach(l => l.isChecked = false);
         this.listToAction = [];
+        break;
     }
     this.longPressActive = false;
     this.editing = 0;

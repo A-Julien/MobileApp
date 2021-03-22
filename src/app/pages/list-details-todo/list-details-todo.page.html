@@ -33,7 +33,7 @@
 <ion-progress-bar *ngIf="showLoader" type="indeterminate"></ion-progress-bar>
 <ion-content *ngIf="!showLoader">
 <ion-list>
-<ion-item-sliding  *ngFor="let todo of todos$ | async; let i = index;trackBy:trackByIdx" #slidingItem >
+<ion-item-sliding  *ngFor="let todo of todos$ | async; let i = index;" #slidingItem >
 
   <ion-item  button (press)="longPress($event, todo)" (click)="ItemLongPress($event, todo)">
     <ion-checkbox mode="ios" *ngIf="editing === 0" [ngModel]="todo.isDone" (click)="finishTodo(todo)" slot="start" ></ion-checkbox>

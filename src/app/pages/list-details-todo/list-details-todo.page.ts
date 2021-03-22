@@ -84,10 +84,6 @@ export class ListDetailsTodoPage implements OnInit {
       searchFilter$
     ]).pipe(
         map(([todo, filter]) => {
-          this.todosSelected = [];
-          todo.forEach(t => {
-            this.todosSelected.push(new Checker(t.id));
-          } );
           return todo.filter(
               list =>
                   list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
@@ -104,6 +100,7 @@ export class ListDetailsTodoPage implements OnInit {
 
     this.todos$.subscribe((to) => {
       this.showLoader = false;
+      this.todosSelected = [];
       to.forEach(l => {
         this.todosSelected.push(new Checker(l.id));
       });

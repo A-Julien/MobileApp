@@ -9,8 +9,8 @@
 
     <ion-item *ngIf="editing == 1"><ion-label color="primary">Rename several todos</ion-label></ion-item>
     <ion-item *ngIf="editing == 2"><ion-label color="primary">Select multiple</ion-label></ion-item>
-    <ion-buttons  *ngIf="editing === 2" slot="start">
-      <ion-checkbox style="margin-left: 20px;" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
+    <ion-buttons  [hidden]="editing !== 2" slot="start">
+      <ion-checkbox #selectAll style="margin-left: 20px;" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
     </ion-buttons>
 
     <ion-buttons *ngIf="!exSearch" slot="end">
@@ -33,13 +33,13 @@
 <ion-progress-bar *ngIf="showLoader" type="indeterminate"></ion-progress-bar>
 <ion-content *ngIf="!showLoader">
 <ion-list>
-<ion-item-sliding  *ngFor="let todo of todos$ | async" #slidingItem >
+<ion-item-sliding  *ngFor="let todo of todos$ | async; let i = index;trackBy:trackByIdx" #slidingItem >
 
   <ion-item  button (press)="longPress($event, todo)" (click)="ItemLongPress($event, todo)">
     <ion-checkbox mode="ios" *ngIf="editing === 0" [ngModel]="todo.isDone" (click)="finishTodo(todo)" slot="start" ></ion-checkbox>
 
     <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
-    <ion-checkbox *ngIf="editing === 2" [ngModel]="iAmCheck(todo.id)"  slot="start" ></ion-checkbox>
+    <ion-checkbox *ngIf="editing === 2" [(ngModel)]="todosSelected[i].isChecked"  slot="start" ></ion-checkbox>
     <ion-label *ngIf="editing !== 1" >
       <h2 [class.strike]="todo.isDone">{{ todo.name }}</h2>
       <p class="tab">{{ todo.content }}</p>
@@ -59,7 +59,7 @@
 <ion-icon name="close-circle" (click)="cancelSelect()" ></ion-icon>
 </ion-chip>
 
-<ion-fab *ngIf="editing === 0" vertical="bottom" horizontal="end" slot="fixed">
+<ion-fab class="add-fab" *ngIf="editing === 0" vertical="bottom" horizontal="end" slot="fixed">
 <ion-fab-button (click)="addTodoModal()">
   <ion-icon name="add-outline"></ion-icon>
 </ion-fab-button>

@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {AlertController, IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
+import {AlertController, IonCheckbox, IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
 import {Checker, List} from '../../models/list';
 import {Todo} from '../../models/todo';
 import {Updater} from '../../models/updater';
@@ -26,6 +26,9 @@ const { Haptics } = Plugins;
 })
 export class ListDetailsTodoPage implements OnInit {
 
+  @ViewChild('selectAll', { static: true }) selectAll: IonCheckbox;
+
+
   @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
 
   listID: string;
@@ -44,6 +47,8 @@ export class ListDetailsTodoPage implements OnInit {
 
   public list$: Observable<List>;
   public todos$: Observable<Todo[]>;
+  private noTrigger = false;
+  private todoToDelAll: Todo[];
 
   constructor(
       private route: ActivatedRoute,
@@ -97,7 +102,13 @@ export class ListDetailsTodoPage implements OnInit {
     );
 
 
-    this.todos$.subscribe(() => this.showLoader = false);
+    this.todos$.subscribe((to) => {
+      this.showLoader = false;
+      to.forEach(l => {
+        this.todosSelected.push(new Checker(l.id));
+      });
+      this.todoToDelAll = to;
+    });
 
     this.listService.listShare$.subscribe(data => {
       data.forEach(d => {
@@ -176,11 +187,16 @@ export class ListDetailsTodoPage implements OnInit {
     await this.listService.updateTodoName(u, this.listID);
   }
 
-  addToDel(todo: Todo){
-    if (this.todosToRm.indexOf(todo) !== -1){
+  addToDel(todo: Todo, overideSelectAll = false){
+    if (this.selectAll.checked && !overideSelectAll) {
+      this.noTrigger = true;
+      this.selectAll.checked = false;
+    }
+
+    if (this.todosToRm.findIndex(t => t.id === todo.id) !== -1){
       todo.isChecked = false;
-      this.todosSelected.find(l => l.id === todo.id).isChecked = false;
-      this.todosToRm = this.todosToRm.filter(t => t !== todo);
+      this.todosSelected.find(t => t.id === todo.id).isChecked = false;
+      this.todosToRm = this.todosToRm.filter(t => t.id !== todo.id);
       return;
     }
     todo.isChecked = true;
@@ -188,16 +204,28 @@ export class ListDetailsTodoPage implements OnInit {
     this.todosToRm.push(todo);
   }
 
+  addToDelAll() {
+    if (this.noTrigger) {
+      this.noTrigger = false;
+      console.log('fuck');
+      return;
+    }
+
+    if (this.selectAll.checked) {
+      console.log('in true');
+
+      this.todosToRm = [];
+      this.todoToDelAll.forEach(t => { this.addToDel(t, true); });
+      // this.zone.run( () => {
+      this.todosSelected.forEach(t => t.isChecked = true);
+      // });
+      return;
+    }
+  }
+
   delete(u: Updater, listId) {
     this.listService.deleteTodo(u, listId);
   }
-
-  private hapticsImpact(style = HapticsImpactStyle.Heavy) {
-    Haptics.impact({
-      style
-    });
-  }
-
 
   ItemLongPress(ev, todo: Todo){
     if (this.editing === 2) {
@@ -210,7 +238,7 @@ export class ListDetailsTodoPage implements OnInit {
     console.log(ev);
     if (this.editing === 0){
       setTimeout(() => {
-        this.hapticsImpact();
+        this.popUpService.hapticsImpact();
         this.longPressActive = true;
         console.log('LONGPRESSS!');
         // this.renderer.addClass(ev.target, 'selected');
@@ -226,7 +254,7 @@ export class ListDetailsTodoPage implements OnInit {
     let msg = 'deleting ' + nbTodos + ' todo';
     if ( nbTodos > 1) { msg = 'Deleting ' + nbTodos + ' Todos'; }
     const loader = await this.popUpService.presentLoading(msg);
-
+    this.editing = 0;
     this.todosToRm.forEach(todo => {
       this.delete(new Updater(todo.id, todo.name), this.listID);
     });
@@ -275,6 +303,11 @@ export class ListDetailsTodoPage implements OnInit {
   }
 
   cancelSelect() {
+    if (this.selectAll.checked) {
+      this.noTrigger = true;
+      this.selectAll.checked = false;
+    }
+
     this.todosSelected.forEach(l => l.isChecked = false);
     this.todosToRm = [];
   }
@@ -290,18 +323,6 @@ export class ListDetailsTodoPage implements OnInit {
     }
     this.longPressActive = false;
     this.editing = 0;
-  }
-
-  iAmCheck(id: string): boolean{
-    if (!id) { return false; }
-    const i = this.todosSelected.findIndex(check => check.id === id);
-    if (i === -1 ) { return false; }
-    return this.todosSelected[i].isChecked;
-  }
-
-
-  addToDelAll() {
-
   }
 
   async saveListName(ev) {
@@ -321,4 +342,9 @@ export class ListDetailsTodoPage implements OnInit {
       return;
     }
   }
+
+  trackByIdx(index: number, obj: any): any {
+    return index;
+  }
+
 }

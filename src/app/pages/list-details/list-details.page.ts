@@ -44,6 +44,7 @@ export class ListDetailsPage implements OnInit {
 
   public list$: Observable<List>;
   public todos$: Observable<Todo[]>;
+  private todoToDelAll: Todo[];
 
   constructor(
       private route: ActivatedRoute,
@@ -96,8 +97,13 @@ export class ListDetailsPage implements OnInit {
         })
     );
 
-
-    this.todos$.subscribe(() => this.showLoader = false);
+    this.todos$.subscribe((to) => {
+      this.showLoader = false;
+      to.forEach(l => {
+        this.todosSelected.push(new Checker(l.id));
+      });
+      this.todoToDelAll = to;
+    });
 
     this.listService.listShare$.subscribe(data => {
       data.forEach(d => {
@@ -305,11 +311,6 @@ export class ListDetailsPage implements OnInit {
     const i = this.todosSelected.findIndex(check => check.id === id);
     if (i === -1 ) { return false; }
     return this.todosSelected[i].isChecked;
-  }
-
-
-  addToDelAll() {
-
   }
 
   async saveListName(ev) {

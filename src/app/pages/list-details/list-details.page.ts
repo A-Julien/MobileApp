@@ -334,7 +334,4 @@ export class ListDetailsPage implements OnInit {
    await this.listService.updateListName(new Updater(this.listID, ev.target.value));
   }
 
-  trackByIdx(index: number, obj: any): any {
-    return index;
-  }
 }

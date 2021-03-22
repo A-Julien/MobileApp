@@ -339,9 +339,4 @@ export class ListDetailsTodoPage implements OnInit {
       return;
     }
   }
-
-  trackByIdx(index: number, obj: any): any {
-    return index;
-  }
-
 }

@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import {List, listToFirebase} from '../models/list';
+import {Injectable} from '@angular/core';
+import {List, listToFirebase, ListType} from '../models/list';
 import {AuthenticationService} from './authentification.service';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
-import {Observable, of } from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 import {PopupService} from './popup.service';
 import firebase from 'firebase';
@@ -10,7 +10,6 @@ import {Todo, todoToFirebase} from '../models/todo';
 import {MetaList, MetaListToFirebase} from '../models/metaList';
 import {Updater} from '../models/updater';
 import DocumentReference = firebase.firestore.DocumentReference;
-
 
 
 @Injectable({
@@ -66,7 +65,11 @@ export class ListService {
         .pipe(switchMap(list =>
             this.listCollection.doc(id).collection<Todo>('todos').snapshotChanges().pipe(
                 map(data => {
-                  list.todos = this.convertSnapData<Todo>(data);
+                  try {
+                    list.todos = this.convertSnapData<Todo>(data);
+                  } catch (err){
+                    return new List('', ListType.todo);
+                  }
                   return list;
                 })
             )

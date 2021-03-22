@@ -32,7 +32,7 @@
 <ion-progress-bar *ngIf="showLoader" type="indeterminate"></ion-progress-bar>
 <ion-content *ngIf="!showLoader">
   <ion-list>
-    <ion-item-sliding  *ngFor="let todo of todos$ | async; let i = index;trackBy:trackByIdx" >
+    <ion-item-sliding  *ngFor="let todo of todos$ | async; let i = index;" >
 
       <ion-item  button (press)="longPress($event, todo)" (click)="ItemLongPress($event, todo)">
         <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>

@@ -316,10 +316,6 @@ export class HomePage implements OnInit {
     }
   }
 
-  trackByIdx(index: number, obj: any): any {
-    return index;
-  }
-
   async delSelect() {
     let msg = 'deleting ' + this.listToAction.length + ' list';
     if ( this.listToAction.length > 1) { msg = 'deleting ' + this.listToAction.length + ' lists'; }

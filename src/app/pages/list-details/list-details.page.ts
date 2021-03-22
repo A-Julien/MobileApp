@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import { ListService} from '../../services/list.service';
 import {AlertController, IonSearchbar, ModalController, PopoverController} from '@ionic/angular';
 import {CreateTodoComponent} from '../../modals/create-todo/create-todo.component';
-import {combineLatest, Observable} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {Checker, List} from '../../models/list';
 import {Todo} from '../../models/todo';
@@ -65,7 +65,7 @@ export class ListDetailsPage implements OnInit {
     this.list$ = this.listService.getOneDB(this.listID);
     const todoFromList$ = this.list$.pipe(
         map(list => {
-          return list.todos;
+          return list ? list.todos : [];
         })
     );
 
@@ -83,7 +83,7 @@ export class ListDetailsPage implements OnInit {
           todo.forEach(t => {
             this.todosSelected.push(new Checker(t.id));
           } );
-          return todo.filter(
+          return todo?.filter(
               list =>
                   list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
           );

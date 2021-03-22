@@ -66,7 +66,8 @@ export class ListService {
         .pipe(switchMap(list =>
             this.listCollection.doc(id).collection<Todo>('todos').snapshotChanges().pipe(
                 map(data => {
-                  list.todos = this.convertSnapData<Todo>(data);
+                  if (!list) { return; }
+                  list.todos ? list.todos = this.convertSnapData<Todo>(data) : list.todos = [];
                   return list;
                 })
             )

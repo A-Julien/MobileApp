@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild} from '@angular/core';
+import {Component, NgZone, OnInit, ViewChild} from '@angular/core';
 import {
   AlertController,
   ModalController,
   IonItemSliding,
   PopoverController,
   IonSearchbar,
-  IonSelect
+  IonSelect, IonCheckbox
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
@@ -25,6 +25,7 @@ import {OptionsComponent} from '../../popOvers/options/options.component';
 import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
 import {Category} from '../../models/category';
+import set = Reflect.set;
 
 @Component({
   selector: 'app-home',
@@ -37,6 +38,8 @@ export class HomePage implements OnInit {
 
   public cancelSelect$ = new BehaviorSubject(null);
   @ViewChild(IonSearchbar, { static: true }) searchBar: IonSearchbar;
+
+  @ViewChild('selectAll', { static: true }) selectAll: IonCheckbox;
 
   longPressActive = false;
 
@@ -57,6 +60,10 @@ export class HomePage implements OnInit {
   userInfo$: Observable<UserInfo>;
   userCat$: Observable<Category[]>;
 
+  private listToDelAll: List[];
+  private noTrigger = false;
+
+  iAmCheck$ = new BehaviorSubject<Checker[]>(null);
 
   constructor(private listService: ListService,
               private modalController: ModalController,
@@ -67,7 +74,8 @@ export class HomePage implements OnInit {
               private popOverController: PopoverController,
               private router: Router,
               public uInfoService: UserInfoService,
-              private alertCtrl: AlertController
+              private alertCtrl: AlertController,
+              private zone: NgZone
 
   ){
     this.nbNotif = 0;
@@ -112,10 +120,7 @@ export class HomePage implements OnInit {
         this.uInfoService.activeCategory$
     ]).pipe (
         map(([lists, filter, cancel, activeCategory]) => {
-          this.listSelected = [];
-          lists.forEach(l => {
-              this.listSelected.push(new Checker(l.id));
-            } );
+          this.iAmCheck$.next(this.listSelected);
           lists = lists.filter(
                 list =>
                   list.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
@@ -130,6 +135,15 @@ export class HomePage implements OnInit {
           return listList;
         })
     );
+
+    this.lists$.subscribe((larr) => {
+      this.listSelected = [];
+      larr.forEach(l => {
+        this.listSelected.push(new Checker(l.id));
+      });
+
+      this.listToDelAll = larr;
+    });
 
     this.listsShared$ = this.listService.listShare$;
     this.listsShared$.subscribe(ml => {
@@ -173,11 +187,10 @@ export class HomePage implements OnInit {
       setTimeout(() => {
         this.popUpService.hapticsImpact();
         this.longPressActive = true;
-        console.log('LONGPRESSS!');
         this.editing = 2;
         list.isChecked = true;
         this.addToDel(list);
-      }, 500);
+      }, 400);
     }
   }
 
@@ -263,19 +276,55 @@ export class HomePage implements OnInit {
     await this.listService.updateListName(u);
   }
 
-  addToDel(list: List){
-    if (this.listToAction.indexOf(list) !== -1){
-      this.listToAction = this.listToAction.filter(l => l !== list);
+  addToDel(list: List, overideSelectAll = false){
+    if (this.selectAll.checked && !overideSelectAll) {
+      this.noTrigger = true;
+      this.selectAll.checked = false;
+    }
+
+    if (this.listToAction.findIndex((l) => l.id === list.id) !== -1){
+      console.log(list);
+      this.listToAction = this.listToAction.filter(l => l.id !== list.id);
       return;
     }
     this.listSelected.find(l => l.id === list.id).isChecked = true;
+    this.iAmCheck$.next(this.listSelected);
     this.listToAction.push(list);
+  }
+
+  addToDelAll(ev) {
+    if (this.noTrigger){
+      this.noTrigger = false;
+      console.log('fuck');
+      return;
+    }
+    console.log('weh gros', this.selectAll.checked);
+    console.log('weh gros', ev.target.value);
+    if (this.selectAll.checked){
+      console.log('in true');
+
+      this.listToAction = [];
+      this.listToDelAll.forEach(l => { this.addToDel(l, true); });
+      // this.zone.run( () => {
+      this.listSelected.forEach(l => l.isChecked = true);
+      // });
+      return;
+    }
+
+    if (!this.selectAll.checked){
+      this.cancelSelect();
+    }
+  }
+
+  trackByIdx(index: number, obj: any): any {
+    return index;
   }
 
   async delSelect() {
     let msg = 'deleting ' + this.listToAction.length + ' list';
     if ( this.listToAction.length > 1) { msg = 'deleting ' + this.listToAction.length + ' lists'; }
     const loader = await this.popUpService.presentLoading(msg);
+    this.editing = 0;
     this.listToAction.forEach(list => {
         console.log('delete list ', list.name);
         this.delete(list);
@@ -337,6 +386,10 @@ export class HomePage implements OnInit {
     }
   }
   cancelSelect() {
+    if (this.selectAll.checked) {
+      this.noTrigger = true;
+      this.selectAll.checked = false;
+    }
     this.listSelected.forEach(l => l.isChecked = false);
     this.listToAction = [];
   }
@@ -362,9 +415,7 @@ export class HomePage implements OnInit {
     return this.listSelected[i].isChecked;
   }
 
-  addToDelAll() {
 
-  }
 
   async choiceCategory(){
     await this.catSelectRef.open();
@@ -375,6 +426,7 @@ export class HomePage implements OnInit {
     if (CatName === 'None'){ newcat = new Category('None'); }
 
     const loader = await this.popUpService.presentLoading('Add ' + this.listToAction.length + ' lists to ' + newcat.name);
+    this.editing = 0;
     for (const list of this.listToAction) {
       await this.uInfoService.addListToCategory(list.id, newcat).catch((err) => {
         loader.dismiss();

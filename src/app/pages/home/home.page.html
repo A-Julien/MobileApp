@@ -3,13 +3,13 @@
     <ion-buttons [hidden]="exSearch || editing" slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
       <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
-      <ion-checkbox *ngIf="editing === 2" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
+      <ion-checkbox *ngIf="editing === 2" slot="start" (ionChange)="addToDelAll($event)" ></ion-checkbox>
     </ion-buttons>
     <ion-item *ngIf="editing == 1"><ion-label color="primary">Rename several lists</ion-label></ion-item>
     <ion-item *ngIf="editing == 2"><ion-label color="primary">Select multiple</ion-label></ion-item>
     <ion-item *ngIf="editing == 3"><ion-label color="primary">Delete multiple</ion-label></ion-item>
-    <ion-buttons  *ngIf="editing === 2" slot="start">
-         <ion-checkbox style="margin-left: 20px;" slot="start" (ionChange)="addToDelAll()" ></ion-checkbox>
+    <ion-buttons [hidden]="editing < 1"  slot="start">
+         <ion-checkbox #selectAll style="margin-left: 20px;" slot="start" (ionChange)="addToDelAll($event)" ></ion-checkbox>
     </ion-buttons>
 
     <ion-buttons *ngIf="!exSearch" slot="end">
@@ -41,11 +41,12 @@
     <ion-searchbar animated="true" [hidden]="editing" #searchBar  (focusout)="unExpendSearch()" (focusin)="expendSearch()" mode="ios"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
+<!---------------------------------------------- LOADER --------------------------------------------------------->
 
 <ion-content [fullscreen]="true" *ngIf="showLoading">
   <app-loading></app-loading>
 </ion-content>
-
+<!---------------------------------------------- BODY --------------------------------------------------------->
 <ion-content [fullscreen]="true" *ngIf="!showLoading" class="modal-wrapper">
   <ion-item *ngIf="(uInfoService.activeCategory$ | async)?.name !== 'None' && editing === 0" color="primary">
     <ion-icon name="folder-open-outline"></ion-icon>
@@ -53,11 +54,11 @@
   </ion-item>
   <ion-list >
     <ion-reorder-group [disabled]="true" (ionItemReorder)="doReorder($event)">
-      <ion-item-sliding  *ngFor="let list of lists$ | async" #slidingItem >
+      <ion-item-sliding  *ngFor="let list of lists$ | async; let i = index;trackBy:trackByIdx" #slidingItem >
 
         <ion-item  button (press)="longPress($event, list)" (click)="ItemLongPress($event, list)">
           <ion-icon [hidden]="editing !== 1" size="small" name="pencil-outline"></ion-icon>
-          <ion-checkbox *ngIf="editing === 2 || editing === 3" [ngModel]="iAmCheck(list.id)" slot="start" ></ion-checkbox>
+          <ion-checkbox #theCheck *ngIf="editing === 2 || editing === 3" [(ngModel)]="listSelected[i].isChecked" slot="start" ></ion-checkbox>
           <ion-label *ngIf="editing !== 1" >{{ list.name }}</ion-label>
           <ion-icon slot="start" *ngIf="list.type == 1 && editing === 0" name="checkmark-done-outline"></ion-icon>
           <ion-icon slot="start" *ngIf="list.type == 0 && editing === 0" name="clipboard-outline"></ion-icon>

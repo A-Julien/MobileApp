@@ -164,6 +164,10 @@ export class UserInfoService {
     });
   }
 
+  refreshCategory(){
+    this.setActiveCategory(this.activeCategory);
+  }
+
   setActiveCategory(caterogy: Category){
     if (!caterogy.lists) {caterogy.lists = []; }
     this.activeCategory$.next(caterogy);

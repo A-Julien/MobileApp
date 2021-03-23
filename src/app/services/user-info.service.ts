@@ -135,7 +135,7 @@ export class UserInfoService {
 
   public removeCategory(category: Category){
     this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES).doc(category.id).delete()
-        .then(() => this.popupService.presentToast('list ' + category.name + ' removed', 1000))
+        .then(() => this.popupService.presentToast('Category ' + category.name + ' removed', 1500))
         .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + category.name));
   }
 

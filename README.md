@@ -90,7 +90,40 @@ But it will be less accurate and longer !
 
 ### Security configuration
 
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
 
+      allow read, write : if request.auth != null;
+
+    // Match any document in the List collection
+      match /List/{listId} {
+            allow read, write: if
+          request.auth.uid == resource.data.owner
+        || (request.auth.token.email in resource.data.owners);
+      match /todos/{todoId} {
+          allow read, write: if 
+            request.auth.token.email in get(/databases/$(database)/documents/List/$(listId)).data.owners;
+      }
+      allow create;
+      }
+
+    // Match any document in the Share collection
+      match /Share/{shareId} {
+            allow read, write: if 
+          request.auth.token.email == resource.data.newOwner;
+      }
+
+    // Match any document in the UserInfo collection
+      match /UserInfo/{settingId} {
+            allow read, write: if 
+          request.auth.uid == resource.data.userUid;
+      }
+
+  }
+}
+```
 
 
 <!-- GETTING STARTED -->

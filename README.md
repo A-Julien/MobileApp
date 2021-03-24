@@ -34,7 +34,16 @@ A simple todo list App with O.C.R support
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#manage-categories">Manage Categories</a></li>
+        <li><a href="#type-of-list">Type of List</a></li>
+        <li><a href="#ocr">Ocr</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#firebase">Firebase</a>
+      <ul>
+        <li><a href="#collections">Collections</a></li>
+        <li><a href="#security-configuration">Security configuration</a></li>
       </ul>
     </li>
     <li>

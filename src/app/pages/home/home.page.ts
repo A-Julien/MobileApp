@@ -163,10 +163,10 @@ export class HomePage implements OnInit, OnDestroy {
     }
     console.log(list);
     switch (list.type) {
-      case 0:
+      case ListType.note:
         this.routeToList(list.id);
         break;
-      case 1:
+      case ListType.todo:
         this.routeToTodos(list.id);
         break;
       default:

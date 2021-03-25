@@ -145,7 +145,7 @@ export class HomePage implements OnInit {
       this.listToDelAll = larr;
     });
 
-    this.listsShared$ = this.listService.listShare$;
+    this.listsShared$ = this.listService.listShare;
     this.listsShared$.subscribe(ml => {
       this.metalist = ml;
       this.nbNotif = 0;

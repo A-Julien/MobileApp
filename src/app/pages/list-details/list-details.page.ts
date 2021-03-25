@@ -105,7 +105,7 @@ export class ListDetailsPage implements OnInit {
       this.todoToDelAll = to;
     });
 
-    this.listService.listShare$.subscribe(data => {
+    this.listService.listShare.subscribe(data => {
       data.forEach(d => {
         if (d.listID === this.listID && d.newOwner === this.auth.userEmail && !d.notify){
           this.listService.removedNotyficationShared(d);
@@ -114,7 +114,7 @@ export class ListDetailsPage implements OnInit {
       });
     });
 
-    this.listService.listShare$.subscribe(data => {
+    this.listService.listShare.subscribe(data => {
       data.forEach(d => {
         if (!d.notify && d.newOwner === this.auth.userEmail){this.nbNotif += 1; }
       });

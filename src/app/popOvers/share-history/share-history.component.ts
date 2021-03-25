@@ -24,7 +24,7 @@ export class ShareHistoryComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.listsShared$ = this.listService.listShare$;
+    this.listsShared$ = this.listService.listShare;
     this.listsShared$.subscribe(ml => this.noSharing = ml.length === 0 || !ml);
   }
 

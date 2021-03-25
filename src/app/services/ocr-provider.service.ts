@@ -28,8 +28,6 @@ export class OcrProviderService {
       langPath: '/assets/lang-data',
       corePath: '/assets/lib/tesseract-core.wasm.js',
       logger: m => console.log(m),
-      /*langPath: '../../assets/lang-data',
-      logger: m => console.log(m), // Add logger here*/
      });
 
     this.worker2 = createWorker({
@@ -37,8 +35,6 @@ export class OcrProviderService {
       langPath: '/assets/lang-data',
       corePath: '/assets/lib/tesseract-core.wasm.js',
       logger: m => console.log(m),
-      /*langPath: '../../assets/lang-data',
-      logger: m => console.log(m), // Add logger here*/
     });
 }
 

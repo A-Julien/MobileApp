@@ -21,8 +21,9 @@ export class ListService {
 
   private listCollection: AngularFirestoreCollection<List>;
   private sharingCollection: AngularFirestoreCollection<MetaList>;
-  // tslint:disable-next-line:variable-name
-  // tslint:disable-next-line:variable-name
+
+  public readonly _listes$: Observable<List[]>;
+  public readonly _listShare$: Observable<MetaList[]>;
 
   constructor(private afs: AngularFirestore,
               private auth: AuthenticationService,
@@ -33,23 +34,27 @@ export class ListService {
 
     this.sharingCollection = this.afs.collection(this.SHARECOLLECTION);
 
-  }
-
-  get listShare$(): Observable<MetaList[]> {
-    return this.auth.u$.pipe(
-        switchMap(user => user ? this.afs.collection(this.SHARECOLLECTION,
-                ref => ref.where('newOwner', '==', user.email)).snapshotChanges() : of([])),
+    this._listes$ = this.auth.u$.pipe(
+        tap(console.log),
+        switchMap(user => user ? this.afs.collection(this.LISTCOLLECTION, ref => ref.where('owners', 'array-contains-any',
+            [user.email, user.uid])).snapshotChanges() : of([])),
         map(actions => this.convertSnapData<List>(actions))
     );
+
+    this._listShare$ = this.auth.u$.pipe(
+        switchMap(user => user ? this.afs.collection(this.SHARECOLLECTION,
+            ref => ref.where('newOwner', '==', user.email)).snapshotChanges() : of([])),
+        map(actions => this.convertSnapData<List>(actions))
+    );
+
+  }
+
+  get listShare(): Observable<MetaList[]> {
+    return this._listShare$;
   }
 
    get lists(): Observable<List[]> {
-     return this.auth.u$.pipe(
-         tap(console.log),
-         switchMap(user => user ? this.afs.collection(this.LISTCOLLECTION, ref => ref.where('owners', 'array-contains-any',
-             [user.email, user.uid])).snapshotChanges() : of([])),
-         map(actions => this.convertSnapData<List>(actions))
-     );
+     return this._listes$;
   }
 
   private convertSnapData<T>(datas){
@@ -97,7 +102,6 @@ export class ListService {
   }
 
   public shareList(list: List, userEmail: string): Promise<any> {
-    console.log(list.id, '  ', userEmail);
     if (list.owner !== this.auth.userId) {
       this.popupService.presentToast('can not share a list that don\'t belong to you');
       return;
@@ -140,8 +144,9 @@ export class ListService {
     this.removedSharedList(list.id);
   }
 
+  // TODO OMG DOESNOT WORK
   private removedSharedList(listID: string){
-    this.listShare$.subscribe((sl) => {
+    this.listShare.subscribe((sl) => {
       sl.forEach((l) => {
         if (l.listID === listID) { this.sharingCollection.doc(l.id).delete(); }
       });
@@ -154,21 +159,15 @@ export class ListService {
   }
 
   public async removeSharedUser(userEmailToRm: string, list: List) {
-    if (userEmailToRm === this.auth.userEmail){
-      console.log('nope');
-      return;
-    }
-    if (list.owner !== this.auth.userId) {
-      console.log('nope');
-      return;
-    }
+    if (userEmailToRm === this.auth.userEmail){ return; }
+    if (list.owner !== this.auth.userId) { return; }
 
     list.owners = list.owners.filter(u => u !== userEmailToRm);
     if (list.owners.length === 1) { list.share = false; }
 
-    this.updateList(list);
-
-    this.listShare$.subscribe((sl) => {
+    await this.updateList(list);
+    // TODO OMG NO SUB
+    this.listShare.subscribe((sl) => {
     sl.forEach((l) => {
         if (l.newOwner === userEmailToRm && l.listID === list.id) {
           this.sharingCollection.doc(l.id).delete();

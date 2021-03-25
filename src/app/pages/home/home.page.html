@@ -67,7 +67,7 @@
           <ion-input *ngIf="editing === 1" [(ngModel)]="list.name" (ngModelChange)="addToUpdateListName(list)"></ion-input>
 
           <ion-badge slot="end" color="danger" *ngIf="isNewList(list.id) && !editing">new</ion-badge>
-          <ion-badge slot="end" color="primary" *ngIf="list.share && !editing">shared</ion-badge>
+          <ion-badge slot="end" color="primary" *ngIf="list.share">shared</ion-badge>
           <ion-reorder slot="end"></ion-reorder>
         </ion-item>
 

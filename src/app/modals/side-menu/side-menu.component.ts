@@ -61,7 +61,7 @@ export class SideMenuComponent implements OnInit {
           this.currentUs = us;
         }
     );
-    const listsShared = this.listService.listShare$;
+    const listsShared = this.listService.listShare;
 
     listsShared?.subscribe(ml => {
       this.nbNotif = 0;

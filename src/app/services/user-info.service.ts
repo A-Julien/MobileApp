@@ -1,19 +1,17 @@
-import { Injectable } from '@angular/core';
+import {Injectable, OnDestroy} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subscription} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 import {uInfoToFirebase, UserInfo} from '../models/userinfo';
 import firebase from 'firebase';
-import {List} from '../models/list';
 import {Category, catToFirebase} from '../models/category';
-import {Todo} from '../models/todo';
 import {PopupService} from './popup.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserInfoService {
+export class UserInfoService implements OnDestroy{
 
   private readonly USERINFOCOLLECTION = '/UserInfo';
   private readonly USERINFOCATEGORIES = 'Categories';
@@ -21,12 +19,10 @@ export class UserInfoService {
 
   private activeCategory: Category;
 
-  // tslint:disable-next-line:variable-name
   private _userInfo: UserInfo;
-  // tslint:disable-next-line:variable-name
   private _userInfoOb$: Observable<UserInfo>;
-  // tslint:disable-next-line:variable-name
   private _userCat$: Observable<Category[]>;
+  private authSub: Subscription;
   private uInfoId: string;
   public activeCategory$ = new BehaviorSubject<Category>(null);
 
@@ -39,6 +35,7 @@ export class UserInfoService {
     this.activeCategory$.subscribe( cat => this.activeCategory = cat);
 
     this.uInfoCollection = this.afs.collection(this.USERINFOCOLLECTION);
+
     this._userInfoOb$ =  this.auth.authState.pipe(
         switchMap(user => user ?
             this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', user.uid)).snapshotChanges() : of([])),
@@ -54,7 +51,7 @@ export class UserInfoService {
         map(actions => this.convertSnapUfin<Category>(actions))
     );
 
-    this.auth.authState.subscribe( user => {
+    this.authSub = this.auth.authState.subscribe( user => {
       if (user){
         this.activeCategory$.next(new Category('None'));
       }
@@ -78,9 +75,7 @@ export class UserInfoService {
     return this._userInfoOb$;
   }
 
-  async uSexist(userUid: string) {
-    console.log('EXIST USER', userUid);
-
+  async uSexist(userUid: string): Promise<void> {
     const uinf = async () => {
       const col = this.afs.collection(this.USERINFOCOLLECTION, ref => ref.where('userUid', '==', userUid));
       let uSnaps = await col.get().toPromise();
@@ -97,11 +92,11 @@ export class UserInfoService {
     await uinf();
   }
 
-  public async addCategory(cat: Category){
+  public async addCategory(cat: Category): Promise<firebase.firestore.DocumentReference<Category>>{
     return  this.uInfoCollection.doc(this.uInfoId).collection('Categories').ref.withConverter(catToFirebase).add(cat);
   }
 
-  public async addListToCategory(listId: string, category: Category){
+  public async addListToCategory(listId: string, category: Category): Promise<void>{
     const rmCat = async () => {
       const col = this.uInfoCollection.doc(this.uInfoId)
           .collection(this.USERINFOCATEGORIES, ref => ref.where('lists', 'array-contains-any', [listId]));
@@ -120,7 +115,7 @@ export class UserInfoService {
     return this.updateListToCategory(listId, category);
   }
 
-  public async updateListToCategory(listId: string, category: Category){
+  public async updateListToCategory(listId: string, category: Category): Promise<void>{
     if (!category.lists) { category.lists = []; }
     category.lists.push(listId);
 
@@ -133,8 +128,8 @@ export class UserInfoService {
     return this.uInfoCollection.doc(userInfo.id).ref.withConverter(uInfoToFirebase).set(userInfo);
   }
 
-  public removeCategory(category: Category){
-    this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES).doc(category.id).delete()
+  public removeCategory(category: Category): Promise<void>{
+    return this.uInfoCollection.doc(this.uInfoId).collection(this.USERINFOCATEGORIES).doc(category.id).delete()
         .then(() => this.popupService.presentToast('Category ' + category.name + ' removed', 1500))
         .catch(() => this.popupService.presentAlert('An error was occurred can not delete ' + category.name));
   }
@@ -171,5 +166,9 @@ export class UserInfoService {
   setActiveCategory(caterogy: Category){
     if (!caterogy.lists) {caterogy.lists = []; }
     this.activeCategory$.next(caterogy);
+  }
+
+  ngOnDestroy(){
+    this.authSub.unsubscribe();
   }
 }

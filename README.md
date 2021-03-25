@@ -34,7 +34,16 @@ A simple todo list App with O.C.R support
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#manage-categories">Manage Categories</a></li>
+        <li><a href="#type-of-list">Type of List</a></li>
+        <li><a href="#ocr">Ocr</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#firebase">Firebase</a>
+      <ul>
+        <li><a href="#collections">Collections</a></li>
+        <li><a href="#security-configuration">Security configuration</a></li>
       </ul>
     </li>
     <li>
@@ -90,7 +99,40 @@ But it will be less accurate and longer !
 
 ### Security configuration
 
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
 
+      allow read, write : if request.auth != null;
+
+    // Match any document in the List collection
+      match /List/{listId} {
+            allow read, write: if
+          request.auth.uid == resource.data.owner
+        || (request.auth.token.email in resource.data.owners);
+      match /todos/{todoId} {
+          allow read, write: if 
+            request.auth.token.email in get(/databases/$(database)/documents/List/$(listId)).data.owners;
+      }
+      allow create;
+      }
+
+    // Match any document in the Share collection
+      match /Share/{shareId} {
+            allow read, write: if 
+          request.auth.token.email == resource.data.newOwner;
+      }
+
+    // Match any document in the UserInfo collection
+      match /UserInfo/{settingId} {
+            allow read, write: if 
+          request.auth.uid == resource.data.userUid;
+      }
+
+  }
+}
+```
 
 
 <!-- GETTING STARTED -->

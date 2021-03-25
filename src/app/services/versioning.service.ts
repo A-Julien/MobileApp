@@ -29,7 +29,6 @@ export class VersioningService {
       owner: this.owner,
       repo: this.repo
     });
-    /*const e =  JSON.parse(t.toString());*/
     this.newTag = res[0].tag_name;
     if (this.detectNewRelease(this.newTag)){
       console.log(res[0].tag_name);

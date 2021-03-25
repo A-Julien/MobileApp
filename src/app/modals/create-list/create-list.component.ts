@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { List, ListType } from '../../models/list';
 import { ListService } from '../../services/list.service';
@@ -7,17 +7,20 @@ import {UserInfoService} from '../../services/user-info.service';
 import {Router} from '@angular/router';
 import {PopupService} from '../../services/popup.service';
 import {Category} from '../../models/category';
+import {Subscription} from 'rxjs';
+
 
 @Component({
   selector: 'app-create-list',
   templateUrl: './create-list.component.html',
   styleUrls: ['./create-list.component.scss'],
 })
-export class CreateListComponent implements OnInit {
+export class CreateListComponent implements OnInit, OnDestroy {
 
   newListForm: FormGroup;
   type: ListType.todo;
   activeCategory: Category;
+  private catSub: Subscription;
 
   constructor(private modalController: ModalController,
               private formBuilder: FormBuilder,
@@ -28,7 +31,7 @@ export class CreateListComponent implements OnInit {
   }
 
   ngOnInit(){
-    this.uInfoService.activeCategory$.subscribe( cat => this.activeCategory = cat);
+    this.catSub = this.uInfoService.activeCategory$.subscribe( cat => this.activeCategory = cat);
 
     this.newListForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -52,7 +55,7 @@ export class CreateListComponent implements OnInit {
           await loader.dismiss();
           await this.popupService.presentAlert('error when created ' + this.newListForm.get('name').value);
       });
-      if (l) { await this.popupService.presentToast(this.newListForm.get('name').value + 'create', 1000); }
+      if (l) { await this.popupService.presentToast(this.newListForm.get('name').value + ' created', 1000); }
       else {
         await loader.dismiss();
         await this.popupService.presentAlert('error when created ' + this.newListForm.get('name').value);
@@ -87,4 +90,8 @@ export class CreateListComponent implements OnInit {
     return this.newListForm.controls;
   }
 
+  ngOnDestroy() {
+    console.log('destroy');
+    this.catSub.unsubscribe();
+  }
 }

@@ -16,7 +16,7 @@ export class List {
     share: boolean;
     owners: string[];
 
-    type: ListType;
+    type: number;
 
     isChecked = false;
 
@@ -26,7 +26,12 @@ export class List {
         this.todos = [];
         this.owners = [];
         this.share = false;
-        this.type = type;
+        if (type === ListType.todo) {
+            this.type = 1;
+        } else {
+            this.type = 0;
+        }
+
     }
 }
 

@@ -1,4 +1,4 @@
-import {Component, NgZone, OnInit, ViewChild} from '@angular/core';
+import {Component, NgZone, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {
   AlertController,
   ModalController,
@@ -9,12 +9,12 @@ import {
 } from '@ionic/angular';
 import { CreateListComponent } from '../../modals/create-list/create-list.component';
 import { ListService} from '../../services/list.service';
-import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, Subscription} from 'rxjs';
 import {PopupService} from '../../services/popup.service';
 import {Checker, List, ListType} from '../../models/list';
 import {ManageSharingComponent} from '../../modals/manage-sharing/manage-sharing.component';
 import {AuthenticationService} from '../../services/authentification.service';
-import { map, startWith } from 'rxjs/operators';
+import {map, startWith, tap} from 'rxjs/operators';
 import {MetaList} from '../../models/metaList';
 import {PhotoService} from '../../services/photo.service';
 import {Router} from '@angular/router';
@@ -26,14 +26,14 @@ import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
 import {Category} from '../../models/category';
 import set = Reflect.set;
-import {VersioningService} from "../../services/versioning.service";
+import {VersioningService} from '../../services/versioning.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
 
   @ViewChild('catSelect') catSelectRef: IonSelect;
 
@@ -64,6 +64,8 @@ export class HomePage implements OnInit {
   private listToDelAll: List[];
   private noTrigger = false;
 
+  private loaderSub: Subscription;
+
   iAmCheck$ = new BehaviorSubject<Checker[]>(null);
 
   constructor(private listService: ListService,
@@ -93,18 +95,15 @@ export class HomePage implements OnInit {
     );
 
     this.userInfo$ = this.uInfoService.userInfoOb$.pipe(
+      tap(uInfo =>
+          this.categories = uInfo?.categories
+      ),
       map(usrInf => {
         usrInf.categories = usrInf.categories.filter( cat => cat !== 'None');
         usrInf.categories.unshift('None');
         return usrInf;
       })
     );
-
-
-    this.uInfoService.userInfoOb$.subscribe( uInfo =>
-      this.categories = uInfo?.categories
-    );
-
 
     const searchFilter$ = this.searchBar.ionChange.pipe(
         map(event => (event.target as HTMLInputElement).value),
@@ -131,32 +130,30 @@ export class HomePage implements OnInit {
             return a.name < b.name ? -1 : 1;
           });
           return listList;
+        }),
+        tap((larr) => {
+          this.listSelected = [];
+          larr.forEach(l => {
+            this.listSelected.push(new Checker(l.id));
+          });
+
+          this.listToDelAll = larr;
         })
     );
 
-    this.lists$.subscribe((larr) => {
-      this.listSelected = [];
-      larr.forEach(l => {
-        this.listSelected.push(new Checker(l.id));
-      });
+    this.loaderSub = this.lists$.subscribe(() => this.showLoading = false);
 
-      this.listToDelAll = larr;
-    });
-
-    this.listsShared$ = this.listService.listShare;
-    this.listsShared$.subscribe(ml => {
-      this.metalist = ml;
-      this.nbNotif = 0;
-      ml.forEach(meta => {
-        if (!meta.notify && meta.newOwner === this.auth.userEmail){
-          this.nbNotif += 1;
-        }
-      });
-    });
-
-    this.lists$?.subscribe(() => {
-      this.showLoading = false;
-    });
+    this.listsShared$ = this.listService.listShare.pipe(
+        tap(ml => {
+          this.metalist = ml;
+          this.nbNotif = 0;
+          ml.forEach(meta => {
+            if (!meta.notify && meta.newOwner === this.auth.userEmail){
+              this.nbNotif += 1;
+            }
+          });
+        })
+    );
   }
 
   ItemLongPress(ev, list: List){
@@ -166,10 +163,10 @@ export class HomePage implements OnInit {
     }
     console.log(list);
     switch (list.type) {
-      case ListType.note:
+      case 0:
         this.routeToList(list.id);
         break;
-      case ListType.todo:
+      case 1:
         this.routeToTodos(list.id);
         break;
       default:
@@ -431,6 +428,11 @@ export class HomePage implements OnInit {
     }
     this.cancelEdit();
     await loader.dismiss();
+  }
+
+  ngOnDestroy() {
+    console.log('je DESTROYED');
+    this.loaderSub.unsubscribe();
   }
 }
 

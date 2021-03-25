@@ -6,6 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {registerWebPlugin} from '@capacitor/core';
 import {FacebookLogin} from '@capacitor-community/facebook-login';
 import {MenuGuardService} from './services/menu-guard.service';
+import {VersioningService} from "./services/versioning.service";
 
 @Component({
     selector: 'app-root',
@@ -18,7 +19,8 @@ export class AppComponent {
         private splashScreen: SplashScreen,
         private statusBar: StatusBar,
         private popoverControler: PopoverController,
-        private menuGuardService: MenuGuardService
+        private menuGuardService: MenuGuardService,
+        private version: VersioningService
     ) {
         this.initializeApp();
         registerWebPlugin(FacebookLogin);

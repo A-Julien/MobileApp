@@ -15,6 +15,7 @@ import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
 import {Category} from '../../models/category';
 import {RmCatComponent} from '../../popOvers/rm-cat/rm-cat.component';
+import {VersioningService} from "../../services/versioning.service";
 
 @Component({
   selector: 'app-side-menu',
@@ -26,7 +27,6 @@ export class SideMenuComponent implements OnInit {
   user$: Observable<firebase.User>;
   userInfo$: Observable<UserInfo>;
   userCat$: Observable<Category[]>;
-  readonly version = '0.9.5';
   forceOCR: boolean;
   private currentUs: USettings;
   private longPressActive = false;
@@ -44,7 +44,8 @@ export class SideMenuComponent implements OnInit {
       public popupService: PopupService,
       private popOverController: PopoverController,
       private uInfoService: UserInfoService,
-      private menuCtrl: MenuController
+      private menuCtrl: MenuController,
+      public version: VersioningService
   ) {
     this.newCategory = '';
     this.user$ = this.authService.authState;

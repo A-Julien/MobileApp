@@ -26,6 +26,7 @@ import {UserInfoService} from '../../services/user-info.service';
 import {UserInfo} from '../../models/userinfo';
 import {Category} from '../../models/category';
 import set = Reflect.set;
+import {VersioningService} from "../../services/versioning.service";
 
 @Component({
   selector: 'app-home',
@@ -74,8 +75,7 @@ export class HomePage implements OnInit {
               private popOverController: PopoverController,
               private router: Router,
               public uInfoService: UserInfoService,
-              private alertCtrl: AlertController,
-              private zone: NgZone
+              public version: VersioningService
 
   ){
     this.nbNotif = 0;
@@ -83,8 +83,6 @@ export class HomePage implements OnInit {
     this.listToUpdateName = [];
     this.listSelected = [];
   }
-
-
 
   ngOnInit(): void {
     this.userCat$ = this.uInfoService.userCat$.pipe(

@@ -81,11 +81,13 @@
     <ion-icon (click)="openInsta()" name="logo-instagram"></ion-icon>
     <ion-icon (click)="openFb()" name="logo-facebook"></ion-icon>
     <ion-icon (click)="sendMail()" name="mail-outline"></ion-icon>
-    <ion-icon (click)="openGithub()" name="logo-github"></ion-icon>
+    <ion-badge class="badge-one-update" *ngIf="(version.newVersion$ | async) > 0" color="danger">update</ion-badge>
+    <ion-icon *ngIf="(version.newVersion$ | async) > 0" (click)="version.getNewVersion()" name="cloud-download-outline"></ion-icon>
+    <ion-icon *ngIf="(version.newVersion$ | async) === 0" (click)="openGithub()" name="logo-github"></ion-icon>
   </div>
 
   <div class="footer-app-version">
-    Version v{{ version }}
+    Version v{{ version.version }}
   </div>
 
 </ion-footer>

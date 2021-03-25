@@ -2,7 +2,8 @@
   <ion-toolbar>
     <ion-buttons [hidden]="exSearch || editing" slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
-      <ion-badge *ngIf="nbNotif > 0" [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif }}</ion-badge>
+      <ion-badge *ngIf="nbNotif > 0 || (version.newVersion$ | async) > 0"
+                 [class.badge-one]="nbNotif < 10" [class.badge-two]="nbNotif >= 10"  color="danger">{{ nbNotif + (version.newVersion$ | async) }}</ion-badge>
       <ion-checkbox *ngIf="editing === 2" slot="start" (ionChange)="addToDelAll($event)" ></ion-checkbox>
     </ion-buttons>
     <ion-item *ngIf="editing == 1"><ion-label color="primary">Rename several lists</ion-label></ion-item>

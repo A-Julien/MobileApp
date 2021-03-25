@@ -9,6 +9,17 @@
   padding-bottom: var(--ion-safe-area-bottom);
   --border-style: none;
 }
+
+.badge-one-update {
+  position: absolute;
+  top: 166px;
+  right: 2px;
+  font-size: 0.4em;
+  --padding-start: 5px;
+  --padding-end: 5px;
+  z-index: 10;
+}
+
 .ion-list-padding{
   padding: 0;
 }
